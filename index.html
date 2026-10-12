@@ -239,7 +239,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
 .tm-empty{padding:6px 0;font-size:15px;color:var(--paper-faint)}
 .tm-note{margin:12px 2px 0;font-size:14px;line-height:1.35;color:var(--paper-faint)}
 .tm-link{display:block;margin:4px auto 0;padding:8px 12px;font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--paper-faint)}
-.tm-list{display:grid}
+.tm-list{display:grid;grid-template-columns:minmax(0,1fr)}
 .code{display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:5px 5px 5px 12px;border-radius:10px;background:var(--seam);font-family:var(--display);font-size:21px;letter-spacing:.14em;color:var(--signal)}
 .mem,.rank{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .mem:last-child,.rank:last-child{border-bottom:0}
@@ -273,6 +273,63 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
 @keyframes toastIn{from{transform:translateY(-6px);opacity:0}}
 .acct{min-height:1.2em;font-size:13.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--paper-dim)}
 .leave-btn{flex:none;height:36px;padding:0 12px;border-radius:10px;background:var(--panel-hi);color:var(--paper);font-weight:800;font-size:14px;letter-spacing:.1em;box-shadow:inset 0 -2px 0 rgba(0,0,0,.35)}
+/* Teams on the game server: badges, ranks, search, profiles, forms, the pop-up sheet */
+.ov.pop{z-index:9;align-items:flex-end;padding:0}
+.pop-panel{max-height:92%}
+.badge{--bs:40px;flex:none;width:var(--bs);height:var(--bs);border-radius:calc(var(--bs)*.3);display:grid;place-items:center;font-style:normal;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 0 2px var(--seam)}
+.badge svg{width:62%;height:62%;fill:#1a0f0a}
+.rchip{flex:none;padding:3px 7px;border-radius:7px;font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--panel-lo);color:var(--paper-dim);white-space:nowrap}
+.rchip.r4{background:var(--molten);color:var(--hazard-ink)}
+.rchip.r3{background:#16404e;color:var(--signal)}
+.rchip.r2{background:#20402a;color:var(--ok)}
+.tap{cursor:pointer}
+.rank.tap:active,.mem.tap:active,.msg.tap:active{filter:brightness(1.15)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{height:32px;padding:0 12px;border-radius:16px;background:var(--panel-lo);color:var(--paper-dim);font-weight:700;font-size:14px;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1)}
+.chip.on{background:var(--paper);color:var(--seam);box-shadow:none}
+.tm-select{appearance:none;-webkit-appearance:none;padding-right:30px;background:var(--seam) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23bfab95' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 11px center/12px 8px}
+.chip-sel{flex:0 1 auto;width:auto;max-width:170px;height:32px;border-radius:16px;font-size:14px;padding-left:12px}
+.tm-area{height:auto;min-height:64px;padding:10px 12px;resize:vertical;line-height:1.3}
+.tm-card>.tm-input,.tm-card>.tm-select,.tm-card>.tm-area{display:block;width:100%;margin-top:10px}
+.tm-row.two>*{flex:1 1 0}
+.tm-row.wrap{flex-wrap:wrap}
+.tm-h.gap{margin-top:14px}
+.prof-top{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.tagline{font-family:var(--display);font-size:13.5px;letter-spacing:.1em;color:var(--signal)}
+.prof-desc{margin:4px 0 10px;font-size:16px;line-height:1.35;overflow-wrap:anywhere}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px;margin:6px 0 10px}
+.fact{padding:8px 10px;border-radius:10px;background:var(--panel-hi)}
+.fact b{display:block;font-size:16px;font-weight:800;overflow-wrap:anywhere}
+.fact span{display:block;margin-top:2px;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--paper-faint)}
+.ann{margin-top:8px;padding:8px 10px;border-radius:10px;background:#33291a;box-shadow:inset 3px 0 0 #ffd34d;font-size:15px;line-height:1.3;overflow-wrap:anywhere;-webkit-user-select:text;user-select:text}
+.ann span{color:var(--paper-faint);font-size:13.5px}
+.ann.pinned{position:sticky;top:0;z-index:1;margin:0 0 4px;flex:none}
+.req{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.req:last-child{border-bottom:0}
+.req-msg{margin-top:3px;font-size:14.5px;font-style:italic;overflow-wrap:anywhere}
+.look-row{display:flex;gap:12px;align-items:flex-start}
+.badge-grid{flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px}
+.bpick{display:grid;place-items:center;padding:4px 0;border-radius:10px;background:var(--panel-lo)}
+.bpick .badge{box-shadow:none}
+.bpick.on{box-shadow:inset 0 0 0 2px var(--paper)}
+.swatches{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+.sw{width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(0,0,0,.25)}
+.sw.on{box-shadow:0 0 0 3px var(--panel-hi),0 0 0 5px var(--paper)}
+.seg{display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--seam);margin-bottom:6px}
+.seg-b{flex:1;height:38px;border-radius:9px;font-weight:800;font-size:14.5px;color:var(--paper-dim)}
+.seg-b.on{background:var(--panel-hi);color:var(--paper);box-shadow:inset 0 -2px 0 var(--molten)}
+.check{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:14.5px;line-height:1.3;color:var(--paper-dim);font-weight:600}
+.check input{flex:none;width:20px;height:20px;margin:0;accent-color:var(--molten)}
+.linkbox{margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--seam);font-size:14px;color:var(--signal);overflow-wrap:anywhere;-webkit-user-select:all;user-select:all}
+.tm-btn.danger,.tm-btn.armed{background:var(--danger);color:#2a0703}
+.tm-link.danger-link{color:var(--danger)}
+.tm-link.dim{opacity:.5}
+.saved-chip{flex:none;padding:3px 8px;border-radius:7px;font-size:12px;font-weight:800;letter-spacing:.1em;background:#20402a;color:var(--ok)}
+.code-in{font-size:24px;letter-spacing:.3em;text-align:center}
+.choose .kv{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:15px;color:var(--paper-dim)}
+.choose .kv b{color:var(--paper);text-align:right;overflow-wrap:anywhere}
+.msg-act{display:flex;gap:6px;margin-top:6px}
+.acct-card .mem{padding-top:0}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 
@@ -400,6 +457,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
         <form id="chatForm" class="chat-form" autocomplete="off"><input id="chatInput" class="tm-input" maxlength="160" placeholder="Message your crew" enterkeyhint="send"><button id="chatSend" class="tm-btn" type="submit">SEND</button></form>
       </div>
       <div id="pane-ranks" role="tabpanel" hidden><div class="tm-h">Race to the signal · 6,371 km</div><div id="rankList" class="tm-list"></div></div>
+    </div>
+  </div>
+
+  <div id="ovPop" class="ov pop" hidden>
+    <div class="panel pop-panel" role="dialog" aria-modal="true" aria-labelledby="popTitle">
+      <div class="panel-head"><h2 id="popTitle"></h2><button id="popClose" class="close-btn" type="button" aria-label="Close"></button></div>
+      <div id="popBody"></div>
     </div>
   </div>
 
@@ -572,7 +636,7 @@ const SAVE_KEY='groundbreaking-freedig-v1';
 const freshState=()=>({seed:(Math.random()*4294967296)>>>0,L:1,coins:0,owned:{shovel:true,pickaxe:true},dyn:0,seen:{},tune:Object.assign({},TUNE_DEFAULT),muted:false,tool:'shovel',best:1,x:null,at:0});
 let state=freshState();
 function saveData(){return{seed:state.seed,L:state.L,coins:state.coins,owned:state.owned,dyn:state.dyn,seen:state.seen,tune:state.tune,muted:state.muted,tool:state.tool,best:state.best,x:myX(),at:state.at};}
-function save(){state.at=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(saveData()));}catch(e){}netSaveSoon();}
+function save(){if(netNoSave)return;state.at=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(saveData()));}catch(e){}netSaveSoon();}
 function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 function applySave(d){
   if(!d||typeof d!=='object'||typeof d.seed!=='number')return false;
@@ -2381,8 +2445,9 @@ function drawIceRing(p,t){
 // and fires the same events. The team rules (seam spacing and toughness, hit power, raid limits) live here so both
 // backends agree; on Supabase the server also enforces them and its game_config row overrides the limits below.
 let TEAM_MAX=20,RAID_COST=150,RAID_COOLDOWN=10*60e3,RAID_SHIELD=30*60e3;const RAID_MAXAGE=6*3600e3,RAID_MOLES=6;
-const NET={on:false,mode:'solo',uid:null,me:null,readOnly:false,serverAuth:false,api:null,
-  teamId:null,team:null,players:{},teams:{},members:[],ranks:[],chat:[],seamDocs:{},hits:{},peers:[],feed:[],names:{},colors:{},ls:{},
+const NET={on:false,mode:'solo',uid:null,me:null,readOnly:false,serverAuth:false,api:null,v2:false,cfg:{},
+  teamId:null,team:null,players:{},teams:{},members:[],ranks:[],chat:[],seamDocs:{},hits:{},peers:[],feed:[],names:{},colors:{},tags:{},ls:{},
+  requests:[],myRequests:{},inbox:[],
   off:window.GB_SUPABASE?{card:'The game server can’t be reached right now. Keep digging: you break hard seams on your own until it’s back.',
       short:'Team play needs the game server, which can’t be reached right now.',line:'Solo dig · game server not reachable'}
     :{card:'Open the game on claude.ai and sign in to dig with a team. Until then you break hard seams on your own.',
@@ -2439,7 +2504,7 @@ const localHits={}; // damage this device has dealt but not yet written
 
 // ---- names: never stored, resolved on screen through the platform ----
 let resolving=false;const nameQ=new Set();
-function netName(id){return id===NET.uid?'You':(NET.names[id]||'Teammate');}
+function netName(id){if(!id)return'Former digger';return id===NET.uid?'You':(NET.names[id]||'Teammate');}
 function netResolve(ids){ // ids that arrive while a lookup is running wait for the next one instead of being dropped
   if(!NET.api||!NET.api.profiles)return;for(const id of ids)if(id&&!(id in NET.names))nameQ.add(id);
   if(resolving||!nameQ.size)return;const need=[...nameQ];nameQ.clear();
@@ -2554,7 +2619,10 @@ function claudeTeamSubs(C,tid){ // everything that belongs to one team: its seam
 }
 
 // ---- the game's hooks into NET ----
-let netSaveT=0,netProgT=0,cloudKey='';
+let netSaveT=0,netProgT=0,cloudKey='',netNoSave=false;
+function netResetLocal(){ // this phone forgets its game (switching or deleting accounts); the page reloads next
+  netNoSave=true;clearTimeout(netSaveT);
+  try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem('gb-chat-seen');}catch(e){}}
 function netSaveSoon(){ // the cloud copy is written only when the save really changed
   if(!NET.on||NET.readOnly)return;clearTimeout(netSaveT);
   netSaveT=setTimeout(()=>{const d=saveData(),k=JSON.stringify(Object.assign({},d,{at:0}));if(k===cloudKey)return;cloudKey=k;NET.api.saveCloud(d);},2500);}
@@ -2568,6 +2636,7 @@ async function netStart(){
   if(!ok){NET.on=false;NET.mode='solo';netFire('change',{});return;}
   if(!NET.cloudDone)await netApplyCloud();
   netProgress();netStatus();
+  if(typeof runPendingLink==='function')setTimeout(runPendingLink,0); // a team or invite link that opened the game
 }
 function netNoServer(e){ // say why team play is off, in words a player can act on
   const m=String((e&&e.message)||e||'');console.warn('GroundBreaking can’t reach its game server: '+m);
@@ -2586,15 +2655,18 @@ async function netApplyCloud(){ // a newer save from another device wins
 
 /* ---------- the Supabase backend: the real app's game server ---------- */
 // Fills in the same NET.api functions and fires the same NET events as the Claude backend in net.js. Each device gets
-// an anonymous Supabase account on first launch (link an email or Apple/Google sign-in to it later). The database
-// functions own every rule that matters: the seam gate, seam HP, the hit cap, raid cooldowns and shields. This file
-// only calls them and listens for changes.
-//   tables  profiles teams seams seam_hits chat_messages raids raid_results saves game_config · view team_ranks
-//   calls   report_progress create_team join_team leave_team set_name open_seam hit_seam post_chat send_raid
-//           report_raid last_raid_on
-//   live    'db:team:<id>'  database changes for your team (row-level security decides what you hear)
+// an anonymous Supabase account on first launch; "Save your progress" links an email to that same account (a 6-digit
+// code), and "Load saved game" signs a new phone into it. The database functions own every rule that matters: ranks,
+// joining, invites, kicks, the seam gate, seam HP, the hit cap, raid limits. This file only calls them and listens.
+//   tables  profiles teams seams seam_hits chat_messages raids raid_results saves game_config team_requests team_invites
+//           team_bans · view team_ranks
+//   calls   report_progress make_team ask_to_join cancel_request answer_request make_invite peek_invite redeem_invite
+//           decline_invite revoke_invites kick_member set_role hand_over update_team rename_team set_announcement
+//           leave_team set_name report delete_my_account open_seam hit_seam post_chat send_raid report_raid last_raid_on
+//           (create_team and join_team for servers without the team update)
+//   live    'me:<you>'      your own profile (rank changes, kicks, being let in), invites to you, your raids' results
+//           'db:team:<id>'  database changes for your team (row-level security decides what you hear)
 //           'team:<id>'     private channel: who's online (presence) and quick 'hit' / 'feed' broadcasts
-//           'raids:<you>'   results of the raids you sent
 const SB_COLORS=['#e8743b','#3ba0e8','#a46be8','#4bb36b','#e8c33b','#e85b8a','#3bd1c4','#9bd13b','#d1913b','#6b8be8'];
 function sbColor(id){let h=7;for(let i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))|0;return SB_COLORS[Math.abs(h)%SB_COLORS.length];}
 const sbMs=t=>t?Date.parse(t)||0:0;
@@ -2602,8 +2674,28 @@ function sbErr(e){ // the server's own words when it says no (they're written fo
   const m=(e&&e.message)||'network error',said=!!e&&e.code==='P0001',down=!e||!e.code||/fetch|network|timeout|load failed/i.test(m);
   return Object.assign(new Error(m),{friendly:said?m:'',code:said?'P0001':down?'unavailable':String(e.code)});
 }
-const sbPlayer=p=>({team:p.team_id||null,best:p.best||1,pts:Number(p.pts)||0,at:sbMs(p.last_seen),raidAt:sbMs(p.raid_at)});
-const sbTeam=t=>({name:t.name,code:t.code,by:t.created_by,at:sbMs(t.created_at),seams:t.seams_broken||0,se:t.seam_every||5});
+function sbAuthErr(e){ // sign-in and email errors, in words a player can act on
+  const c=String((e&&e.code)||''),m=String((e&&e.message)||''),st=e&&e.status;
+  const say=c==='email_exists'||/already been registered|already registered/i.test(m)?'That email already has a saved game. Use “Load saved game” to switch to it.'
+    :c==='email_address_not_authorized'||/not authorized/i.test(m)?'The game server can’t email that address yet: it still needs its own email service set up.'
+    :c==='email_address_invalid'||c==='validation_failed'||/invalid.*email|email.*invalid/i.test(m)?'That email doesn’t look right.'
+    :c==='otp_expired'||/expired or is invalid|invalid otp|token has expired/i.test(m)?'That code didn’t work. Check it, or send a new one.'
+    :c==='otp_disabled'||c==='user_not_found'||/signups not allowed/i.test(m)?'No saved game uses that email.'
+    :c==='identity_already_exists'?'That Google account already has a saved game. Use “Load saved game” to switch to it.'
+    :c==='manual_linking_disabled'||c==='provider_disabled'?'Google sign-in isn’t switched on for this game yet.'
+    :st===429||/rate limit|too many/i.test(c+m)?'Too many tries. Wait a minute, then try again.'
+    :/fetch|network|load failed/i.test(m)?'Can’t reach the game server. Check your connection and try again.':'Something went wrong. Try again.';
+  return Object.assign(new Error(m||say),{friendly:say,code:c||'auth'});
+}
+const sbName=p=>p.name_hidden?'Digger #'+p.tag:(p.display_name||'');
+const sbPlayer=p=>({team:p.team_id||null,best:p.best||1,pts:Number(p.pts)||0,at:sbMs(p.last_seen),raidAt:sbMs(p.raid_at),
+  role:p.team_id?(p.team_role||'digger'):null,tag:p.tag||'',hidden:!!p.name_hidden,joinedAt:sbMs(p.joined_team_at)});
+const sbTeam=t=>({name:t.name_hidden?'Team #'+t.code:t.name,code:t.code,by:t.created_by,at:sbMs(t.created_at),seams:t.seams_broken||0,se:t.seam_every||5,
+  badge:t.badge||'pick',color:t.badge_color||'#fc6a1c',desc:t.description||'',join:t.join_type||'open',minDepth:t.min_depth||0,lang:t.language||'',
+  region:t.region||'',family:!!t.family_friendly,ann:t.announcement||'',annAt:sbMs(t.announced_at),annBy:t.announced_by||null,hidden:!!t.name_hidden,
+  renamedAt:sbMs(t.renamed_at)});
+const sbRank=r=>({id:r.id,name:r.name,front:r.front,members:r.members,pts:Number(r.pts)||0,seams:r.seams_broken,code:r.code,badge:r.badge||'pick',
+  color:r.badge_color||'#fc6a1c',join:r.join_type||'open',minDepth:r.min_depth||0,desc:r.description||'',lang:r.language||'',region:r.region||'',family:!!r.family_friendly});
 const sbSeam=s=>({hp:s.hp,by:s.opened_by,at:sbMs(s.opened_at),broke:sbMs(s.broken_at)});
 const sbChat=m=>({id:m.id,by:m.user_id,tid:m.team_id,t:m.body,at:sbMs(m.created_at),s:m.is_system?1:0});
 const sbRaid=r=>({id:r.id,from:r.from_team,to:r.to_team,by:r.sender,at:sbMs(r.created_at),n:r.moles});
@@ -2611,47 +2703,65 @@ const sbRaid=r=>({id:r.id,from:r.from_team,to:r.to_team,by:r.sender,at:sbMs(r.cr
 async function netStartSupabase(){
   const C=window.GB_SUPABASE;
   if(!C||!C.url||!C.key||!window.supabase||typeof window.supabase.createClient!=='function')return false;
-  const sb=window.supabase.createClient(C.url,C.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
-  let{data:{session}}=await sb.auth.getSession();
-  if(!session){ // first launch on this device: an anonymous account, named until the player picks a name
+  // detectSessionInUrl: a sign-in or email-confirmation link opened in this browser lands here and finishes itself
+  const sb=window.supabase.createClient(C.url,C.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  const guest=async()=>{ // first launch on this device: an anonymous account, named until the player picks a name
     const r=await sb.auth.signInAnonymously({options:{data:{name:'Digger '+rid(3,'23456789')}}});
     if(r.error){
       if(r.error.code==='anonymous_provider_disabled'||/anonymous sign-ins are disabled/i.test(r.error.message||'')){NET.offWhy='signins';
         NET.off={card:'The game server isn’t letting new players in yet: anonymous sign-ins are switched off in Supabase (Authentication, Sign In / Providers). Keep digging solo until they’re on.',
           short:'Team play is waiting on the game server: anonymous sign-ins are switched off.',line:'Solo dig · the server has guest sign-ins switched off'};}
       throw r.error;}
-    session=r.data.session;
-  }
-  if(!session||!session.user)return false;
+    return r.data.session;};
+  let{data:{session}}=await sb.auth.getSession(),user=session&&session.user;
+  if(session){ // the account may be gone: deleted on another phone, or cleared after a long time away
+    const r=await sb.auth.getUser();
+    if(r.error&&(r.error.status===401||r.error.status===403||/not exist|not found/i.test(r.error.message||''))){
+      await sb.auth.signOut({scope:'local'}).catch(()=>{});session=null;}
+    else if(r.error)throw r.error;
+    else user=r.data.user;}
+  if(!session){session=await guest();user=session&&session.user;}
+  if(!session||!user)return false;
   await sb.realtime.setAuth(); // private team channels check who you are
-  const uid=session.user.id;
-  const[me,cfg]=await Promise.all([sb.from('profiles').select('*').eq('id',uid).maybeSingle(),sb.from('game_config').select('*').maybeSingle()]);
+  const uid=user.id;
+  let[me,cfg]=await Promise.all([sb.from('profiles').select('*').eq('id',uid).maybeSingle(),sb.from('game_config').select('*').maybeSingle()]);
   if(me.error)throw me.error;
+  if(!me.data)throw new Error('No profile for this account');
   if(cfg.data){const g=cfg.data; // the server's limits win over the ones baked into the game
-    TEAM_MAX=g.team_max||TEAM_MAX;RAID_COST=g.raid_cost??RAID_COST;RAID_COOLDOWN=(g.raid_cooldown_min??10)*60e3;RAID_SHIELD=(g.raid_shield_min??30)*60e3;}
-  const name=(me.data&&me.data.display_name)||'Digger';
-  Object.assign(NET,{on:true,mode:'supabase',uid,readOnly:false,serverAuth:true,me:{id:uid,name,color:sbColor(uid)}});
-  NET.names[uid]=name;NET.colors[uid]=sbColor(uid);
-  const S={sb,uid,seq:0,tid:null,db:null,ch:null,live:false,status:{},opening:{},ranks:[],rankAt:0};
+    TEAM_MAX=g.team_max||TEAM_MAX;RAID_COST=g.raid_cost??RAID_COST;RAID_COOLDOWN=(g.raid_cooldown_min??10)*60e3;RAID_SHIELD=(g.raid_shield_min??30)*60e3;
+    NET.cfg=Object.assign({},g);NET.v2='team_create_cost' in g;}
+  const P=me.data,name=sbName(P)||'Digger';
+  Object.assign(NET,{on:true,mode:'supabase',uid,readOnly:false,serverAuth:true,
+    me:{id:uid,name,color:sbColor(uid),tag:P.tag||'',saved:!user.is_anonymous,email:user.email||'',nameAt:sbMs(P.name_changed_at),hidden:!!P.name_hidden}});
+  NET.names[uid]=name;NET.colors[uid]=sbColor(uid);NET.tags[uid]=P.tag||'';
+  const S={sb,C,uid,seq:0,tid:null,db:null,ch:null,live:false,status:{},opening:{},ranks:[],rankAt:0,leaving:false,joining:false,switching:false,pending:null,authSet:null};
   NET.api=supabaseApi(S);
-  NET.players[uid]=me.data?sbPlayer(me.data):{team:null,best:1,pts:0,at:Date.now(),raidAt:0};
-  if(me.data&&me.data.team_id)await S.loadTeams([me.data.team_id]);
+  NET.players[uid]=sbPlayer(P);
+  if(P.team_id)await S.loadTeams([P.team_id]);
   await netApplyCloud();NET.cloudDone=true; // a newer save from another device first, so raids and rewards land on top of it
-  sb.channel('raids:'+uid)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'raid_results',filter:'sender=eq.'+uid},p=>S.raidResult(p.new))
-    .subscribe();
+  let mine=sb.channel('me:'+uid)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'raid_results',filter:'sender=eq.'+uid},p=>S.raidResult(p.new));
+  if(NET.v2)mine=mine
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles',filter:'id=eq.'+uid},p=>{if(p.new&&p.new.id===uid)S.meRow(p.new);})
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'team_invites',filter:'invitee=eq.'+uid},p=>{if(p.new)S.inviteIn(p.new);});
+  mine.subscribe();
   netDerive(); // joins your team's channels if you're on one
   S.catchUpRaids();S.refreshRanks();
-  setInterval(()=>{if(teamIsOpen())S.refreshRanks();},20000);
-  sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'){NET.on=false;netFire('change',{});}});
+  if(NET.v2){S.loadInbox();S.loadMyRequests();}
+  setInterval(()=>{if(teamIsOpen()){S.refreshRanks();if(NET.v2){S.loadInbox();S.loadMyRequests();S.loadRequests();}}},20000);
+  sb.auth.onAuthStateChange((ev,s)=>{
+    if(ev==='SIGNED_OUT'&&!S.switching){NET.on=false;netFire('change',{});}
+    if((ev==='USER_UPDATED'||ev==='SIGNED_IN')&&s&&s.user&&s.user.id===uid)S.userIn(s.user);});
   return true;
 }
 
 function supabaseApi(S){
-  const{sb,uid}=S,since=ms=>new Date(Date.now()-ms).toISOString();
-  const me=()=>NET.players[uid]||(NET.players[uid]={team:null,best:1,pts:0,at:Date.now(),raidAt:0});
+  const{sb,uid,C}=S,since=ms=>new Date(Date.now()-ms).toISOString();
+  const me=()=>NET.players[uid]||(NET.players[uid]={team:null,best:1,pts:0,at:Date.now(),raidAt:0,role:null});
   const rpc=async(fn,args)=>{const{data,error}=await sb.rpc(fn,args||{});if(error)throw sbErr(error);return data;};
-  const crew=rows=>{const P={[uid]:NET.players[uid]};for(const p of rows)P[p.id]=sbPlayer(p);NET.players=P;netResolve(Object.keys(P));};
+  const crew=rows=>{const P={[uid]:NET.players[uid]};for(const p of rows){P[p.id]=sbPlayer(p);noteName(p);}NET.players=P;netResolve(Object.keys(P));};
+  const noteName=p=>{if(!p||!p.id)return;if(p.display_name!=null){NET.names[p.id]=sbName(p);NET.colors[p.id]=sbColor(p.id);}if(p.tag)NET.tags[p.id]=p.tag;};
+  const joined=t=>{NET.teams[t.id]=sbTeam(t);const m=me();m.team=t.id;m.joinedAt=Date.now();netDerive();S.rankAt=0;S.refreshRanks();if(NET.v2){S.loadMyRequests();S.loadInbox();}};
 
   S.loadTeams=async ids=>{
     ids=[...new Set(ids)].filter(Boolean);if(!ids.length)return;
@@ -2662,35 +2772,78 @@ function supabaseApi(S){
     if(Date.now()-S.rankAt<4000)return;S.rankAt=Date.now();
     const{data,error}=await sb.from('team_ranks').select('*').order('front',{ascending:false}).order('pts',{ascending:false}).limit(50);
     if(error){S.rankAt=0;return;}
-    S.ranks=data.map(r=>({id:r.id,name:r.name,front:r.front,members:r.members,pts:Number(r.pts)||0,seams:r.seams_broken}));
+    S.ranks=data.map(sbRank);
     for(const r of data){const T=NET.teams[r.id]||{};
-      NET.teams[r.id]=Object.assign({},T,{name:r.name,code:r.code,seams:Math.max(r.seams_broken,T.seams||0),se:r.seam_every});}
+      NET.teams[r.id]=Object.assign({},T,{name:r.name,code:r.code,seams:Math.max(r.seams_broken,T.seams||0),se:r.seam_every},
+        NET.v2?{badge:r.badge,color:r.badge_color,join:r.join_type,minDepth:r.min_depth,desc:r.description,lang:r.language,region:r.region,family:r.family_friendly}:{});}
     netDerive();
   };
   S.progressNow=async()=>{
     const row=await rpc('report_progress',{p_best:Math.max(1,state.best||state.L||1),p_pts:Math.round(myX().pts||0)});
     if(row&&row.id===uid){NET.players[uid]=sbPlayer(row);netDerive();}
   };
+  S.userIn=u=>{const saved=!u.is_anonymous,email=u.email||'';
+    if(saved!==NET.me.saved||email!==NET.me.email){NET.me.saved=saved;NET.me.email=email;netFire('account');netFire('change',{});}};
+  S.checkUser=async()=>{const{data,error}=await sb.auth.getUser();if(!error&&data&&data.user)S.userIn(data.user);};
+
+  // ---- you: rank changes, kicks, and being let into a team arrive as changes to your own profile ----
+  S.meRow=row=>{const before=Object.assign({},NET.players[uid]||{}),P=sbPlayer(row);NET.players[uid]=P;noteName(row);
+    const nm=sbName(row);if(nm&&nm!==NET.me.name){NET.me.name=nm;NET.me.hidden=!!row.name_hidden;netFire('names');}
+    if(before.team&&!P.team&&!S.leaving)S.removed(before.team);
+    if(P.team&&P.team!==before.team){
+      S.loadTeams([P.team]).then(()=>{netDerive();if(!S.joining){toast(`You’re in ${(NET.teams[P.team]||{}).name||'a team'}!`,'#86e39a');sfx('unlock');claimOldSeams();accountNudge('team');}
+        S.loadMyRequests();S.loadInbox();}).catch(()=>{});}
+    else netDerive();
+    if(P.team&&P.team===before.team&&P.role!==before.role){netFire('change',{});if(NET.v2&&roleRank(P.role)>=2)S.loadRequests();}
+  };
+  S.removed=async tid=>{const name=(NET.teams[tid]||{}).name||'your team';let why='';
+    try{const b=await sb.from('team_bans').select('kind,reason').eq('team_id',tid).eq('user_id',uid).maybeSingle();if(b.data&&b.data.kind==='kick')why=b.data.reason;}catch(e){}
+    toast(why?`You were removed from ${name}: ${why}`:`You were removed from ${name}`,'#ff5b47');hint(`You were removed from ${name}.`);};
+
+  // ---- requests, invites, the inbox ----
+  S.loadRequests=async()=>{ // join requests for your team (Veterans and up can see them)
+    const tid=NET.teamId;if(!NET.v2||!tid||roleRank(me().role)<2){if(NET.requests.length){NET.requests=[];netFire('requests');}return;}
+    const{data,error}=await sb.from('team_requests').select('*').eq('team_id',tid).gte('created_at',since((NET.cfg.request_expiry_hours||48)*3600e3)).order('created_at',{ascending:true});
+    if(error||NET.teamId!==tid)return;
+    const ids=data.map(r=>r.user_id);
+    if(ids.length){const p=await sb.from('profiles').select('id,display_name,tag,name_hidden,best,pts,team_id').in('id',ids);if(!p.error)for(const x of p.data){noteName(x);S.extra[x.id]=x;}}
+    NET.requests=data.map(r=>({id:r.user_id,msg:r.message||'',at:sbMs(r.created_at),best:(S.extra[r.user_id]||{}).best||1,team:(S.extra[r.user_id]||{}).team_id||null}));
+    netFire('requests');};
+  S.extra={};
+  S.requestIn=row=>{if(row.team_id!==NET.teamId||NET.requests.some(r=>r.id===row.user_id))return;S.loadRequests().then(()=>{
+    const r=NET.requests.find(x=>x.id===row.user_id);if(r&&!teamIsOpen())toast(`${netName(r.id)} wants to join your team`,'#62e3ff');});};
+  S.loadMyRequests=async()=>{if(!NET.v2)return;
+    const{data,error}=await sb.from('team_requests').select('team_id,created_at').eq('user_id',uid);if(error)return;
+    const R={};for(const r of data)R[r.team_id]=sbMs(r.created_at);NET.myRequests=R;
+    try{await S.loadTeams(Object.keys(R).filter(id=>!NET.teams[id]));}catch(e){}netFire('requests');};
+  S.loadInbox=async()=>{if(!NET.v2)return;
+    const{data,error}=await sb.from('team_invites').select('*').eq('invitee',uid).gte('expires_at',new Date().toISOString());if(error)return;
+    try{await S.loadTeams(data.map(i=>i.team_id).filter(id=>!NET.teams[id]));}catch(e){}
+    netResolve(data.map(i=>i.created_by));
+    NET.inbox=data.filter(i=>NET.teams[i.team_id]).map(i=>({token:i.token,team:i.team_id,from:i.created_by,until:sbMs(i.expires_at)}));netFire('inbox');};
+  S.inviteIn=row=>{S.loadInbox().then(()=>{const t=NET.teams[row.team_id];if(t)toast(`${netName(row.created_by)} invited you to ${t.name}`,'#62e3ff');});};
 
   // ---- one team at a time: its database changes, plus a private channel for presence and quick broadcasts ----
   S.teamSubs=async tid=>{
     const seq=++S.seq,old=[S.db,S.ch].filter(Boolean);
     S.db=S.ch=null;S.live=false;S.tid=tid;S.opening={};
-    NET.seamDocs={};NET.hits={};NET.chat=[];NET.peers=[];NET.feed=[];netFire('chat');netFire('peers');
+    NET.seamDocs={};NET.hits={};NET.chat=[];NET.peers=[];NET.feed=[];NET.requests=[];netFire('chat');netFire('peers');netFire('requests');
     for(const c of old)await sb.removeChannel(c).catch(()=>{});
     if(!tid||seq!==S.seq)return;
     const ok=()=>seq===S.seq;
-    const db=sb.channel('db:team:'+tid)
+    let db=sb.channel('db:team:'+tid)
       .on('postgres_changes',{event:'*',schema:'public',table:'profiles',filter:'team_id=eq.'+tid},p=>{const r=p.new;
-        if(ok()&&r&&r.id){NET.players[r.id]=sbPlayer(r);netResolve([r.id]);netDerive();}})
+        if(ok()&&r&&r.id&&(r.id!==uid||!NET.v2)){NET.players[r.id]=sbPlayer(r);noteName(r);netResolve([r.id]);netDerive();}})
       .on('postgres_changes',{event:'UPDATE',schema:'public',table:'teams',filter:'id=eq.'+tid},p=>{const r=p.new;
-        if(ok()&&r&&r.id){NET.teams[tid]=sbTeam(r);netDerive();netFire('seam',0);}})
+        if(ok()&&r&&r.id){const was=NET.teams[tid]||{};NET.teams[tid]=sbTeam(r);netDerive();netFire('seam',0);
+          if(NET.v2&&r.announcement&&r.announcement!==was.ann&&r.announced_by!==uid)toast(`New announcement: ${r.announcement}`,'#ffd34d');}})
       .on('postgres_changes',{event:'*',schema:'public',table:'seams',filter:'team_id=eq.'+tid},p=>{const r=p.new;
         if(ok()&&r&&r.n){NET.seamDocs[r.n]=sbSeam(r);netFire('seam',r.n);}})
       .on('postgres_changes',{event:'*',schema:'public',table:'seam_hits',filter:'team_id=eq.'+tid},p=>{const r=p.new;
         if(ok()&&r&&r.n)S.hitRow(r);})
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'team_id=eq.'+tid},p=>{if(ok()&&p.new)S.chatRow(p.new);})
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'raids',filter:'to_team=eq.'+tid},p=>{if(ok()&&p.new)S.raidsIn([p.new]);});
+    if(NET.v2)db=db.on('postgres_changes',{event:'INSERT',schema:'public',table:'team_requests',filter:'team_id=eq.'+tid},p=>{if(ok()&&p.new)S.requestIn(p.new);});
     const ch=sb.channel('team:'+tid,{config:{private:true,presence:{key:uid}}})
       .on('presence',{event:'sync'},()=>{if(ok())S.peers(ch.presenceState());})
       .on('broadcast',{event:'feed'},m=>{const d=m&&m.payload;if(!ok()||!d||!d.by||d.by===uid)return;
@@ -2723,6 +2876,7 @@ function supabaseApi(S){
         NET.chat=got.concat(mine);netResolve([...new Set(got.map(m=>m.by).filter(Boolean))]);}
       if(!raids.error&&raids.data.length)S.raidsIn(raids.data);
       netDerive();netFire('chat');netFire('seam',0);
+      if(NET.v2)S.loadRequests();
     }catch(e){console.warn('team load',(e&&e.message)||e);}
   };
   S.reloadCrew=async()=>{const seq=S.seq,{data,error}=await sb.from('profiles').select('*').eq('team_id',S.tid);
@@ -2732,9 +2886,11 @@ function supabaseApi(S){
     H.total=Math.max(H.total||0,Object.values(H.by).reduce((a,b)=>a+b,0));
     if(!quiet){netResolve([r.user_id]);netFire('seam',n);}};
   S.chatRow=row=>{const m=sbChat(row);if(NET.chat.some(x=>x.id===m.id))return;
-    const i=NET.chat.findIndex(x=>x.tmp&&x.by===m.by&&x.t===m.t);if(i>=0)NET.chat.splice(i,1); // my own message, now confirmed
+    let i=NET.chat.findIndex(x=>x.tmp&&x.by===m.by&&x.t===m.t);
+    if(i<0&&m.by===uid&&!m.s)i=NET.chat.findIndex(x=>x.tmp&&x.by===uid); // the server may have hidden a word
+    if(i>=0)NET.chat.splice(i,1);
     NET.chat=NET.chat.concat([m]).slice(-80);if(m.by)netResolve([m.by]);
-    if(m.s&&/(joined|left|started) the team/.test(m.t))S.reloadCrew().catch(()=>{}); // someone came or went
+    if(m.s&&/(joined|left|started) the team|kicked|promoted|demoted|Foreman/.test(m.t))S.reloadCrew().catch(()=>{}); // the crew changed
     netFire('chat');};
   S.raidsIn=async rows=>{const list=rows.map(sbRaid);
     try{await S.loadTeams(list.map(r=>r.from).filter(id=>!NET.teams[id]));}catch(e){}
@@ -2747,21 +2903,22 @@ function supabaseApi(S){
   S.peers=st=>{const out=[];
     for(const id in st){const ms=st[id]||[],m=ms[ms.length-1]||{};out.push(Object.assign({},m,{id,isMe:id===uid}));}
     NET.peers=out;netResolve(out.map(p=>p.id));netFire('peers');};
+  const leaving=async run=>{S.leaving=true;try{return await run();}finally{setTimeout(()=>{S.leaving=false;},3000);}};
+  const joining=async run=>{S.joining=true;try{return await run();}finally{setTimeout(()=>{S.joining=false;},3000);}};
 
   const api={
     profiles:async ids=>{ids=ids.filter(Boolean);
       for(let i=0;i<ids.length;i+=100){const part=ids.slice(i,i+100);
-        const{data,error}=await sb.from('profiles').select('id,display_name').in('id',part);if(error)throw sbErr(error);
+        const{data,error}=await sb.from('profiles').select(NET.v2?'id,display_name,tag,name_hidden':'id,display_name').in('id',part);if(error)throw sbErr(error);
         for(const id of part){if(!(id in NET.names))NET.names[id]='';NET.colors[id]=sbColor(id);}
-        for(const p of data)NET.names[p.id]=p.display_name||'';}},
-    reportProgress:()=>netWrite('progress',S.progressNow),
-    createTeam:async name=>{const t=await rpc('create_team',{p_name:name});NET.teams[t.id]=sbTeam(t);me().team=t.id;
-      netDerive();S.rankAt=0;S.refreshRanks();return t.id;},
+        for(const p of data)noteName(p);}},
+    reportProgress:()=>{if(!S.switching)netWrite('progress',S.progressNow);},
+    createTeam:async name=>{const t=await joining(()=>rpc('create_team',{p_name:name}));me().role='foreman';joined(t);return t.id;},
     joinTeam:async code=>{
-      try{const t=await rpc('join_team',{p_code:String(code||'')});NET.teams[t.id]=sbTeam(t);me().team=t.id;netDerive();S.rankAt=0;S.refreshRanks();return null;}
+      try{const t=await joining(()=>rpc('join_team',{p_code:String(code||'')}));joined(t);return null;}
       catch(e){return e.friendly||'Could not reach the game server. Try again.';}},
-    leaveTeam:async()=>{await rpc('leave_team');me().team=null;netDerive();S.rankAt=0;S.refreshRanks();},
-    openSeam:n=>{ // the server checks you've really reached it, then sets its HP from your team's size
+    leaveTeam:async()=>{await leaving(()=>rpc('leave_team'));const m=me();m.team=null;m.role=null;netDerive();S.rankAt=0;S.refreshRanks();},
+    openSeam:n=>{ // the server checks you've really reached it, then sets its HP from your team's active diggers
       if(!S.opening[n])S.opening[n]=(async()=>{
           await S.progressNow();const s=await rpc('open_seam',{p_n:n});
           if(S.tid===NET.teamId){NET.seamDocs[n]=sbSeam(s);netFire('seam',n);}})()
@@ -2788,17 +2945,94 @@ function supabaseApi(S){
     emitFeed:(k,v)=>{if(S.ch&&S.live)S.ch.send({type:'broadcast',event:'feed',payload:{k,v,L:state.L,by:uid}}).catch(()=>{});},
     emitHit:(n,d)=>{if(S.ch&&S.live)S.ch.send({type:'broadcast',event:'hit',payload:{n,d:Math.round(d),by:uid}}).catch(()=>{});},
     loadSave:async()=>{const{data,error}=await sb.from('saves').select('data').eq('user_id',uid).maybeSingle();if(error)throw sbErr(error);return data?data.data:null;},
-    saveCloud:d=>netWrite('save',async()=>{const{error}=await sb.from('saves').upsert({user_id:uid,data:d,updated_at:new Date().toISOString()});if(error)throw sbErr(error);}),
+    saveCloud:d=>netWrite('save',async()=>{if(netNoSave)return;const{error}=await sb.from('saves').upsert({user_id:uid,data:d,updated_at:new Date().toISOString()});if(error)throw sbErr(error);}),
     teamChanged:tid=>{S.teamSubs(tid).catch(e=>console.warn('team channels',(e&&e.message)||e));},
     rankRows:tid=>{ // the server's ranking, with your own team's row kept live
       const rows=S.ranks.map(r=>Object.assign({},r));
       if(tid&&NET.teams[tid]){const T=NET.teams[tid],mem=Object.values(NET.players).filter(p=>p.team===tid);
         let row=rows.find(r=>r.id===tid);if(!row){row={id:tid};rows.push(row);}
-        Object.assign(row,{name:T.name,front:teamFront(tid),members:mem.length,pts:mem.reduce((s,p)=>s+(p.pts||0),0),seams:T.seams||0});}
+        Object.assign(row,{name:T.name,code:T.code,badge:T.badge,color:T.color,join:T.join,minDepth:T.minDepth,front:teamFront(tid),members:mem.length,pts:mem.reduce((s,p)=>s+(p.pts||0),0),seams:T.seams||0});}
       return rows.filter(r=>r.members>0).sort((a,b)=>b.front-a.front||b.pts-a.pts);},
-    refreshRanks:()=>{S.refreshRanks().catch(()=>{});},
-    setName:async v=>{await rpc('set_name',{p_name:v});v=String(v).trim().slice(0,24);
-      NET.me.name=v;NET.names[uid]=v;netFire('names');netFire('change',{});},
+    refreshRanks:()=>{S.refreshRanks().catch(()=>{});if(NET.v2){S.loadInbox();S.loadMyRequests();S.loadRequests();}},
+    setName:async v=>{await rpc('set_name',{p_name:v});
+      const{data}=await sb.from('profiles').select('display_name,tag,name_hidden,name_changed_at').eq('id',uid).maybeSingle();
+      const nm=data?sbName(data):String(v).trim();NET.me.name=nm;NET.names[uid]=nm;if(data){NET.me.nameAt=sbMs(data.name_changed_at);NET.me.hidden=!!data.name_hidden;}
+      netFire('names');netFire('change',{});},
+
+    // ---- teams v2: finding and joining ----
+    searchTeams:async(q,f)=>{f=f||{};q=String(q||'').replace(/[%*_,()\\"]/g,' ').replace(/\s+/g,' ').trim();
+      const base=()=>{let b=sb.from('team_ranks').select('*');
+        if(f.join)b=b.eq('join_type',f.join);else if(!q)b=b.neq('join_type','invite');
+        if(f.lang)b=b.eq('language',f.lang);if(f.qualify)b=b.lte('min_depth',Math.max(1,state.best||1));if(f.room)b=b.lt('members',TEAM_MAX);
+        return b.order('front',{ascending:false}).order('pts',{ascending:false}).limit(30);};
+      const asks=[q?base().ilike('name','%'+q+'%'):base()];
+      if(/^#?[A-Z2-9]{6}$/i.test(q))asks.unshift(sb.from('team_ranks').select('*').eq('code',q.replace('#','').toUpperCase()).limit(1));
+      const res=await Promise.all(asks),seen=new Set(),out=[];
+      for(const r of res){if(r.error)throw sbErr(r.error);for(const row of r.data)if(!seen.has(row.id)){seen.add(row.id);out.push(sbRank(row));}}
+      return out;},
+    teamProfile:async id=>{
+      const[t,mem]=await Promise.all([sb.from('teams').select('*').eq('id',id).maybeSingle(),
+        sb.from('profiles').select('id,display_name,tag,name_hidden,team_role,best,pts,last_seen,joined_team_at').eq('team_id',id)]);
+      if(t.error)throw sbErr(t.error);if(!t.data)return null;
+      NET.teams[id]=Object.assign({},NET.teams[id]||{},sbTeam(t.data));
+      const members=(mem.data||[]).map(p=>{noteName(p);return{id:p.id,role:p.team_role||'digger',best:p.best||1,pts:Number(p.pts)||0,at:sbMs(p.last_seen),joinedAt:sbMs(p.joined_team_at)};})
+        .sort((a,b)=>roleRank(b.role)-roleRank(a.role)||a.joinedAt-b.joinedAt);
+      const T=NET.teams[id],front=Math.min(Math.max(0,...members.map(m=>m.best)),((T.seams||0)+1)*(T.se||5));
+      return{id,team:T,members,front,pts:members.reduce((s,m)=>s+m.pts,0)};},
+    teamByCode:async code=>{const c=String(code||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase();if(!c)return null;
+      const{data,error}=await sb.from('teams').select('*').eq('code',c).maybeSingle();if(error)throw sbErr(error);
+      if(!data)return null;NET.teams[data.id]=Object.assign({},NET.teams[data.id]||{},sbTeam(data));return data.id;},
+    askToJoin:async(tid,msg)=>{const r=await joining(()=>rpc('ask_to_join',{p_team:tid,p_message:String(msg||'')}));
+      if(r.status==='joined'||r.status==='member'){me().role='digger';joined(r.team);}else{S.joining=false;S.loadMyRequests();} // a request: the answer may come any second
+      return r.status;},
+    cancelRequest:async tid=>{await rpc('cancel_request',{p_team:tid});await S.loadMyRequests();},
+    answerRequest:async(id,yes)=>{try{await rpc('answer_request',{p_user:id,p_accept:!!yes});}finally{await S.loadRequests();}
+      if(yes)S.reloadCrew().catch(()=>{});},
+    makeTeam:async(name,settings)=>{const t=await joining(()=>rpc('make_team',{p_name:name,p_settings:settings||{}}));me().role='foreman';joined(t);return t.id;},
+    makeInvite:async tag=>rpc('make_invite',tag?{p_invitee_tag:String(tag)}:{}),
+    peekInvite:async token=>rpc('peek_invite',{p_token:String(token||'')}),
+    redeemInvite:async token=>{const t=await joining(()=>rpc('redeem_invite',{p_token:String(token||'')}));me().role=me().team===t.id?me().role:'digger';joined(t);return t.id;},
+    declineInvite:async token=>{await rpc('decline_invite',{p_token:token});await S.loadInbox();},
+    revokeInvites:async token=>rpc('revoke_invites',token?{p_token:token}:{}),
+    // ---- running a team ----
+    kick:async(id,reason)=>{await rpc('kick_member',{p_user:id,p_reason:String(reason||'')});await S.reloadCrew();},
+    setRole:async(id,role)=>{await rpc('set_role',{p_user:id,p_role:role});await S.reloadCrew();},
+    handOver:async id=>{await rpc('hand_over',{p_user:id});await S.reloadCrew();},
+    updateTeam:async settings=>{const t=await rpc('update_team',{p_settings:settings||{}});NET.teams[t.id]=sbTeam(t);netDerive();return t;},
+    renameTeam:async name=>{const t=await rpc('rename_team',{p_name:name});NET.teams[t.id]=sbTeam(t);netDerive();S.rankAt=0;S.refreshRanks();return t;},
+    setAnnouncement:async text=>{const t=await rpc('set_announcement',{p_text:String(text||'')});NET.teams[t.id]=sbTeam(t);netDerive();return t;},
+    report:async(kind,target,reason)=>rpc('report',{p_kind:kind,p_target:String(target),p_reason:String(reason||'')}),
+    // ---- your account ----
+    authSettings:async()=>{if(S.authSet)return S.authSet;
+      try{const r=await fetch(C.url+'/auth/v1/settings',{headers:{apikey:C.key}});S.authSet=r.ok?await r.json():{};}catch(e){S.authSet={};}return S.authSet;},
+    saveStart:async email=>{const{error}=await sb.auth.updateUser({email:String(email).trim()},{emailRedirectTo:location.origin+location.pathname});if(error)throw sbAuthErr(error);},
+    saveConfirm:async(email,code)=>{const{error}=await sb.auth.verifyOtp({email:String(email).trim(),token:String(code).replace(/\s/g,''),type:'email_change'});
+      if(error)throw sbAuthErr(error);await sb.auth.refreshSession().catch(()=>{});await S.checkUser();return NET.me.saved;},
+    checkSaved:async()=>{await S.checkUser();return NET.me.saved;}, // for a confirmation link opened on another device
+    loadStart:async email=>{const{error}=await sb.auth.signInWithOtp({email:String(email).trim(),options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}});
+      if(error)throw sbAuthErr(error);},
+    loadConfirm:async(email,code)=>{ // signs this phone into the saved account; reports what it holds so the player can choose
+      const{data:{session:g}}=await sb.auth.getSession();S.switching=true;netNoSave=true; // nothing of this phone's game may land in the saved account
+      const{data,error}=await sb.auth.verifyOtp({email:String(email).trim(),token:String(code).replace(/\s/g,''),type:'email'});
+      if(error){S.switching=false;netNoSave=false;throw sbAuthErr(error);}
+      const nu=data.user.id;S.pending={guest:g,uid:nu,email:data.user.email||email};
+      if(nu===uid){S.pending=null;S.switching=false;netNoSave=false;return{same:true};}
+      const[p,sv]=await Promise.all([sb.from('profiles').select('display_name,tag,name_hidden,team_id,best,pts').eq('id',nu).maybeSingle(),
+        sb.from('saves').select('data').eq('user_id',nu).maybeSingle()]);
+      let team='';if(p.data&&p.data.team_id){const t=await sb.from('teams').select('name,code,name_hidden').eq('id',p.data.team_id).maybeSingle();if(t.data)team=t.data.name_hidden?'Team #'+t.data.code:t.data.name;}
+      const sd=sv.data&&sv.data.data||{};
+      return{name:p.data?sbName(p.data):'',team,best:Math.max(p.data?p.data.best:1,sd.best|0,1),L:Math.max(1,sd.L|0),coins:Math.max(0,sd.coins|0),email:S.pending.email};},
+    loadFinish:async useSaved=>{ // switch to the saved game (this phone's guest account goes), or stay as you were
+      const P=S.pending;S.pending=null;if(!P)return;
+      if(!useSaved){await sb.auth.setSession({access_token:P.guest.access_token,refresh_token:P.guest.refresh_token});S.switching=false;netNoSave=false;return;}
+      if(!NET.me.saved&&P.guest)try{
+        const g=window.supabase.createClient(C.url,C.key,{global:{headers:{Authorization:'Bearer '+P.guest.access_token}},auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+        await g.rpc('delete_my_account');}catch(e){}
+      netResetLocal();location.reload();},
+    signOut:async()=>{S.switching=true;await sb.auth.signOut({scope:'local'}).catch(()=>{});netResetLocal();location.reload();},
+    deleteAccount:async()=>{await rpc('delete_my_account');S.switching=true;await sb.auth.signOut({scope:'local'}).catch(()=>{});netResetLocal();location.reload();},
+    linkGoogle:async()=>{const{error}=await sb.auth.linkIdentity({provider:'google',options:{redirectTo:location.origin+location.pathname}});if(error)throw sbAuthErr(error);},
+    loadGoogle:async()=>{const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});if(error)throw sbAuthErr(error);},
   };
   return api;
 }
@@ -2817,9 +3051,10 @@ function openTeam(tab){
     tab=S.open&&!S.broken?'team':NET.chat.some(m=>m.by!==NET.uid&&m.at>chatSeen)?'chat':null;} // open on whatever is new
   if(tab)teamTab=tab;$('ovTeam').hidden=false;mode='modal';renderTeam();
   if(NET.api&&NET.api.refreshRanks)NET.api.refreshRanks();}
-function closeTeam(){$('ovTeam').hidden=true;if(mode==='modal')mode='play';}
+function closeTeam(){if(popIsOpen())closePop();$('ovTeam').hidden=true;if(mode==='modal')mode='play';}
 function teamIsOpen(){return!$('ovTeam').hidden;}
 function renderTeam(){
+  if(NET.v2&&$('pane-team').dataset.v!=='2'){$('pane-team').dataset.v='2';$('pane-team').dataset.k='';}
   for(const t of['team','chat','ranks']){const b=$('tab-'+t);b.classList.toggle('on',teamTab===t);b.setAttribute('aria-selected',teamTab===t?'true':'false');$('pane-'+t).hidden=teamTab!==t;}
   $('teamTitle').textContent=NET.team?NET.team.name:'Team';
   if(teamTab==='team')renderTeamPane();else if(teamTab==='chat')renderChat();else renderRanks();
@@ -2828,6 +3063,7 @@ function renderTeam(){
 
 // ---- Team tab ----
 function renderTeamPane(){
+  if(NET.v2&&NET.mode==='supabase'&&NET.on)return renderTeamPane2();
   const P=$('pane-team'),key=!NET.on?'off':NET.teamId?'t:'+NET.teamId:'none';
   if(P.dataset.k!==key){P.dataset.k=key;P.textContent='';buildTeamPane(P,key);}
   if(key==='none')fillOpenTeams();
@@ -2943,15 +3179,26 @@ function renderChat(){
   const L=$('chatList');L.textContent='';
   if(!NET.teamId){L.append(el('div','tm-empty',NET.on?'Join a team to chat with your crew.':NET.off.short));$('chatForm').hidden=true;return;}
   $('chatForm').hidden=false;$('chatInput').disabled=$('chatSend').disabled=NET.readOnly;
+  const T=NET.team;if(NET.v2&&T&&T.ann){const a=el('div','ann pinned');a.append(el('b',null,'📌 '),document.createTextNode(T.ann));if(T.annBy)a.append(el('span',null,` · ${netName(T.annBy)}`));L.append(a);}
   if(!NET.chat.length)L.append(el('div','tm-empty','No messages yet. Say hi to your crew.'));
-  let last=0;
+  let last=0,hid=0;
   for(const m of NET.chat){
     if(m.s){const r=el('div','msg sys');r.append(el('b',null,netName(m.by)),document.createTextNode(' '+m.t));L.append(r);continue;}
+    if(NET.v2&&m.by&&m.by!==NET.uid&&isBlocked(m.by)){hid++;continue;}
     const r=el('div','msg'+(m.by===NET.uid?' me':''));const h=el('div','mh');h.append(avatar(m.by),el('b',null,m.by===NET.uid?'You':netName(m.by)),el('span',null,ago(m.at)));
-    r.append(h,el('div','mt',m.t));L.append(r);last=Math.max(last,m.at);}
+    r.append(h,el('div','mt',m.t));L.append(r);last=Math.max(last,m.at);
+    if(NET.v2&&m.id&&m.by!==NET.uid){r.classList.add('tap');r.addEventListener('click',()=>msgActions(r,m));}}
+  if(hid)L.append(el('div','tm-empty',`${hid} message${hid===1?'':'s'} from blocked players hidden.`));
   L.scrollTop=L.scrollHeight;
   if(teamIsOpen()){chatSeen=Math.max(chatSeen,...NET.chat.map(m=>m.at),0);try{localStorage.setItem('gb-chat-seen',String(chatSeen));}catch(e){}}
 }
+function msgActions(r,m){ // tap someone's message: report it, or stop seeing their messages
+  const open=r.querySelector('.msg-act');if(open){open.remove();return;}
+  for(const x of document.querySelectorAll('#chatList .msg-act'))x.remove();
+  const a=el('div','msg-act'),rp=tmBtn('REPORT','alt sm'),bl=tmBtn('BLOCK','alt sm');
+  rp.addEventListener('click',e=>{e.stopPropagation();busy(rp,async()=>{await NET.api.report('chat',m.id,'chat');rp.textContent='REPORTED';rp.disabled=true;},null);});
+  bl.addEventListener('click',e=>{e.stopPropagation();setBlocked(m.by,true);toast(`You won’t see ${netName(m.by)}’s messages. Unblock from the crew list.`,'#87735f');renderChat();});
+  a.append(rp,bl);r.append(a);}
 function sendChatNow(){const i=$('chatInput'),v=i.value.trim();if(!v||!NET.teamId)return;i.value='';NET.api.sendChat(v);sfx('select');}
 
 // ---- Ranks tab ----
@@ -2961,12 +3208,13 @@ function renderRanks(){
   if(!NET.ranks.length){L.append(el('div','tm-empty','No teams yet. Be the first to start one.'));return;}
   const cool=Math.max(0,RAID_COOLDOWN-(Date.now()-(myX().raidAt||0)));
   NET.ranks.forEach((r,i)=>{
-    const row=el('div','rank'+(r.id===NET.teamId?' mine':''));row.append(el('b','rk','#'+(i+1)));
+    const row=el('div','rank'+(r.id===NET.teamId?' mine':''));row.append(el('b','rk','#'+(i+1)));if(NET.v2)row.append(badgeEl(r.badge,r.color,28));
     const mid=el('div','grow');mid.append(el('div','nm',r.name+(r.id===NET.teamId?' (you)':'')),el('div','st',`${meters(r.front)} · ${r.members} digger${r.members===1?'':'s'} · ${r.seams} seam${r.seams===1?'':'s'}`));row.append(mid);
     if(NET.teamId&&r.id!==NET.teamId){const b=el('button','tm-btn sm raid','');b.type='button';
       b.append(el('span',null,cool?`${Math.ceil(cool/60e3)} min`:'MOLES'),el('small',null,cool?'':' '+RAID_COST));
       b.disabled=!!cool||state.coins<RAID_COST||NET.readOnly;b.title=`Send moles after ${r.name} (${RAID_COST} coins)`;
       b.addEventListener('click',()=>sendRaidTo(r.id,b));row.append(b);}
+    else if(!NET.teamId&&NET.v2){const b=el('button','tm-btn alt sm','VIEW');b.type='button';b.addEventListener('click',()=>openTeamProfile(r.id));row.append(b);}
     else if(!NET.teamId&&r.members<TEAM_MAX){const b=el('button','tm-btn alt sm','JOIN');b.type='button';b.disabled=NET.readOnly;
       b.addEventListener('click',async()=>{const m=await NET.api.joinTeam(NET.teams[r.id].code);if(m)hint(m);else{claimOldSeams();teamTab='team';renderTeam();}});row.append(b);}
     L.append(row);});
@@ -2977,8 +3225,9 @@ function renderRanks(){
 // ---- HUD badge, toasts, title line ----
 function updateTeamBadge(){
   const on=NET.teamId?NET.peers.filter(p=>!p.isMe).length:0,b=$('teamBadge');b.hidden=!on;b.textContent=on;
-  const unread=NET.chat.some(m=>m.by!==NET.uid&&m.at>chatSeen),n=NET.team?(NET.team.seams||0)+1:0,seamOpen=n&&seamState(n).open&&!seamState(n).broken;
-  $('teamDot').hidden=!(unread||seamOpen);$('chatDot').hidden=!unread;
+  const unread=NET.chat.some(m=>m.by!==NET.uid&&m.at>chatSeen&&!(NET.v2&&m.by&&isBlocked(m.by))),n=NET.team?(NET.team.seams||0)+1:0,seamOpen=n&&seamState(n).open&&!seamState(n).broken;
+  const news=NET.v2&&(NET.teamId?NET.requests.length>0&&roleRank(myRole())>=2:NET.inbox.length>0);
+  $('teamDot').hidden=!(unread||seamOpen||news);$('chatDot').hidden=!unread;
 }
 function toast(text,color){
   const box=$('toasts'),t=el('div','toast');const d=el('i');d.style.background=color||'#fc6a1c';t.append(d,el('span',null,text));box.append(t);
@@ -2986,7 +3235,7 @@ function toast(text,color){
 }
 function updateAcct(){
   const a=$('acctLine');if(!a)return;
-  a.textContent=NET.on?`${NET.mode==='supabase'?'Playing as':'Signed in as'} ${NET.me.name||'you'}${NET.team?' · '+NET.team.name:' · no team yet'}`:NET.off.line;
+  a.textContent=NET.on?`${NET.mode==='supabase'?'Playing as':'Signed in as'} ${NET.me.name||'you'}${NET.team?' · '+NET.team.name:' · no team yet'}${NET.v2&&!NET.me.saved?' · not saved':''}`:NET.off.line;
 }
 function claimOldSeams(){ // seams your new team broke before you joined pay nothing, and old raids aren't yours to fight
   const T=NET.team;if(!T)return;const X=myX();X.joinedAt=Date.now();for(let n=1;n<=(T.seams||0);n++)X.claimed[NET.teamId+':'+n]=1;save();
@@ -2994,7 +3243,9 @@ function claimOldSeams(){ // seams your new team broke before you joined pay not
 function wireTeamUI(){
   const b=$('btnTeam');b.insertAdjacentHTML('afterbegin',ICON_TEAM);b.addEventListener('click',()=>openTeam());
   $('teamClose').innerHTML=ICON.close;$('teamClose').addEventListener('click',closeTeam);
-  $('ovTeam').addEventListener('pointerdown',e=>{if(e.target===$('ovTeam'))closeTeam();});
+  $('popClose').innerHTML=ICON.close;$('popClose').addEventListener('click',closePop);
+  $('ovPop').addEventListener('pointerdown',e=>{if(e.target===$('ovPop'))closePop();});
+  $('ovTeam').addEventListener('pointerdown',e=>{if(e.target===$('ovTeam')&&!popIsOpen())closeTeam();});
   for(const t of['team','chat','ranks'])$('tab-'+t).addEventListener('click',()=>{teamTab=t;renderTeam();if(t!=='chat'&&NET.api&&NET.api.refreshRanks)NET.api.refreshRanks();});
   $('chatForm').addEventListener('submit',e=>{e.preventDefault();sendChatNow();});
   netOn('change',ev=>{updateAcct();updateTeamBadge();if(teamIsOpen())renderTeam();if(ev&&ev.teamChanged&&NET.teamId){netStatus();}seamClaims();refreshDropSoon();});
@@ -3008,6 +3259,475 @@ function wireTeamUI(){
   updateAcct();
 }
 let dropT=0;function refreshDropSoon(){clearTimeout(dropT);dropT=setTimeout(()=>{dropState='';refreshDrop();},50);}
+
+/* ---------- teams on the game server: find, join and run a crew ---------- */
+// The online game's team screens: search, team profiles, join types and requirements, requests, invite links and
+// direct invites, ranks (Foreman, Shift Boss, Veteran, Digger) with the actions each may take, team settings, the
+// pinned announcement, kicks and handovers. The server checks every action again; the screens only offer what your
+// rank allows. The Claude version and servers without the team update keep the simple screens in team.js.
+const ROLES={foreman:{label:'Foreman',rank:4},shift_boss:{label:'Shift Boss',rank:3},veteran:{label:'Veteran',rank:2},digger:{label:'Digger',rank:1}};
+const roleRank=r=>(ROLES[r]||{rank:0}).rank;
+const roleLabel=r=>(ROLES[r]||ROLES.digger).label;
+const myRole=()=>NET.teamId&&NET.players[NET.uid]?NET.players[NET.uid].role||'digger':null;
+const JOIN_LBL={open:'Anyone can join',request:'Ask to join',invite:'Invite only'};
+const BADGE_COLORS=['#fc6a1c','#e3301a','#ffd23a','#86e39a','#62e3ff','#3ba0e8','#a46be8','#e85b8a','#f2e8da','#8a7666'];
+const BADGES={
+  pick:'<path d="M3.5 8.2C7.6 3.6 16.4 3.6 20.5 8.2 17 6.6 14.4 6 12 6S7 6.6 3.5 8.2z"/><path d="M10.9 6.4h2.2l.9 15.1h-4z"/>',
+  drill:'<path d="M7.5 2.5h9v3.2h-9z"/><path d="M6.5 7h11L12 22z"/>',
+  gem:'<path d="M6.5 3.5h11l4 5.5L12 21 2.5 9z"/>',
+  mole:'<path fill-rule="evenodd" d="M12 3.5a8.5 8.5 0 0 1 8.5 8.5v8.5h-17V12A8.5 8.5 0 0 1 12 3.5zM8.6 10.2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6.8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM12 14.3c-1.3 0-2.3.8-2.3 1.7S10.7 17.7 12 17.7s2.3-.8 2.3-1.7-1-1.7-2.3-1.7z"/>',
+  flame:'<path d="M12 2c1.2 4.2 6.5 6.3 6.5 12.2A6.5 6.5 0 0 1 5.5 14.2c0-3.1 1.7-5.2 3.1-6.3 0 2.1.9 3.3 2.1 3.6-.2-3.5-.4-6.3 1.3-9.5z"/>',
+  bolt:'<path d="M13.8 2 4.5 13.8h6.6L9.6 22l9.9-12.3h-6.8z"/>',
+  crown:'<path d="M2.8 7.2 7.6 11 12 3.8l4.4 7.2 4.8-3.8-2 12.3H4.8z"/>',
+  star:'<path d="m12 2.5 2.9 6.3 6.8.8-5 4.6 1.4 6.8L12 17.6 5.9 21l1.4-6.8-5-4.6 6.8-.8z"/>',
+  shield:'<path d="M12 2.2 20 5.3V11c0 5.2-3.4 9.2-8 10.9C7.4 20.2 4 16.2 4 11V5.3z"/>',
+  lantern:'<path d="M9 2h6v2.2H9z"/><path d="M6.8 5.2h10.4l-1.1 2.2v9.4l1.1 2.4H6.8l1.1-2.4V7.4z"/><path d="M10 20.4h4V22h-4z"/>',
+  rock:'<path d="m2.5 18 3.2-8.6 5.4-4.3 6.3 2.1 4.1 6.3-2 6.4H4.6z"/>',
+  skull:'<path fill-rule="evenodd" d="M12 2.2a8.6 8.6 0 0 0-8.6 8.6c0 3.1 1.6 5.4 3.4 6.6v4.4h10.4v-4.4c1.8-1.2 3.4-3.5 3.4-6.6A8.6 8.6 0 0 0 12 2.2zM8.4 9.4a2.1 2.1 0 1 0 0 4.2 2.1 2.1 0 0 0 0-4.2zm7.2 0a2.1 2.1 0 1 0 0 4.2 2.1 2.1 0 0 0 0-4.2z"/>'};
+const LANGS=[['','Any language'],['en','English'],['es','Español'],['fr','Français'],['de','Deutsch'],['pt','Português'],['it','Italiano'],['nl','Nederlands'],
+  ['pl','Polski'],['sv','Svenska'],['tr','Türkçe'],['ru','Русский'],['uk','Українська'],['ar','العربية'],['hi','हिन्दी'],['id','Bahasa Indonesia'],['th','ไทย'],
+  ['vi','Tiếng Việt'],['ja','日本語'],['ko','한국어'],['zh','中文'],['other','Other']];
+const REGIONS=[['','Anywhere'],['na','North America'],['sa','South America'],['eu','Europe'],['af','Africa'],['me','Middle East'],['as','Asia'],['oc','Oceania']];
+const DEPTHS=[0,5,10,25,50,100,200,500]; // layers; 10 m each
+const langName=c=>(LANGS.find(l=>l[0]===c)||['',''])[1];
+const regionName=c=>(REGIONS.find(l=>l[0]===c)||['',''])[1];
+const reqText=L=>L>0?`from ${meters(L)}`:'no requirement';
+const T2={q:'',join:'',qualify:false,lang:'',results:null,busy:0,loading:false,at:0,err:''};
+let blocked=[];try{blocked=JSON.parse(localStorage.getItem('gb-blocked')||'[]');}catch(e){}
+const isBlocked=id=>blocked.includes(id);
+function setBlocked(id,on){blocked=blocked.filter(x=>x!==id);if(on)blocked.push(id);try{localStorage.setItem('gb-blocked',JSON.stringify(blocked));}catch(e){}}
+
+// ---- small parts ----
+function badgeEl(b,color,size){const i=el('i','badge');i.style.background=color||'#fc6a1c';if(size)i.style.setProperty('--bs',size+'px');
+  i.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true">${BADGES[b]||BADGES.pick}</svg>`;return i;}
+function roleChip(role){return el('b','rchip r'+roleRank(role),roleLabel(role));}
+function tmBtn(text,cls,on){const b=el('button','tm-btn'+(cls?' '+cls:''),text);b.type='button';if(on)b.addEventListener('click',on);return b;}
+function tmInput(ph,max,val){const i=el('input','tm-input');i.placeholder=ph;if(max)i.maxLength=max;i.autocomplete='off';if(val!=null)i.value=val;return i;}
+function tmSelect(opts,val){const s=el('select','tm-input tm-select');for(const[v,t]of opts){const o=el('option',null,t);o.value=v;s.append(o);}s.value=val==null?'':val;return s;}
+function tmErr(){return el('div','tm-err');}
+async function busy(btn,run,err){ // one tap, one call: the button waits, and the server's words land under it
+  if(btn.disabled)return;btn.disabled=true;if(err)err.textContent='';
+  try{return await run();}catch(e){if(err)err.textContent=(e&&e.friendly)||'Couldn’t reach the game server. Try again.';sfx('deny');}finally{btn.disabled=false;}}
+function armed(btn,label,run){ // destructive taps ask twice
+  btn.addEventListener('click',()=>{if(btn.dataset.armed!=='1'){btn.dataset.armed='1';const t=btn.textContent;btn.textContent=label;btn.classList.add('armed');
+    setTimeout(()=>{btn.dataset.armed='';btn.textContent=t;btn.classList.remove('armed');},3500);return;}btn.dataset.armed='';btn.classList.remove('armed');run();});}
+const linkBase=()=>location.origin+location.pathname;
+const teamLink=code=>linkBase()+'?team='+code;
+const inviteLink=token=>linkBase()+'?invite='+token;
+async function copyText(s,btn){let ok=false;try{await navigator.clipboard.writeText(s);ok=true;}catch(e){}
+  if(btn){const t=btn.textContent;btn.textContent=ok?'COPIED':'COPY FAILED';setTimeout(()=>btn.textContent=t,1500);}if(ok)sfx('select');return ok;}
+async function shareLink(title,url,btn){if(navigator.share){try{await navigator.share({title,text:title,url});return;}catch(e){if(e&&e.name==='AbortError')return;}}copyText(url,btn);}
+
+// ---- the pop-up sheet, above the team sheet ----
+let popMode=null,popClose=null,popSeq=0;
+function openPop(title,build,onClose){const ov=$('ovPop');popSeq++;if(ov.hidden&&mode==='play'){popMode='play';mode='modal';}
+  if(!ov.hidden&&popClose){const f=popClose;popClose=null;f();}
+  $('popTitle').textContent=title;const B=$('popBody');B.textContent='';B.scrollTop=0;ov.hidden=false;popClose=onClose||null;build(B);return B;}
+function closePop(){const ov=$('ovPop');if(ov.hidden)return;ov.hidden=true;$('popBody').textContent='';
+  if(popClose){const f=popClose;popClose=null;f();}if(popMode&&mode==='modal'&&!teamIsOpen())mode=popMode;popMode=null;if(teamIsOpen())renderTeam();}
+function popIsOpen(){return!$('ovPop').hidden;}
+
+// ---- the Team tab ----
+function renderTeamPane2(){
+  const P=$('pane-team'),key=!NET.on?'off':NET.teamId?'t:'+NET.teamId+':'+myRole():'none';
+  if(P.dataset.k!==key){P.dataset.k=key;P.textContent='';buildTeamPane2(P,key);}
+  fillAcctCard();
+  if(key==='none'){fillInbox();fillSearch();if(!T2.loading&&(!T2.results||Date.now()-T2.at>15000))doSearch();}
+  if(key.startsWith('t:'))fillMine2();
+}
+function buildTeamPane2(P,key){
+  if(key==='off'){const c=el('div','tm-card');c.append(el('div','tm-title','Solo dig'),el('div','tm-sub',NET.off.card));P.append(c);return;}
+  if(key==='none'){P.append(acctCard());
+    const ib=el('div','tm-card');ib.id='tmInbox';ib.hidden=true;P.append(ib);
+    const s=el('div','tm-card');s.append(el('div','tm-h','Find a team'));
+    const r=el('div','tm-row'),q=tmInput('Name or #tag',120,T2.q);q.id='tmFind';q.enterKeyHint='search';
+    const go=tmBtn('FIND','alt',()=>{T2.q=q.value.trim();if(linkFrom(T2.q)){q.value='';T2.q='';return;}doSearch();});go.id='tmFindGo';
+    q.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go.click();}});r.append(q,go);
+    const f=el('div','chips');
+    for(const[v,t]of[['','Any'],['open','Open'],['request','Ask to join']]){const c=el('button','chip'+(T2.join===v?' on':''),t);c.type='button';c.dataset.v=v;
+      c.addEventListener('click',()=>{T2.join=v;for(const x of f.querySelectorAll('.chip[data-v]'))x.classList.toggle('on',x.dataset.v===v);doSearch();});f.append(c);}
+    const qc=el('button','chip'+(T2.qualify?' on':''),'I can join');qc.type='button';qc.addEventListener('click',()=>{T2.qualify=!T2.qualify;qc.classList.toggle('on',T2.qualify);doSearch();});f.append(qc);
+    const lg=tmSelect(LANGS,T2.lang);lg.classList.add('chip-sel');lg.setAttribute('aria-label','Language');lg.addEventListener('change',()=>{T2.lang=lg.value;doSearch();});f.append(lg);
+    const list=el('div','tm-list');list.id='tmResults';
+    s.append(r,f,list);P.append(s);
+    const c=el('div','tm-card');c.id='tmStart';P.append(c);
+    return;}
+  const head=el('div','tm-card team-head');head.id='tmHead';P.append(head);
+  const rq=el('div','tm-card');rq.id='tmReqs';rq.hidden=true;P.append(rq);
+  const seam=el('div','tm-card seam-card');seam.id='tmSeam';P.append(seam);
+  const mem=el('div','tm-card');mem.append(el('div','tm-h','Crew'));const ml=el('div','tm-list');ml.id='tmMembers';mem.append(ml);P.append(mem);
+  const fd=el('div','tm-card');fd.append(el('div','tm-h','Lately'));const fl=el('div','tm-list');fl.id='tmFeed';fd.append(fl);P.append(fd);
+  P.append(acctCard());
+  const lv=el('button','tm-link','Leave team');lv.type='button';lv.id='tmLeave';P.append(lv);
+  lv.addEventListener('click',async()=>{
+    if(myRole()==='foreman'&&NET.members.length>1){hint('Hand over the Foreman role first: tap a teammate in the crew list.');sfx('deny');return;}
+    if(lv.dataset.armed!=='1'){lv.dataset.armed='1';lv.textContent=NET.members.length>1?'Tap again to leave':'Tap again: the team closes when its last digger leaves';setTimeout(()=>{lv.dataset.armed='';lv.textContent='Leave team';},3500);return;}
+    try{await NET.api.leaveTeam();}catch(e){hint((e&&e.friendly)||'Could not leave the team. Try again.');}renderTeam();});
+}
+
+// ---- no team yet: invites, requests, search, start one ----
+function fillInbox(){const B=$('tmInbox');if(!B)return;B.textContent='';
+  const reqs=Object.entries(NET.myRequests||{}).filter(([id])=>NET.teams[id]);
+  B.hidden=!NET.inbox.length&&!reqs.length;if(B.hidden)return;
+  if(NET.inbox.length){B.append(el('div','tm-h','Invites'));
+    for(const iv of NET.inbox){const T=NET.teams[iv.team],row=el('div','rank');row.append(badgeEl(T.badge,T.color));
+      const mid=el('div','grow');mid.append(el('div','nm',T.name),el('div','st',`${netName(iv.from)} invited you · ${ago(iv.until-(NET.cfg.invite_expiry_days||7)*864e5)}`));
+      const v=tmBtn('VIEW','alt sm',()=>openTeamProfile(iv.team,{token:iv.token,from:iv.from}));
+      const x=tmBtn('✕','alt sm',async()=>{x.disabled=true;try{await NET.api.declineInvite(iv.token);}catch(e){hint((e&&e.friendly)||'Try again.');}fillInbox();});x.setAttribute('aria-label','Decline invite');
+      row.append(mid,v,x);B.append(row);}}
+  if(reqs.length){B.append(el('div','tm-h'+(NET.inbox.length?' gap':''),'Your requests'));
+    for(const[id,at]of reqs){const T=NET.teams[id],row=el('div','rank');row.append(badgeEl(T.badge,T.color));
+      const mid=el('div','grow');mid.append(el('div','nm',T.name),el('div','st',`Waiting for a Veteran or higher · sent ${ago(at)}`));
+      const c=tmBtn('CANCEL','alt sm',async()=>{c.disabled=true;try{await NET.api.cancelRequest(id);}catch(e){hint((e&&e.friendly)||'Try again.');}fillInbox();});
+      row.append(mid,c);row.addEventListener('click',e=>{if(e.target===c)return;openTeamProfile(id);});B.append(row);}}
+}
+async function doSearch(){if(!NET.v2||!NET.on)return;const my=++T2.busy;T2.err='';T2.loading=true;
+  try{const rows=await NET.api.searchTeams(T2.q,{join:T2.join,qualify:T2.qualify,lang:T2.lang});if(my!==T2.busy)return;T2.results=rows;T2.at=Date.now();}
+  catch(e){if(my!==T2.busy)return;T2.err=(e&&e.friendly)||'Couldn’t reach the game server.';}
+  T2.loading=false;if(teamIsOpen()&&teamTab==='team')fillSearch();}
+function fillSearch(){const L=$('tmResults');if(!L)return;L.textContent='';
+  if(T2.err){L.append(el('div','tm-err',T2.err));return;}
+  if(!T2.results){L.append(el('div','tm-empty','Looking for teams…'));}
+  else if(!T2.results.length)L.append(el('div','tm-empty',T2.q?`No team called “${T2.q}”. Check the spelling, or try its #tag.`:'No teams match yet. Start one and share its link.'));
+  for(const r of T2.results||[]){const row=el('div','rank tap');row.tabIndex=0;row.setAttribute('role','button');row.append(badgeEl(r.badge,r.color));
+    const mid=el('div','grow'),full=r.members>=TEAM_MAX;
+    mid.append(el('div','nm',r.name),el('div','st',`${full?'Full':JOIN_LBL[r.join]} · ${reqText(r.minDepth)} · ${meters(r.front)} deep`));
+    row.append(mid,el('b','rk',`${r.members}/${TEAM_MAX}`));
+    const open=()=>openTeamProfile(r.id);row.addEventListener('click',open);row.addEventListener('keydown',e=>{if(e.key==='Enter')open();});L.append(row);}
+  const S=$('tmStart');if(!S)return;S.textContent='';
+  const cost=NET.cfg.team_create_cost??1000;
+  S.append(el('div','tm-title','Start a team'),el('div','tm-sub',`Pick a name and a badge, and lead it as Foreman. Costs ${cost.toLocaleString('en-US')} coins.`));
+  S.append(tmBtn('START A TEAM','wide',()=>openCreate()));
+}
+
+// ---- a team's profile ----
+async function openTeamProfile(id,o){o=o||{};
+  const B=openPop('Team',B=>B.append(el('div','tm-empty','Loading…'))),seq=popSeq;let d;
+  try{d=await NET.api.teamProfile(id);}catch(e){if(seq===popSeq&&popIsOpen()){B.textContent='';B.append(el('div','tm-err',(e&&e.friendly)||'Couldn’t reach the game server.'));}return;}
+  if(seq!==popSeq||!popIsOpen())return;B.textContent='';
+  if(!d){B.append(el('div','tm-empty','That team is gone.'));return;}
+  const T=d.team,mine=NET.teamId===id,full=d.members.length>=TEAM_MAX;$('popTitle').textContent=mine?'Your team':'Team';
+  const top=el('div','prof-top');top.append(badgeEl(T.badge,T.color,58));const tx=el('div','grow');
+  tx.append(el('div','tm-title',T.name),el('div','tm-sub tagline',`#${T.code}`));top.append(tx);B.append(top);
+  if(T.desc)B.append(el('p','prof-desc',T.desc));
+  const facts=el('div','facts');const fact=(k,v)=>{const f=el('div','fact');f.append(el('b',null,v),el('span',null,k));facts.append(f);};
+  fact('Diggers',`${d.members.length}/${TEAM_MAX}`);fact('Team depth',meters(d.front));fact('Seams broken',String(T.seams||0));
+  fact('Joining',JOIN_LBL[T.join]);fact('Requirement',T.minDepth?meters(T.minDepth):'None');
+  if(T.lang||T.region)fact('Plays in',[langName(T.lang),T.region?regionName(T.region):''].filter(Boolean).join(' · '));
+  if(T.family)fact('Chat','Family Friendly');
+  B.append(facts);
+  // what you can do here
+  const act=el('div','tm-card prof-act'),err=tmErr();
+  const leaveNote=()=>NET.teamId&&!mine?el('div','tm-sub dim',`Joining leaves ${NET.team.name}.`):null;
+  const done=async st=>{if(st==='joined'||st==='member'){closePop();claimOldSeams();sfx('unlock');toast(`Welcome to ${T.name}!`,'#86e39a');accountNudge('team');teamTab='team';if(!teamIsOpen()&&mode==='play')openTeam('team');else renderTeam();}
+    else if(st==='requested'){sfx('select');openTeamProfile(id);}};
+  if(mine)act.append(el('div','tm-sub','You’re on this team.'));
+  else if(NET.readOnly)act.append(el('div','tm-sub','You can look but not join here.'));
+  else if(o.token){act.append(el('div','tm-sub',`${o.fromName||(o.from?netName(o.from):'A teammate')} invited you. An invite skips the requirement and the request.`));
+    const j=tmBtn('JOIN TEAM','wide',()=>busy(j,async()=>{await NET.api.redeemInvite(o.token);done('joined');},err));act.append(j);const n=leaveNote();if(n)act.append(n);}
+  else if(myRole()==='foreman'&&NET.members.length>1)act.append(el('div','tm-sub','You lead your own team. Hand over the Foreman role before you join another.'));
+  else if(T.join==='invite')act.append(el('div','tm-sub','Invite only. Ask someone on the team to send you an invite.'));
+  else if(NET.myRequests[id]){act.append(el('div','tm-sub',`Request sent ${ago(NET.myRequests[id])}. A Veteran or higher will let you in.`));
+    const c=tmBtn('CANCEL REQUEST','alt wide',()=>busy(c,async()=>{await NET.api.cancelRequest(id);openTeamProfile(id);},err));act.append(c);}
+  else if(full)act.append(el('div','tm-sub','This team is full.'));
+  else if((state.best||1)<T.minDepth)act.append(el('div','tm-sub',`This team wants diggers who have reached ${meters(T.minDepth)}. Your deepest is ${meters(state.best||1)}.`));
+  else if(T.join==='request'){const m=tmInput('Say hi (optional)',80);act.append(el('div','tm-sub','This team checks who joins. Send a request, and a Veteran or higher will answer.'),m);
+    const a=tmBtn('ASK TO JOIN','wide',()=>busy(a,async()=>done(await NET.api.askToJoin(id,m.value)),err));act.append(a);const n=leaveNote();if(n)act.append(n);}
+  else{const j=tmBtn('JOIN TEAM','wide',()=>busy(j,async()=>done(await NET.api.askToJoin(id,'')),err));act.append(j);const n=leaveNote();if(n)act.append(n);}
+  act.append(err);B.append(act);
+  const ml=el('div','tm-card');ml.append(el('div','tm-h','Crew'));
+  for(const m of d.members){const row=el('div','mem');row.append(avatar(m.id));const mid=el('div','grow'),nm=el('div','nm');
+    nm.append(document.createTextNode(m.id===NET.uid?(NET.me.name||'You')+' (you)':netName(m.id)));mid.append(nm,el('div','st',`deepest ${meters(m.best)} · ${m.at?'seen '+ago(m.at):''}`));
+    row.append(mid,roleChip(m.role));ml.append(row);}
+  if(!d.members.length)ml.append(el('div','tm-empty','Nobody yet.'));
+  B.append(ml);
+  if(!mine){const rp=el('button','tm-link','Report this team’s name');rp.type='button';
+    rp.addEventListener('click',()=>busy(rp,async()=>{await NET.api.report('team',id,'name');rp.textContent='Reported. Thanks.';},err));B.append(rp);}
+}
+
+// ---- starting a team, and its settings ----
+function teamForm(B,init,o){ // badge, colour, who can join, requirement, description, language, region, Family Friendly
+  const v=Object.assign({badge:'pick',color:'#fc6a1c',join:'open',minDepth:0,desc:'',lang:'',region:'',family:false},init||{});
+  const prev=el('div','badge-prev');const pv=()=>{prev.textContent='';prev.append(badgeEl(v.badge,v.color,58));};pv();
+  const bg=el('div','badge-grid');
+  for(const b of Object.keys(BADGES)){const t=el('button','bpick'+(b===v.badge?' on':''));t.type='button';t.setAttribute('aria-label','Badge '+b);t.append(badgeEl(b,v.color,34));
+    t.addEventListener('click',()=>{v.badge=b;for(const x of bg.children)x.classList.toggle('on',x===t);pv();});bg.append(t);}
+  const sw=el('div','swatches');
+  for(const c of BADGE_COLORS){const t=el('button','sw'+(c===v.color?' on':''));t.type='button';t.style.background=c;t.setAttribute('aria-label','Colour '+c);
+    t.addEventListener('click',()=>{v.color=c;for(const x of sw.children)x.classList.toggle('on',x===t);for(const i of bg.querySelectorAll('.badge'))i.style.background=c;pv();});sw.append(t);}
+  const look=el('div','tm-card');const lr=el('div','look-row');lr.append(prev,bg);look.append(el('div','tm-h','Badge'),lr,sw);B.append(look);
+  const who=el('div','tm-card');who.append(el('div','tm-h','Who can join'));const seg=el('div','seg');
+  for(const[j,t]of[['open','Anyone'],['request','Ask first'],['invite','Invite only']]){const b=el('button','seg-b'+(v.join===j?' on':''),t);b.type='button';
+    b.addEventListener('click',()=>{v.join=j;for(const x of seg.children)x.classList.toggle('on',x===b);});seg.append(b);}
+  const dep=tmSelect(DEPTHS.map(L=>[String(L),L?`Reached ${meters(L)}`:'No depth requirement']),String(v.minDepth));
+  if(!DEPTHS.includes(v.minDepth)){const op=el('option',null,`Reached ${meters(v.minDepth)}`);op.value=String(v.minDepth);dep.prepend(op);dep.value=String(v.minDepth);}
+  who.append(seg,el('div','tm-sub dim','Requests and invites are answered by Veterans and up. Invites skip the requirement.'),dep);B.append(who);
+  const about=el('div','tm-card');const ds=el('textarea','tm-input tm-area');ds.maxLength=200;ds.rows=3;ds.placeholder='What’s your crew about? (optional)';ds.value=v.desc;
+  const lg=tmSelect(LANGS,v.lang),rg=tmSelect(REGIONS,v.region);lg.setAttribute('aria-label','Language');rg.setAttribute('aria-label','Region');
+  const fr=el('div','tm-row two');fr.append(lg,rg);
+  const ff=el('label','check');const cb=el('input');cb.type='checkbox';cb.checked=v.family;cb.disabled=!!(o&&o.familyLocked);
+  ff.append(cb,el('span',null,o&&o.familyLocked?'Family Friendly chat (on for good)':'Family Friendly chat: hides milder words too. Can’t be switched off later.'));
+  about.append(el('div','tm-h','About'),ds,fr,ff);B.append(about);
+  return()=>({badge:v.badge,color:v.color,join_type:v.join,min_depth:Number(dep.value)||0,description:ds.value,language:lg.value,region:rg.value,family_friendly:cb.checked});
+}
+function openCreate(){
+  if(!NET.me.saved){openAccount('save','Teams need a saved account, so a lost phone never strands your crew. Save your progress, then start your team.');return;}
+  const cost=NET.cfg.team_create_cost??1000;
+  openPop('Start a team',B=>{
+    const nc=el('div','tm-card');const nm=tmInput('Team name (3 to 20 characters)',20);nc.append(el('div','tm-h','Name'),nm,el('div','tm-sub dim','Team names are unique. Your crew sees it everywhere.'));B.append(nc);
+    const get=teamForm(B,{},{});const err=tmErr();
+    const go=tmBtn(`START TEAM · ${cost.toLocaleString('en-US')} COINS`,'wide');go.id='tmCreateGo';
+    if(state.coins<cost){go.disabled=true;err.textContent=`You need ${cost.toLocaleString('en-US')} coins. You have ${state.coins.toLocaleString('en-US')}.`;}
+    go.addEventListener('click',()=>busy(go,async()=>{
+      const name=nm.value.trim();if(name.length<3){err.textContent='Give your team a name of at least 3 characters.';return;}
+      if(state.coins<cost){err.textContent=`You need ${cost.toLocaleString('en-US')} coins.`;return;}
+      await NET.api.makeTeam(name,get());
+      state.coins-=cost;shownCoins=state.coins;$('coinTxt').textContent=state.coins.toLocaleString('en-US');save();
+      claimOldSeams();sfx('unlock');closePop();teamTab='team';renderTeam();toast(`${name} is open for diggers. Share its link from the Team tab.`,'#86e39a');},err));
+    if(NET.teamId)B.append(el('div','tm-sub dim',`Starting a team leaves ${NET.team.name}.`));
+    B.append(go,err);});
+}
+function openSettings(){const T=NET.team,r=roleRank(myRole());if(!T||r<3)return;
+  openPop('Team settings',B=>{
+    const get=teamForm(B,{badge:T.badge,color:T.color,join:T.join,minDepth:T.minDepth,desc:T.desc,lang:T.lang,region:T.region,family:T.family},{familyLocked:T.family});
+    const err=tmErr(),sv=tmBtn('SAVE SETTINGS','wide');sv.id='tmSettingsGo';
+    sv.addEventListener('click',()=>busy(sv,async()=>{await NET.api.updateTeam(get());sfx('select');closePop();toast('Team settings saved','#86e39a');},err));B.append(sv,err);
+    const an=el('div','tm-card');an.append(el('div','tm-h','Pinned announcement'));
+    const at=el('textarea','tm-input tm-area');at.maxLength=160;at.rows=2;at.placeholder='Pin a note for your crew';at.value=T.ann||'';
+    const ar=el('div','tm-row'),ae=tmErr(),pin=tmBtn('PIN','',()=>busy(pin,async()=>{await NET.api.setAnnouncement(at.value);ae.textContent='';toast(at.value.trim()?'Announcement pinned':'Announcement cleared','#86e39a');sfx('select');},ae));
+    const clr=tmBtn('CLEAR','alt',()=>busy(clr,async()=>{await NET.api.setAnnouncement('');at.value='';toast('Announcement cleared','#86e39a');},ae));
+    ar.append(pin,clr);an.append(at,ar,el('div','tm-sub dim',`A new one every ${NET.cfg.announce_hours||12} hours. Everyone sees it at the top of chat.`),ae);B.append(an);
+    if(myRole()==='foreman'){const rn=el('div','tm-card');rn.append(el('div','tm-h','Rename the team'));
+      const ri=tmInput('New name',20,T.name),re=tmErr(),rb=tmBtn('RENAME','',()=>busy(rb,async()=>{await NET.api.renameTeam(ri.value);sfx('select');toast('Team renamed','#86e39a');closePop();},re));
+      const rr=el('div','tm-row');rr.append(ri,rb);const days=NET.cfg.team_rename_days||30;
+      rn.append(rr,el('div','tm-sub dim',T.renamedAt&&!T.hidden&&Date.now()-T.renamedAt<days*864e5?`Renamed ${ago(T.renamedAt)}. Teams can be renamed once every ${days} days.`:`Teams can be renamed once every ${days} days.`),re);B.append(rn);}
+    const iv=el('div','tm-card');iv.append(el('div','tm-h','Invite links'),el('div','tm-sub dim','Stop every invite link and direct invite your crew has sent.'));
+    const ie=tmErr(),ib=tmBtn('CANCEL ALL INVITES','alt wide');armed(ib,'TAP AGAIN TO CANCEL THEM',()=>busy(ib,async()=>{const n=await NET.api.revokeInvites();toast(n?`${n} invite${n===1?'':'s'} cancelled`:'No invites to cancel','#86e39a');},ie));
+    iv.append(ib,ie);B.append(iv);});
+}
+
+// ---- invites ----
+function openInvite(){const T=NET.team;if(!T)return;const r=roleRank(myRole());
+  openPop('Invite diggers',B=>{
+    const lk=el('div','tm-card');
+    if(r>=2){lk.append(el('div','tm-h','Invite link'),el('div','tm-sub','Anyone with this link can join, even if your team asks first or is invite only. It skips the depth requirement and lasts 7 days.'));
+      const out=el('div','linkbox','Making a link…'),row=el('div','tm-row'),cp=tmBtn('COPY','alt'),sh=tmBtn('SHARE','');cp.disabled=sh.disabled=true;row.append(cp,sh);
+      const le=tmErr();lk.append(out,row,le);
+      NET.api.makeInvite().then(v=>{const u=inviteLink(v.token);out.textContent=u;cp.disabled=sh.disabled=false;
+        cp.addEventListener('click',()=>copyText(u,cp));sh.addEventListener('click',()=>shareLink(`Dig with ${T.name} in GroundBreaking`,u,sh));})
+        .catch(e=>{out.textContent='';le.textContent=(e&&e.friendly)||'Couldn’t make a link.';});}
+    const tl=el('div','tm-card');const u=teamLink(T.code);tl.append(el('div','tm-h','Team link'),el('div','tm-sub',`Opens your team’s profile. Joining follows your team’s rules (${JOIN_LBL[T.join].toLowerCase()}, ${reqText(T.minDepth)}).`),el('div','linkbox',u));
+    const tr=el('div','tm-row'),c2=tmBtn('COPY','alt',()=>copyText(u,c2)),s2=tmBtn('SHARE','',()=>shareLink(`Dig with ${T.name} in GroundBreaking`,u,s2));tr.append(c2,s2);tl.append(tr);
+    if(r>=2){const dt=el('div','tm-card');dt.append(el('div','tm-h','Invite by player tag'),el('div','tm-sub dim','The invite lands in their Team tab.'));
+      const di=tmInput('#TAG',10),de=tmErr(),db=tmBtn('INVITE','',()=>busy(db,async()=>{await NET.api.makeInvite(di.value);toast(`Invite sent to #${di.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase()}`,'#86e39a');di.value='';sfx('select');},de));
+      di.style.textTransform='uppercase';const dr=el('div','tm-row');dr.append(di,db);dt.append(dr,de);B.append(lk,dt,tl);}
+    else B.append(tl,el('div','tm-sub dim','Veterans and up can also send invite links that skip the requirement.'));});
+}
+
+// ---- your team ----
+function fillMine2(){
+  const T=NET.team;if(!T)return;
+  const H=$('tmHead');H.textContent='';
+  const r=roleRank(myRole()),fr=teamFront(NET.teamId),online=NET.peers.filter(p=>!p.isMe).length;
+  const top=el('div','prof-top');top.append(badgeEl(T.badge,T.color,52));const tx=el('div','grow');
+  tx.append(el('div','tm-title',T.name),el('div','tm-sub tagline',`#${T.code} · ${JOIN_LBL[T.join]} · ${reqText(T.minDepth)}`));top.append(tx);H.append(top);
+  H.append(el('div','tm-sub',`Team depth ${meters(fr)} · ${NET.members.length}/${TEAM_MAX} diggers · ${online} online now`));
+  if(T.ann){const a=el('div','ann');a.append(el('b',null,'📌 '),document.createTextNode(T.ann));if(T.annBy)a.append(el('span',null,` · ${netName(T.annBy)}`));H.append(a);}
+  const row=el('div','tm-row');row.append(tmBtn(r>=2?'INVITE':'SHARE LINK','',()=>openInvite()));
+  if(r>=3)row.append(tmBtn('SETTINGS','alt',()=>openSettings()));H.append(row);
+  const R=$('tmReqs');R.textContent='';R.hidden=!(r>=2&&NET.requests.length);
+  if(!R.hidden){R.append(el('div','tm-h',`Asking to join · ${NET.requests.length}`));
+    for(const q of NET.requests){const rw=el('div','req');rw.append(avatar(q.id));const mid=el('div','grow');
+      mid.append(el('div','nm',netName(q.id)),el('div','st',`deepest ${meters(q.best)} · ${ago(q.at)}${q.team?' · on another team':''}`));if(q.msg)mid.append(el('div','req-msg',`“${q.msg}”`));
+      const ok=tmBtn('LET IN','sm'),no=tmBtn('✕','alt sm');no.setAttribute('aria-label','Decline');
+      ok.addEventListener('click',()=>busy(ok,async()=>{await NET.api.answerRequest(q.id,true);sfx('unlock');},null).then(()=>fillMine2()));
+      no.addEventListener('click',()=>busy(no,async()=>{await NET.api.answerRequest(q.id,false);},null).then(()=>fillMine2()));
+      rw.append(mid,ok,no);R.append(rw);}}
+  fillSeamCard();
+  const ML=$('tmMembers');ML.textContent='';
+  const mem=NET.members.slice().sort((a,b)=>roleRank(b.role)-roleRank(a.role)||(b.pts||0)-(a.pts||0));
+  for(const m of mem){const s=memberStatus(m),row=el('div','mem tap');row.tabIndex=0;row.setAttribute('role','button');row.append(avatar(m.id));
+    const mid=el('div','grow'),nm=el('div','nm');if(s.on||m.id===NET.uid){const d=el('i','on-dot');nm.append(d);}
+    nm.append(document.createTextNode(m.id===NET.uid?(NET.me.name||'You')+' (you)':netName(m.id)));
+    mid.append(nm,el('div','st',`${s.txt} · deepest ${meters(m.best||1)}`));row.append(mid,roleChip(m.role||'digger'),el('b','pts',(m.pts||0).toLocaleString('en-US')));
+    const open=()=>openMember(m.id);row.addEventListener('click',open);row.addEventListener('keydown',e=>{if(e.key==='Enter')open();});ML.append(row);}
+  const FL=$('tmFeed');FL.textContent='';
+  const items=NET.feed.slice(-6).reverse();
+  if(!items.length)FL.append(el('div','tm-empty','Big finds and breakthroughs from your crew show up here.'));
+  for(const f of items){const fr2=el('div','feed');const d=el('i');d.style.background=NET.colors[f.by]||'#fc6a1c';fr2.append(d,el('span',null,feedText(f)));FL.append(fr2);}
+  const lv=$('tmLeave');if(lv)lv.classList.toggle('dim',myRole()==='foreman'&&NET.members.length>1);
+}
+
+// ---- one teammate: rank changes, kick, hand over, report, block ----
+function openMember(id){const m=NET.players[id];if(!m||!NET.team)return;
+  const me=id===NET.uid,mr=roleRank(myRole()),tr=roleRank(m.role||'digger'),name=me?NET.me.name:netName(id);
+  openPop(me?'You':'Teammate',B=>{
+    const top=el('div','prof-top');top.append(avatar(id));const tx=el('div','grow');
+    tx.append(el('div','tm-title',name+(me?' (you)':'')),el('div','tm-sub tagline',`#${NET.tags[id]||m.tag||''}`));top.append(tx,roleChip(m.role||'digger'));B.append(top);
+    const facts=el('div','facts');const fact=(k,v)=>{const f=el('div','fact');f.append(el('b',null,v),el('span',null,k));facts.append(f);};
+    fact('Deepest',meters(m.best||1));fact('Points',(m.pts||0).toLocaleString('en-US'));fact('Last dug',m.at?ago(m.at):'—');if(m.joinedAt)fact('On the team',ago(m.joinedAt).replace(' ago',''));
+    B.append(facts);
+    if(me){B.append(el('div','tm-sub dim','That’s you. Your rank is set by the Foreman and Shift Bosses.'));return;}
+    const err=tmErr(),acts=el('div','tm-card');
+    const opts=mr===4?['shift_boss','veteran','digger'].filter(x=>x!==m.role):mr===3?(m.role==='digger'?['veteran']:m.role==='veteran'?['shift_boss','digger']:[]):[];
+    if(mr>=3&&tr<mr&&opts.length){acts.append(el('div','tm-h','Rank'));const rr=el('div','tm-row wrap');
+      for(const ro of opts){const up=roleRank(ro)>tr,b=tmBtn(`${up?'PROMOTE TO':'DEMOTE TO'} ${roleLabel(ro).toUpperCase()}`,up?'sm':'alt sm',()=>busy(b,async()=>{await NET.api.setRole(id,ro);sfx('select');closePop();},err));rr.append(b);}
+      acts.append(rr);}
+    if(mr===4){const hb=tmBtn('MAKE FOREMAN','alt wide');armed(hb,`TAP AGAIN: YOU BECOME A SHIFT BOSS`,()=>busy(hb,async()=>{await NET.api.handOver(id);sfx('unlock');closePop();toast(`${name} is the Foreman now`,'#86e39a');},err));
+      acts.append(hb);}
+    if(mr>=2&&tr<mr){const kr=el('div','tm-row'),ki=tmInput('Reason (optional, shown in chat)',80),kb=tmBtn('KICK','danger');
+      armed(kb,'TAP AGAIN',()=>busy(kb,async()=>{await NET.api.kick(id,ki.value);sfx('deny');closePop();toast(`${name} was kicked`,'#ff5b47');},err));
+      kr.append(ki,kb);acts.append(el('div','tm-h gap','Kick'),kr,el('div','tm-sub dim',`They can’t rejoin for ${NET.cfg.kick_ban_hours||24} hours.${mr===2?` Veterans can kick once every ${NET.cfg.veteran_kick_minutes||20} minutes.`:''}`));}
+    if(acts.childNodes.length){acts.append(err);B.append(acts);}
+    const more=el('div','tm-row wrap');
+    const rp=tmBtn('REPORT NAME','alt sm',()=>busy(rp,async()=>{await NET.api.report('player',id,'name');rp.textContent='REPORTED';rp.disabled=true;},err));
+    const bl=tmBtn(isBlocked(id)?'UNBLOCK':'BLOCK','alt sm',()=>{setBlocked(id,!isBlocked(id));bl.textContent=isBlocked(id)?'UNBLOCK':'BLOCK';toast(isBlocked(id)?`You won’t see ${name}’s messages`:`You’ll see ${name}’s messages again`,'#87735f');});
+    more.append(rp,bl);B.append(more);if(!acts.childNodes.length)B.append(err);});
+}
+
+// ---- links into the game: ?team=TAG opens a team, ?invite=TOKEN offers to join ----
+let pendingLink=null;
+function linkFrom(s){ // a pasted invite or team link (or a bare token) in the search box
+  const m=/[?&](invite|team)=([A-Za-z0-9]+)/.exec(s||'');if(!m)return false;handleLink(m[1],m[2]);return true;}
+function readLinks(){const q=new URLSearchParams(location.search),iv=q.get('invite'),tm=q.get('team');
+  if(iv)pendingLink=['invite',iv];else if(tm)pendingLink=['team',tm];
+  if(iv||tm){q.delete('invite');q.delete('team');const s=q.toString();try{history.replaceState(null,'',location.pathname+(s?'?'+s:'')+location.hash);}catch(e){}}}
+function runPendingLink(){if(!pendingLink||!NET.on||!NET.v2||mode!=='play')return;const[k,v]=pendingLink;pendingLink=null;handleLink(k,v);}
+async function handleLink(kind,v){if(!NET.v2){hint('Team links need the game server.');return;}
+  if(kind==='team'){let id=null;try{id=await NET.api.teamByCode(v);}catch(e){}
+    if(!id){hint('That team link doesn’t lead anywhere anymore.');sfx('deny');return;}openTeamProfile(id);return;}
+  let p=null;try{p=await NET.api.peekInvite(v);}catch(e){}
+  if(!p){hint('That invite link doesn’t work anymore. Ask for a new one.');sfx('deny');return;}
+  if(p.expired){hint(`That invite to ${p.name} has expired. Ask for a new one.`);sfx('deny');return;}
+  if(p.for_someone_else){hint(`That invite to ${p.name} is for someone else.`);sfx('deny');return;}
+  openTeamProfile(p.team_id,{token:v.toUpperCase(),fromName:p.from});
+}
+netOn('requests',()=>{if(teamIsOpen()&&teamTab==='team')renderTeamPane();updateTeamBadge();});
+netOn('inbox',()=>{if(teamIsOpen()&&teamTab==='team')renderTeamPane();updateTeamBadge();});
+readLinks();
+
+/* ---------- your account: save your progress, load it on a new phone, delete it ---------- */
+// Everyone starts as a guest. Saving links an email to that same account with a 6-digit code (and Google, once the
+// game server has it switched on); loading signs another phone into it. A guest's game lives only on its phone, so
+// the game offers to save at the moments that matter (a seam broken, a team joined, a few days in), never mid-dig.
+const acctFlow={email:''};
+const guestHasProgress=()=>(state.best||1)>2||state.coins>=100||!!NET.teamId;
+const EMAIL_RE=/^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+function acctCard(){const c=el('div','tm-card acct-card');c.id='tmAcct';return c;}
+function fillAcctCard(){const c=$('tmAcct');if(!c||!NET.me)return;c.textContent='';
+  const row=el('div','mem tap');row.tabIndex=0;row.setAttribute('role','button');row.append(avatar(NET.uid));
+  const mid=el('div','grow');mid.append(el('div','nm',NET.me.name||'You'),el('div','st',`#${NET.me.tag} · ${NET.me.saved?'saved':'not saved yet'}`));row.append(mid);
+  if(NET.me.saved)row.append(el('b','saved-chip','SAVED'));
+  else{const b=tmBtn('SAVE','sm',e=>{e.stopPropagation();openAccount('save');});b.id='tmSaveBtn';row.append(b);}
+  const open=()=>openAccount();row.addEventListener('click',open);row.addEventListener('keydown',e=>{if(e.key==='Enter')open();});
+  c.append(row,el('div','tm-sub dim',`Your shaft: layer ${state.L} · deepest ${meters(state.best||state.L)} · ${(myX().pts||0).toLocaleString('en-US')} pts`));
+}
+function openAccount(step,why){step=step||'main';
+  const title={main:'Your account',save:'Save your progress',load:'Load saved game',delete:'Delete account'}[step];
+  openPop(title,B=>{if(step==='save'||step==='load')acctEmail(B,step,why);else if(step==='delete')acctDelete(B);else acctMain(B);});
+}
+function acctMain(B){
+  const nc=el('div','tm-card'),nr=el('div','tm-row'),ni=tmInput('Your name',16,NET.me.name),ns=tmBtn('SAVE','alt'),ne=tmErr();ni.id='tmMe';ns.id='tmMeSave';
+  ns.addEventListener('click',()=>busy(ns,async()=>{const v=ni.value.trim();if(v===NET.me.name)return;await NET.api.setName(v);
+    ns.textContent='SAVED';sfx('select');setTimeout(()=>ns.textContent='SAVE',1500);fillAcctCard();updateAcct();},ne));
+  ni.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ns.click();}});
+  nr.append(ni,ns);const days=NET.cfg.name_change_days||14;
+  nc.append(el('div','tm-h','Name'),nr,el('div','tm-sub dim',NET.me.nameAt?`Changed ${ago(NET.me.nameAt)}. Names can change once every ${days} days.`:`3 to 16 characters. Your first change is free; after that, once every ${days} days.`),ne);
+  const tc=el('div','tm-card'),tr=el('div','code');tr.append(el('span',null,'#'+NET.me.tag));const cp=tmBtn('COPY','alt sm',()=>copyText('#'+NET.me.tag,cp));tr.append(cp);
+  tc.append(el('div','tm-h','Player tag'),tr,el('div','tm-sub dim','Share it so a team can invite you. Support asks for it too.'));
+  const sc=el('div','tm-card');
+  if(NET.me.saved){sc.append(el('div','tm-h','Saved'),el('div','tm-sub',`Your game is saved with ${NET.me.email||'your account'}. On a new phone, tap Load saved game and use that email.`));
+    sc.append(tmBtn('LOAD A DIFFERENT SAVED GAME','alt wide',()=>openAccount('load')));
+    const so=tmBtn('SIGN OUT ON THIS PHONE','alt wide');armed(so,'TAP AGAIN: THIS PHONE STARTS FRESH',()=>busy(so,()=>NET.api.signOut(),null));sc.append(so);}
+  else{sc.append(el('div','tm-h','Guest'),el('div','tm-sub','Your game lives only on this phone. Save it to keep your progress, team and rank if you lose or change phones.'));
+    const sv=tmBtn('SAVE MY PROGRESS','wide',()=>openAccount('save'));sv.id='acctSave';
+    const ld=tmBtn('LOAD SAVED GAME','alt wide',()=>openAccount('load'));ld.id='acctLoad';sc.append(sv,ld);}
+  const dl=el('button','tm-link danger-link','Delete account');dl.type='button';dl.id='acctDelete';dl.addEventListener('click',()=>openAccount('delete'));
+  B.append(nc,tc,sc,dl);
+}
+function acctEmail(B,kind,why){ // kind 'save': this account; 'load': another, saved account
+  const c=el('div','tm-card');if(why)c.append(el('div','tm-sub',why));
+  c.append(el('div','tm-sub',kind==='save'?'We’ll email you a 6-digit code. Enter it here and your game is saved to that email. No password.'
+    :'Enter the email your game is saved with. We’ll send a 6-digit code.'));
+  const ei=tmInput('you@example.com',254,acctFlow.email);ei.type='email';ei.autocomplete='email';ei.inputMode='email';ei.id='acctEmail';
+  const er=tmErr(),go=tmBtn('EMAIL ME A CODE','wide');go.id='acctSend';
+  go.addEventListener('click',()=>busy(go,async()=>{const v=ei.value.trim();if(!EMAIL_RE.test(v)){er.textContent='That email doesn’t look right.';return;}
+    acctFlow.email=v;if(kind==='save')await NET.api.saveStart(v);else await NET.api.loadStart(v);acctCode(B,kind);},er));
+  ei.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go.click();}});
+  c.append(ei,go,er);B.append(c);
+  if(kind==='load'&&!NET.me.saved&&guestHasProgress())B.append(el('div','tm-sub dim','This phone has a guest game. You’ll pick which game it keeps.'));
+  const seq=popSeq;
+  NET.api.authSettings().then(st=>{if(seq!==popSeq||!st||!st.external||!st.external.google)return;
+    const g=tmBtn('CONTINUE WITH GOOGLE','alt wide'),ge=tmErr(),gc=el('div','tm-card');g.id='acctGoogle';
+    g.addEventListener('click',()=>busy(g,()=>kind==='save'?NET.api.linkGoogle():NET.api.loadGoogle(),ge));
+    gc.append(el('div','tm-h','Or'),g,ge);B.append(gc);});
+  setTimeout(()=>{if(seq===popSeq)ei.focus();},60);
+}
+function acctCode(B,kind){B.textContent='';const seq=popSeq;
+  const c=el('div','tm-card');c.append(el('div','tm-sub',`Enter the 6-digit code we sent to ${acctFlow.email}.`));
+  const ci=tmInput('6-digit code',12);ci.inputMode='numeric';ci.autocomplete='one-time-code';ci.id='acctCode';ci.classList.add('code-in');
+  const er=tmErr(),go=tmBtn(kind==='save'?'SAVE MY PROGRESS':'LOAD SAVED GAME','wide');go.id='acctConfirm';
+  go.addEventListener('click',()=>busy(go,async()=>{const v=ci.value.replace(/\D/g,'');if(v.length<6){er.textContent='The code has 6 digits.';return;}
+    if(kind==='save'){await NET.api.saveConfirm(acctFlow.email,v);acctSaved(B);}
+    else acctChoose(B,await NET.api.loadConfirm(acctFlow.email,v));},er));
+  ci.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go.click();}});
+  const again=el('button','tm-link','Send a new code');again.type='button';
+  again.addEventListener('click',()=>busy(again,async()=>{if(kind==='save')await NET.api.saveStart(acctFlow.email);else await NET.api.loadStart(acctFlow.email);toast('New code sent','#86e39a');},er));
+  const back=el('button','tm-link','Use a different email');back.type='button';back.addEventListener('click',()=>{B.textContent='';acctEmail(B,kind);});
+  c.append(ci,go,er,el('div','tm-sub dim','Nothing yet? Check your spam folder. Codes work for an hour.'));B.append(c,again,back);
+  if(kind==='save'){ // opening the email's link instead (on any device) also saves the game
+    const t=setInterval(async()=>{if(seq!==popSeq||!popIsOpen()||NET.me.saved){clearInterval(t);return;}
+      try{if(await NET.api.checkSaved()&&seq===popSeq){clearInterval(t);acctSaved(B);}}catch(e){}},5000);}
+  setTimeout(()=>{if(seq===popSeq)ci.focus();},60);
+}
+function acctSaved(B){B.textContent='';sfx('fanfare');
+  const c=el('div','tm-card');c.append(el('div','tm-title','Progress saved'),el('div','tm-sub',`Your game is saved with ${NET.me.email||acctFlow.email}. On a new phone, tap Load saved game and use that email.`));
+  c.append(tmBtn('DONE','wide',()=>closePop()));B.append(c);fillAcctCard();updateAcct();}
+function acctChoose(B,info){B.textContent='';
+  if(info.same){const c=el('div','tm-card');c.append(el('div','tm-sub','That’s the game you’re already playing.'),tmBtn('DONE','wide',()=>closePop()));B.append(c);return;}
+  if(NET.me.saved||!guestHasProgress()){B.append(el('div','tm-empty','Loading your saved game…'));NET.api.loadFinish(true);return;}
+  let chosen=false;popClose=()=>{if(!chosen){chosen=true;NET.api.loadFinish(false).catch(()=>{});}}; // closing the sheet keeps this phone's game
+  const card=(title,rows,label,cls,on)=>{const c=el('div','tm-card choose');c.append(el('div','tm-h',title));
+    for(const[k,v]of rows){const r=el('div','kv');r.append(el('span',null,k),el('b',null,v));c.append(r);}const b=tmBtn(label,cls,on);c.append(b);return c;};
+  B.append(el('div','tm-sub','This phone has a game too. Which one should it keep?'));
+  B.append(card(`Saved game · ${info.email}`,[['Name',info.name||'—'],['Deepest',meters(info.best)],['Coins',info.coins.toLocaleString('en-US')],['Team',info.team||'None']],
+    'USE SAVED GAME','wide',async()=>{chosen=true;popClose=null;for(const b of B.querySelectorAll('button'))b.disabled=true;await NET.api.loadFinish(true);}));
+  B.append(card('This phone · guest',[['Name',NET.me.name],['Deepest',meters(state.best||1)],['Coins',state.coins.toLocaleString('en-US')],['Team',NET.team?NET.team.name:'None']],
+    'KEEP THIS PHONE’S GAME','alt wide',async()=>{chosen=true;popClose=null;try{await NET.api.loadFinish(false);}catch(e){}closePop();toast('Kept this phone’s game. Your saved game is still there.','#86e39a');}));
+  B.append(el('div','tm-sub dim','Using the saved game deletes this phone’s guest game. Keeping this phone’s game leaves your saved game as it is.'));
+}
+function acctDelete(B){const c=el('div','tm-card');
+  c.append(el('div','tm-sub','This deletes your account and everything in it: your saved game, your name and tag, and your place on your team. It can’t be undone.'));
+  if(myRole()==='foreman'&&NET.members.length>1)c.append(el('div','tm-sub',`You lead ${NET.team.name}. The next in line becomes Foreman.`));
+  c.append(el('div','tm-sub dim','This phone then starts a fresh game.'));
+  const ti=tmInput('Type DELETE to confirm',10);ti.id='acctDelType';ti.autocapitalize='characters';
+  const er=tmErr(),go=tmBtn('DELETE MY ACCOUNT','danger wide');go.id='acctDelGo';go.disabled=true;
+  ti.addEventListener('input',()=>{go.disabled=ti.value.trim().toUpperCase()!=='DELETE';});
+  go.addEventListener('click',()=>busy(go,()=>NET.api.deleteAccount(),er));
+  c.append(ti,go,er);B.append(c);
+}
+
+// ---- asking to save, at the moments that matter ----
+const nudgeQ=[];let acctAgeDone=false;
+function accountNudge(why){if(!NET.v2||!NET.on||NET.mode!=='supabase'||!NET.me||NET.me.saved)return;
+  const k='gb-nudge-'+why;try{if(localStorage.getItem(k))return;localStorage.setItem(k,String(Date.now()));}catch(e){return;}
+  if(!nudgeQ.includes(why))nudgeQ.push(why);}
+function nudgeTick(){
+  if(pendingLink&&NET.on&&mode==='play'&&!MG&&!dropping&&!popIsOpen()){runPendingLink();return;} // a team or invite link, once you're in the game
+  if(NET.me&&NET.me.saved)nudgeQ.length=0;
+  if(!nudgeQ.length||mode!=='play'||MG||dropping||popIsOpen()||teamIsOpen()||!$('ovRaid').hidden)return;
+  const why=nudgeQ.shift();if(why==='team'&&!NET.teamId)return; // not on a team anymore: that moment has passed
+  const say={seam:'You broke a hard seam!',team:'You’re on a team now.',days3:'You’ve been digging for a few days.'}[why]||'Keep your game safe.';
+  openPop('Save your progress?',B=>{const c=el('div','tm-card');
+    c.append(el('div','tm-title',say),el('div','tm-sub','Right now your game lives only on this phone. Save it with your email and a new phone picks up where you left off, team and all.'));
+    const s=tmBtn('SAVE MY PROGRESS','wide',()=>openAccount('save'));s.id='nudgeSave';
+    const later=el('button','tm-link','Not now');later.type='button';later.id='nudgeLater';later.addEventListener('click',closePop);c.append(s);B.append(c,later);});
+}
+setInterval(nudgeTick,1500);
+netOn('change',()=>{if(!NET.v2||acctAgeDone||!NET.me)return;acctAgeDone=true; // a few days in, once
+  try{let t=Number(localStorage.getItem('gb-first-play')||0);if(!t){t=Date.now();localStorage.setItem('gb-first-play',String(t));}
+    if(Date.now()-t>3*864e5)accountNudge('days3');}catch(e){}});
+netOn('account',()=>{fillAcctCard();updateAcct();});
 
 /* ---------- hard seams: a team-wide barrier every few layers ---------- */
 // Everyone digs their own shaft, but at a hard seam nobody on the team can drop further until the team breaks it.
@@ -3028,13 +3748,18 @@ function enterSeam(n){
   seamTarget=n;startMini('seam');
 }
 function seamReward(n,share){return Math.round((40+6*n*seamEvery())*(1+1.5*clamp(share,0,1)));}
+function seamPaysMe(n){ // on the game server, a seam pays the diggers who were on the team when it opened (no hopping in for the payout)
+  const D=NET.seamDocs[n],P=NET.players[NET.uid];
+  return!(NET.v2&&NET.serverAuth&&D&&D.at&&P&&P.joinedAt&&D.at<P.joinedAt-2000);}
 function seamClaims(){ // a seam your team breaks while you're on it pays everyone, more for those who hit it
   if(!NET.teamId)return;const X=myX(),k0=NET.teamId+':';
   for(let n=1;n<=(NET.team.seams||0);n++){const k=k0+n;if(X.claimed[k])continue;
     if(MG&&MG.kind==='seam'&&MG.n===n)continue; // the fight's own results pay for it
-    X.claimed[k]=1;const S=seamState(n),v=seamReward(n,S.total?S.mine/S.total:0);
+    X.claimed[k]=1;
+    if(!seamPaysMe(n)){toast(`Your team broke through hard seam ${n}! (It opened before you joined, so no reward this time.)`,'#ffd34d');save();continue;}
+    const S=seamState(n),v=seamReward(n,S.total?S.mine/S.total:0);
     state.coins+=v;coinBump();$('coinTxt').textContent=state.coins.toLocaleString('en-US');shownCoins=state.coins;
-    toast(`Your team broke through hard seam ${n}! +${v} coins`,'#ffd34d');sfx('fanfare');save();}
+    toast(`Your team broke through hard seam ${n}! +${v} coins`,'#ffd34d');sfx('fanfare');save();accountNudge('seam');}
 }
 
 // ---- the seam fight ----
@@ -3135,11 +3860,13 @@ function seamDrawCrew(M,S){ // who's hitting it, by share of the damage
   ctx.restore();
 }
 function seamResults(M){
-  const S=seamState(M.n),share=S.total?clamp(S.mine/S.total,0,1):0,v=seamReward(M.n,share),mates=Object.keys(S.by).filter(id=>S.by[id]>0&&id!==NET.uid).length;
+  const S=seamState(M.n),share=S.total?clamp(S.mine/S.total,0,1):0,pays=seamPaysMe(M.n),v=pays?seamReward(M.n,share):0,mates=Object.keys(S.by).filter(id=>S.by[id]>0&&id!==NET.uid).length;
   if(NET.teamId)myX().claimed[NET.teamId+':'+M.n]=1;
+  if(M.broke)accountNudge('seam');
   const rows=[['Hard seam',`${M.n} · ${M.depth.toLocaleString('en-US')} m`],[NET.teamId?'Team damage':'Damage',`${Math.round(S.total).toLocaleString('en-US')} / ${S.hp.toLocaleString('en-US')}`],
     ...(NET.teamId?[['Your damage',`${Math.round(S.mine).toLocaleString('en-US')} (${Math.round(share*100)}%)`]]:[])];
   if(NET.teamId)rows.push(['Teammates who hit it',String(mates)]);
+  if(!pays)rows.push(['Reward','None: it opened before you joined']);
   return{tag:NET.teamId?'Team breakthrough':'Seam broken',title:'BREAKTHROUGH!',rows,total:v,great:share>=0.34};
 }
 function seamLeave(){const M=MG;if(!M||M.kind!=='seam')return;seamFlush(M,true);M.payout=0;M.phase='result';endMini();}
@@ -3333,7 +4060,7 @@ cv.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('gesturestart',e=>e.preventDefault());
 window.addEventListener('keydown',e=>{
   if(e.target&&e.target.tagName==='INPUT')return;
-  if(e.key==='Escape'){if(!$('ovShop').hidden)closeShop();else if(!$('ovTune').hidden)closeTune();else if(teamIsOpen())closeTeam();return;}
+  if(e.key==='Escape'){if(popIsOpen())closePop();else if(!$('ovShop').hidden)closeShop();else if(!$('ovTune').hidden)closeTune();else if(teamIsOpen())closeTeam();return;}
   if(mode!=='play')return;
   const n=parseInt(e.key,10);if(n>=1&&n<=9){const owned=TOOL_ORDER.filter(k=>state.owned[k]);if(owned[n-1])selectTool(owned[n-1]);}
 });
