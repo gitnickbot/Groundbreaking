@@ -493,6 +493,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
         <button id="tPlay-moles" class="tbtn primary" type="button">Play Mole Whack</button>
         <button id="tPlay-geode" class="tbtn primary" type="button">Play Geode Crack</button>
         <button id="tPlay-crawl" class="tbtn primary" type="button">Play Crawler Blast</button>
+        <button id="tPlay-slash" class="tbtn primary" type="button">Play Boulder Slash</button>
         <button id="tSeed" class="tbtn" type="button">New seed</button>
         <button id="tCoins" class="tbtn" type="button">+1,000 coins</button>
         <button id="tSkip" class="tbtn" type="button">Skip to next layer</button>
@@ -979,6 +980,10 @@ function sfx(name,k=1){if(!AU.c||state.muted)return;const t=AU.c.currentTime;if(
     case'lavaburst':nz(t,0.9,{f:500,f2:90,q:0.7,gain:0.6});tn(t,0.7,{f:70,f2:35,gain:0.35});nz(t+0.2,0.5,{type:'bandpass',f:900,f2:300,q:1,gain:0.2});break;
     case'freeze':tn(t,0.25,{type:'triangle',f:2400*r(),f2:3600,gain:0.05});nz(t,0.3,{type:'highpass',f:5000,gain:0.12});tn(t+0.06,0.3,{f:1800*r(),gain:0.04});break;
     case'zap':tn(t,0.07,{type:'triangle',f:1700*r(),f2:640,gain:0.045});break;
+    case'whoosh':nz(t,0.16,{type:'bandpass',f:700*r(),f2:2400,q:0.9,gain:0.16});break;
+    case'slice':nz(t,0.1,{type:'bandpass',f:2600*r(),f2:900,q:1.4,gain:0.35});tn(t,0.12,{f:180*r(),f2:70,gain:0.22});break;
+    case'shatter':nz(t,0.3,{type:'highpass',f:4500,gain:0.28});[2637,3136,3520,2349].forEach((f,i)=>tn(t+i*0.035,0.14,{type:'triangle',f:f*r(),gain:0.05}));break;
+    case'puff':nz(t,0.22,{type:'highpass',f:1600*r(),gain:0.07});break;
   }}catch(e){}}
 function drillSound(on){
   if(on&&!AU.drill&&AU.c&&!state.muted){const c=AU.c,o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain(),lfo=c.createOscillator(),lg=c.createGain(),f=c.createBiquadFilter();
@@ -1382,7 +1387,7 @@ function endPhase(reason){
 // Every cavern is a small module: init, layout, still (static scene), peek (live bits seen from the layer above),
 // begin, update, draw, tap and results. The cavern is built while you dig the layer above it, so the scene you
 // glimpse through the holes is the same object that becomes the game when you drop.
-const MINI_ORDER=['bugs','bones','moles','geode','crawl'];
+const MINI_ORDER=['bugs','bones','moles','geode','crawl','slash'];
 const MOLTEN=['#ff9b2e','#fc6315','#e3301a'];
 const GAMES={
   bugs:{title:'BUG CRUSHER',stat:'HAUL',timed:true,go:'SMASH!',
@@ -1406,6 +1411,11 @@ const GAMES={
     teaser:'Something long is crawling between the rocks below.',
     init:crawlInit,layout:crawlLayout,decor:crawlDecor,still:crawlStill,peek:crawlPeek,hud0:crawlHud0,begin:crawlBegin,update:crawlUpdate,draw:crawlDraw,overlay:drawCombo,
     down:crawlDown,move:crawlMove,up:crawlUp,results:crawlResults}, // played by dragging: down, move and up instead of tap
+  slash:{title:'BOULDER SLASH',stat:'EARNED',timed:true,go:'SLASH!',bare:true,
+    tip:'Swipe to split boulders for geodes. Leave the gems and the dynamite alone.',
+    teaser:'Steam vents are tossing boulders around down there.',
+    init:slashInit,layout:slashLayout,decor:slashDecor,still:slashStill,peek:slashPeek,hud0:slashHud0,begin:slashBegin,update:slashUpdate,draw:slashDraw,overlay:slashOverlay,
+    down:slashDown,move:slashMove,up:slashUp,results:slashResults},
 };
 let cavernPrev=null; // the cavern waiting under the current layer, if the next drop leads into one
 function miniKindFor(L){const n=Math.max(1,state.tune.miniEvery|0),i=Math.max(0,Math.floor((L-1)/n)-1);return MINI_ORDER[i%MINI_ORDER.length];}
@@ -1533,7 +1543,7 @@ function miniPause(hidden){ // stop every cavern clock while the app is in the b
   if(M.phase!=='play'&&M.phase!=='count')return;
   if(hidden){M.pausedAt=now();return;}
   if(!M.pausedAt)return;const d=now()-M.pausedAt;M.pausedAt=0;
-  for(const k of['t0','c0','i0','spawnT','lastKill','showT','nextT','gt','nextSpawn','rattleT','cheerT','spiderT','waveT','stunT','safeT','fireT','shotT'])if(typeof M[k]==='number')M[k]+=d;
+  for(const k of['t0','c0','i0','spawnT','lastKill','showT','nextT','gt','nextSpawn','rattleT','cheerT','spiderT','waveT','stunT','safeT','fireT','shotT','flashT'])if(typeof M[k]==='number')M[k]+=d;
   for(const q of M.queue||[])q.t+=d;
   for(const m of M.moles||[]){m.t0+=d;m.st+=d;}
 }
@@ -2733,6 +2743,402 @@ function crawlDraw(M,t){
   crawlDrawSpider(M,ctx,t,fade);
   crawlDrawShots(M,ctx,t);
   crawlDrawMiner(M,ctx,t);
+}
+
+/* ---------- Boulder Slash ---------- */
+// Steam vents in the cavern floor hurl boulders into the air. Swipe through them with the pick to split them open:
+// every boulder has a geode inside, common quartz up to the rare signal crystal. Loose gems get thrown up too and
+// shatter if the pick touches them (leave them and the crew below catches them), and so does dynamite.
+// The round ends on a mother lode: one huge boulder that hangs in the air while you hack at it.
+// Positions are screen px; layout rescales everything if the screen changes size mid-round.
+const SLASH_GEO=[ // what's inside a boulder, common to rare
+  {name:'Quartz',  col:'#dfe6ee',hi:'#ffffff',deep:'#5d6a78',v:1, w:32},
+  {name:'Amethyst',col:'#a66bff',hi:'#ead9ff',deep:'#3c1677',v:2, w:26},
+  {name:'Citrine', col:'#ffa424',hi:'#fff1c2',deep:'#8a3a00',v:3, w:17},
+  {name:'Jade',    col:'#3ad38a',hi:'#d8ffe9',deep:'#0c5a34',v:4, w:11},
+  {name:'Sapphire',col:'#3b7bff',hi:'#d6e4ff',deep:'#0e2a77',v:6, w:7},
+  {name:'Ruby',    col:'#ff3b4f',hi:'#ffd6db',deep:'#6e0a16',v:8, w:5},
+  {name:'Signal crystal',col:'#62e3ff',hi:'#ecfdff',deep:'#0b5670',v:15,w:2},
+];
+const SLASH_GEMS={emerald:1,topaz:2,sapphire:2,ruby:3,amethyst:3}; // a loose gem's worth when you let it fall to the crew
+const SLASH_RB=38; // boulder art is painted at this radius (× M.u) and scaled to each boulder
+function slashInit(M){
+  const T=state.tune,rng=mulberry32(M.seed+5);
+  M.spd=T.bugSpeed*Math.min(1.3,1+0.02*(M.L-1));
+  Object.assign(M,{df:1+0.1*(M.L-1),objs:[],halves:[],strikes:[],pops:[],trails:[],stroke:null,ptr:null,queue:[],nextT:0,stunT:-9,flashT:-9,
+    vents:[],lode:null,lodeDone:false,art:null,artKey:'',lw:0,lh:0,ltop:0,volleys:0,
+    earned:0,thrown:0,cut:0,missed:0,best:-1,bestCombo:0,gemsThrown:0,saved:0,shattered:0,booms:0,boomVal:0,lodeHits:0,lodeVal:0});
+  M.ventF=[0.14,0.38,0.62,0.86].map(f=>f+(rng()-0.5)*0.06);
+  M.rest=[0.27,0.52,0.74].map(f=>({f:f+(rng()-0.5)*0.08,dy:30+rng()*70,r:27+rng()*7,v:Math.floor(rng()*6),rot:rng()*TAU})); // lying on the floor; the first ones thrown up
+}
+function slashLayout(M){
+  const u=M.u;
+  M.g=1.45*M.ph*M.spd*M.spd; // gravity, px/s²: about two seconds in the air whatever the screen
+  M.vents=M.ventF.map(f=>({x:M.W*f,y:M.H-24*u}));
+  if(M.lw&&(M.lw!==M.W||M.lh!==M.ph||M.ltop!==M.top)){ // the screen changed size mid-round: keep everything in proportion
+    const kx=M.W/M.lw,ky=M.ph/M.lh;
+    for(const o of M.objs.concat(M.halves)){o.x*=kx;o.y=M.top+(o.y-M.ltop)*ky;o.vx*=kx;o.vy*=ky;if(o.hy!=null)o.hy=M.top+(o.hy-M.ltop)*ky;}
+    M.trails=[];M.stroke=null;M.ptr=null;
+  }
+  M.lw=M.W;M.lh=M.ph;M.ltop=M.top;
+  slashArt(M);
+}
+function slashHud0(M){miniStat(0);miniHud(1,M.dur+' s',false);}
+function slashBegin(M,t){M.nextT=t+0.35;}
+
+/* swiping */
+function slashDown(M,id,x,y,t){
+  if(M.ptr!=null)return;
+  M.ptr=id;M.stroke={pts:[{x,y,t}],n:0,last:-9,cx:x,cy:y,fast:false,whoosh:-9,stun:t<M.stunT};M.trails.push(M.stroke);
+  if(M.lode)M.lode.inside=Math.hypot(x-M.lode.x,y-M.lode.y)<M.lode.r;
+}
+function slashMove(M,id,x,y,t){
+  const s=M.stroke;if(id!==M.ptr||!s)return;
+  const p0=s.pts[s.pts.length-1],dx=x-p0.x,dy=y-p0.y,d=Math.hypot(dx,dy);if(d<1.5)return;
+  const sp=d/Math.max(1/240,t-p0.t);s.pts.push({x,y,t});if(s.pts.length>40)s.pts.shift();
+  if(M.phase!=='play'||t<M.stunT){s.stun=t<M.stunT;return;}
+  s.stun=false;
+  const fast=sp>260*M.u; // only a real swipe cuts: resting or creeping fingers never do
+  if(fast&&!s.fast&&t-s.whoosh>0.22){sfx('whoosh');s.whoosh=t;}
+  s.fast=fast;
+  const ang=Math.atan2(dy,dx);
+  for(const o of M.objs){
+    if(o.dead)continue;
+    const hit=segDist(o.x,o.y,p0.x,p0.y,x,y)<o.r;
+    if(o.kind==='lode'){if(fast&&hit&&!o.inside&&t-o.last>0.06)slashLodeHit(M,o,ang,t);o.inside=Math.hypot(x-o.x,y-o.y)<o.r;continue;} // one hit per pass through it
+    if(!fast||!hit)continue;
+    if(o.kind==='boulder')slashCut(M,o,ang,t);
+    else if(o.kind==='gem')slashShatter(M,o,t);
+    else{slashBoom(M,o,t);break;} // the blast knocks the pick away
+  }
+}
+function slashUp(M,id,t){
+  if(id!=null&&id!==M.ptr)return;
+  if(M.stroke)slashCombo(M,M.stroke,t);
+  M.ptr=null;M.stroke=null;if(M.lode)M.lode.inside=false;
+}
+
+/* throwing */
+function slashPickGeo(){let tot=0;for(const K of SLASH_GEO)tot+=K.w;let r=Math.random()*tot;for(let i=0;i<SLASH_GEO.length;i++){r-=SLASH_GEO[i].w;if(r<=0)return i;}return 0;}
+function slashVolley(M,t,e){
+  const f=clamp(e/M.dur,0,1),k=M.volleys++,plan=[];
+  if(k<4)plan.push(...[['boulder'],['boulder','boulder'],['boulder','gem'],['boulder','boulder','tnt']][k]); // a gentle start that shows each kind once
+  else if(e>6&&Math.random()<0.1){ // a spray: one vent fans five boulders across the cave
+    const v=Math.floor(Math.random()*M.vents.length);
+    for(let i=0;i<5;i++)M.queue.push({t:t+i*0.11,kind:'boulder',vent:v,ax:M.W*(0.14+i*0.18)});
+    M.nextT=t+(1.6+Math.random()*0.3)/M.spd;return;
+  }else{
+    const n=1+(Math.random()<0.4+0.35*f?1:0)+(Math.random()<0.18+0.3*f?1:0)+(Math.random()<0.1*f?1:0);
+    for(let i=0;i<n;i++)plan.push('boulder');
+    if(Math.random()<0.32)plan.push('gem');
+    if(Math.random()<Math.min(0.42,0.14+0.22*f+0.012*Math.min(10,M.L)))plan.push('tnt');
+  }
+  for(let i=plan.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[plan[i],plan[j]]=[plan[j],plan[i]];}
+  const vs=[0,1,2,3].sort(()=>Math.random()-0.5);
+  plan.forEach((kind,i)=>M.queue.push({t:t+i*(0.12+Math.random()*0.14),kind,vent:vs[i%4]}));
+  M.nextT=t+(lerp(1.35,0.85,f)+Math.random()*0.3)/M.spd;
+}
+function slashLaunch(M,q,t){
+  const u=M.u,o={kind:q.kind,x:0,y:0,vx:0,vy:0,rot:Math.random()*TAU,va:(Math.random()-0.5)*5,dead:false,seed:Math.random(),t0:t};
+  let x0,y0;
+  if(q.kind==='boulder'&&M.rest.length&&q.ax==null){const r=M.rest.shift();x0=M.W*r.f;y0=M.H-(40+r.dy)*u;o.v=r.v;o.r=r.r*u;o.rot=r.rot;} // the ones you saw lying there go first
+  else{const V=M.vents[q.vent];x0=V.x;y0=V.y;}
+  const apexY=M.top+M.ph*(0.12+Math.random()*0.3),vy=-Math.sqrt(2*M.g*Math.max(60*u,y0-apexY)),T=-vy/M.g;
+  const ax=q.ax!=null?q.ax:clamp(x0+(Math.random()-0.5)*M.W*0.6,M.W*0.12,M.W*0.88);
+  Object.assign(o,{x:x0,y:y0,vx:(ax-x0)/T,vy});
+  if(q.kind==='boulder'){if(o.v==null){o.v=Math.floor(Math.random()*6);o.r=(27+Math.random()*9)*u;}o.geo=slashPickGeo();M.thrown++;}
+  else if(q.kind==='gem'){const ks=Object.keys(SLASH_GEMS);o.type=ks[Math.floor(Math.random()*ks.length)];o.r=21*u;M.gemsThrown++;}
+  else{o.r=25*u;o.va*=0.6;sfx('fuse');}
+  M.objs.push(o);
+  for(let i=0;i<6;i++)spawn('dust',x0+(Math.random()-0.5)*20*u,y0-6*u,{ang:-Math.PI/2+(Math.random()-0.5)*0.8,color:'#e8e0d6',speed:50+Math.random()*80,size:6+Math.random()*6,life:0.5+Math.random()*0.3});
+  sfx('puff');
+}
+function slashLode(M,t){ // the finale: one huge boulder that hangs in the air while you hack at it
+  const u=M.u,x0=M.W/2,y0=M.H-24*u,apexY=M.top+M.ph*0.36;
+  const o={kind:'lode',x:x0,y:y0,vx:0,vy:-Math.sqrt(2*M.g*(y0-apexY)),rot:0,va:0.5,r:64*u,hits:0,hover:false,hy:null,last:-9,inside:false,shake:-9,cracks:[],
+    dead:false,t0:t,seed:Math.random(),geo:4+Math.floor(Math.random()*3)};
+  M.lode=o;M.lodeDone=true;M.objs.push(o);
+  if(!M.art.lode){const P=slashShape(9,64*u);M.art.lode=slashRockImg(M,9,64*u);M.art.lodeFace=slashFace(M,64*u,P,SLASH_GEO[o.geo],mulberry32(77));}
+  callout('MOTHER LODE!','molten');sfx('steam');buzz([15,30,15]);addShake(3);
+  for(let i=0;i<14;i++)spawn('dust',x0+(Math.random()-0.5)*50*u,y0-8*u,{ang:-Math.PI/2+(Math.random()-0.5)*1,color:'#e8e0d6',speed:70+Math.random()*120,size:10+Math.random()*10,life:0.7+Math.random()*0.4});
+}
+
+/* what the pick does */
+function slashCut(M,o,ang,t){
+  o.dead=true;M.cut++;const K=SLASH_GEO[o.geo],val=Math.round(K.v*M.df),u=M.u,s=M.stroke;
+  if(t-s.last>0.35)slashCombo(M,s,t);s.n++;s.last=t;s.cx=o.x;s.cy=o.y;
+  M.earned+=val;if(o.geo>M.best)M.best=o.geo;
+  const face=slashFaceImg(M,o.v,o.geo),sc=o.r/(SLASH_RB*u);
+  for(const side of[-1,1]){const nx=-Math.sin(ang)*side,ny=Math.cos(ang)*side,push=(110+Math.random()*60)*u;
+    M.halves.push({x:o.x+nx*3,y:o.y+ny*3,vx:o.vx*0.5+nx*push,vy:Math.min(o.vy,0)*0.4+ny*push-90*u,a:ang,va:side*(1.5+Math.random()*2.5),side,img:face,imgRot:o.rot-ang,sc,r:o.r,t0:t});}
+  M.strikes.push({x:o.x,y:o.y,a:ang,t0:t});
+  const R=bandFor(M.L).rock,rare=K.v>=6;
+  spawn('ring',o.x,o.y,{color:K.hi,size:o.r*1.6,life:0.3,speed:0});
+  for(let i=0;i<(rare?20:12);i++)spawn('spark',o.x,o.y,{color:i%2?K.col:K.hi,speed:90+Math.random()*160,life:0.35+Math.random()*0.2});
+  for(let i=0;i<6;i++)spawn('chunk',o.x,o.y,{color:hsl(R[0],R[1],R[2]-12+Math.random()*16),size:1.5+Math.random()*2.5,speed:60+Math.random()*120,vz:60+Math.random()*80});
+  floatText(o.x,o.y-o.r-6*u-(s.n%2?0:18*u),`+${val} ${K.name.toUpperCase()}`,rare?'#ffd34d':K.hi,rare?18:15); // labels in one swipe step up and down so they don't collide
+  sfx('slice');sfx(rare?'scarab':'gem');buzz(rare?16:8);addShake(rare?2.5:1.2);
+}
+function slashCombo(M,s,t){ // three or more boulders in one swipe pay a bonus
+  const n=s.n;s.n=0;if(n<3)return;
+  const val=Math.round(n*M.df);M.earned+=val;M.bestCombo=Math.max(M.bestCombo,n);
+  M.pops.push({str:`${n} BOULDER COMBO`,sub:`+${val}`,x:s.cx,y:s.cy,t0:t});
+  sfx('unlock');buzz([10,20,10]);
+}
+function slashShatter(M,o,t){
+  o.dead=true;M.shattered++;const u=M.u,col=LOOT[o.type].col,take=Math.min(M.earned,Math.round(3*M.df));M.earned-=take;
+  if(M.stroke)M.stroke.n=0; // and the combo with it
+  for(let i=0;i<18;i++)spawn('chunk',o.x,o.y,{color:i%4?col:'#ffffff',size:2.5+Math.random()*3.5,speed:90+Math.random()*190,vz:90+Math.random()*90,life:0.7}); // big glassy shards
+  for(let i=0;i<14;i++)spawn('spark',o.x,o.y,{color:i%2?'#ffffff':col,speed:140+Math.random()*200,life:0.35});
+  spawn('ring',o.x,o.y,{color:'rgba(255,255,255,0.95)',size:o.r*2.4,life:0.32,speed:0});spawn('ring',o.x,o.y,{color:col,size:o.r*1.5,life:0.4,speed:0});
+  floatText(o.x,o.y-o.r-4*u,'SHATTERED','#ff5b47',17);if(take)floatText(o.x,o.y+o.r+8*u,`-${take}`,'#ff5b47',15);
+  sfx('shatter');buzz([20,30,20]);addShake(2.5);M.lossT=t;
+}
+function slashBoom(M,o,t){
+  o.dead=true;M.booms++;const u=M.u,take=Math.min(M.earned,Math.round(10*M.df));M.earned-=take;M.boomVal+=take;
+  M.stunT=t+0.9;M.flashT=t;M.lossT=t;if(M.stroke){M.stroke.n=0;M.stroke.stun=true;}
+  for(const q of M.objs){ // the blast throws everything nearby away from it
+    if(q.dead||q===o||q.kind==='lode')continue;const dx=q.x-o.x,dy=q.y-o.y,d=Math.hypot(dx,dy)||1;
+    if(d<170*u){const k=(1-d/(170*u))*420*u;q.vx+=dx/d*k;q.vy+=dy/d*k-60*u;q.va+=(Math.random()-0.5)*8;}}
+  spawn('ring',o.x,o.y,{color:'rgba(255,200,90,1)',size:150*u,life:0.45,speed:0});
+  for(let i=0;i<28;i++)spawn('spark',o.x,o.y,{color:i%2?'#ffd34d':'#ff7a2e',speed:150+Math.random()*260,life:0.4+Math.random()*0.3});
+  for(let i=0;i<10;i++)spawn('dust',o.x,o.y,{color:'#2a1a12',speed:40+Math.random()*90,size:14+Math.random()*12,life:0.7+Math.random()*0.4});
+  for(let i=0;i<10;i++)spawn('chunk',o.x,o.y,{color:i%2?'#c8322a':'#2a1a12',size:1.6+Math.random()*2.6,speed:120+Math.random()*180,vz:90+Math.random()*90});
+  floatText(o.x,o.y-30*u,'BOOM!','#ff7a2e',24);if(take)floatText(o.x,o.y+8*u,`-${take}`,'#ff5b47',17);
+  sfx('boom');buzz([40,60,40]);addShake(10);
+}
+function slashLodeHit(M,o,ang,t){
+  o.hits++;o.last=t;o.shake=t;M.lodeHits++;const u=M.u,val=Math.round(M.df);M.earned+=val;M.lodeVal+=val;
+  const la=ang+Math.PI-o.rot+(Math.random()-0.5)*0.8,pts=[[Math.cos(la)*0.95,Math.sin(la)*0.95]]; // a new crack runs in from where the pick bit
+  for(let i=1;i<=4;i++){const f=0.95-0.16*i,a=la+(Math.random()-0.5)*0.5;pts.push([Math.cos(a)*f,Math.sin(a)*f]);}
+  o.cracks.push(pts);
+  const hx=o.x+Math.cos(ang+Math.PI)*o.r*0.7,hy=o.y+Math.sin(ang+Math.PI)*o.r*0.7;
+  M.strikes.push({x:o.x,y:o.y,a:ang,t0:t});
+  floatText(o.x+(Math.random()-0.5)*o.r,o.y-o.r*0.7,`+${val}`,'#ffd34d',16);
+  for(let i=0;i<8;i++)spawn('spark',hx,hy,{color:i%2?'#fff3d0':SLASH_GEO[o.geo].col,speed:90+Math.random()*120,life:0.3});
+  for(let i=0;i<4;i++)spawn('chunk',hx,hy,{color:'#5a4e46',size:1.5+Math.random()*2.2,speed:60+Math.random()*100,vz:60+Math.random()*60});
+  sfx('chip');buzz(8);addShake(1.6);
+  if(o.hits>=14)slashBurstLode(M,o,t);
+}
+function slashBurstLode(M,o,t){
+  o.dead=true;M.lode=null;const u=M.u,K=SLASH_GEO[o.geo],val=Math.round(8*M.df);M.earned+=val;M.lodeVal+=val;if(o.geo>M.best)M.best=o.geo;
+  for(const side of[-1,1])M.halves.push({x:o.x,y:o.y,vx:side*130*u,vy:-140*u,a:-Math.PI/2+0.3,va:side*1.2,side,img:M.art.lodeFace,imgRot:o.rot+Math.PI/2-0.3,sc:1,r:o.r,t0:t});
+  spawn('ring',o.x,o.y,{color:K.hi,size:o.r*2.4,life:0.5,speed:0});
+  for(let i=0;i<34;i++)spawn('spark',o.x,o.y,{color:i%3?K.col:K.hi,speed:120+Math.random()*240,life:0.5+Math.random()*0.3});
+  for(let i=0;i<12;i++)spawn('chunk',o.x,o.y,{color:'#5a4e46',size:2+Math.random()*3,speed:90+Math.random()*160,vz:90+Math.random()*90});
+  M.pops.push({str:`${K.name.toUpperCase()} LODE`,sub:`+${M.lodeVal}`,x:o.x,y:o.y-10*u,t0:t});
+  sfx('boom');sfx('fanfare');buzz([20,40,20,40]);addShake(6);
+}
+function slashGone(M,o){ // fell back down (or flew out the side) untouched
+  o.dead=true;const u=M.u;
+  if(o.kind==='gem'){const val=Math.round(SLASH_GEMS[o.type]*M.df);M.earned+=val;M.saved++;
+    floatText(clamp(o.x,30*u,M.W-30*u),M.H-34*u,`+${val} SAVED`,LOOT[o.type].col,15);sfx('coin');}
+  else if(o.kind==='boulder')M.missed++;
+}
+
+/* the clock */
+function slashUpdate(M,dt,t){
+  const u=M.u;
+  if(M.phase==='play'){
+    const e=t-M.t0,rem=Math.max(0,M.dur-e);timerHud(M,rem);
+    if(!M.lodeDone&&rem<=Math.min(6.2,M.dur*0.3)&&e>2)slashLode(M,t);
+    if(!M.lode&&t>=M.nextT&&rem>1.6)slashVolley(M,t,e); // no new throws while the lode is up
+    const L=M.lode;
+    if(L&&L.hover&&rem<=0.45){if(L.hits)slashBurstLode(M,L,t);else{L.hover=false;M.lode=null;}}
+    if(rem<=0){M.phase='end';M.e0=t;M.endDelay=1.4;slashUp(M,null,t);
+      if(M.lode){if(M.lode.hits)slashBurstLode(M,M.lode,t);else{M.lode.hover=false;M.lode=null;}}
+      callout('TIME!','#62e3ff');sfx('buzzer');buzz([20,30,20]);miniHud(0,'0 s',true);}
+  }
+  for(let i=M.queue.length-1;i>=0;i--)if(t>=M.queue[i].t){const q=M.queue.splice(i,1)[0];if(M.phase==='play')slashLaunch(M,q,t);}
+  for(const o of M.objs){
+    if(o.kind==='lode'&&!o.dead&&(o.hover||(o.vy>=0&&o.hy==null&&M.lode===o))){ // reaches the top of its throw and hangs there
+      if(!o.hover){o.hover=true;o.hy=o.y;}
+      o.vy=0;o.vx=0;o.y=o.hy+Math.sin((t-o.t0)*3)*3*u;o.rot+=o.va*dt*0.3;continue;}
+    o.vy+=M.g*dt;o.x+=o.vx*dt;o.y+=o.vy*dt;o.rot+=o.va*dt;
+    if(o.kind==='tnt'&&Math.random()<dt*28){const c=Math.cos(o.rot),s=Math.sin(o.rot),fx=4*u,fy=-31*u;
+      spawn('spark',o.x+c*fx-s*fy,o.y+s*fx+c*fy,{color:Math.random()<0.5?'#ffd34d':'#ff9b2e',speed:30+Math.random()*50,life:0.2+Math.random()*0.15});}
+    if((o.vy>0&&o.y>M.H+o.r+20)||o.x<-o.r-80||o.x>M.W+o.r+80)slashGone(M,o);
+  }
+  M.objs=M.objs.filter(o=>!o.dead);
+  for(const h of M.halves){h.vy+=M.g*dt;h.x+=h.vx*dt;h.y+=h.vy*dt;h.a+=h.va*dt;}
+  M.halves=M.halves.filter(h=>h.y<M.H+h.r*2+40&&t-h.t0<3);
+  for(const tr of M.trails)tr.pts=tr.pts.filter(p=>t-p.t<0.2);
+  M.trails=M.trails.filter(tr=>tr.pts.length||tr===M.stroke);
+  M.strikes=M.strikes.filter(s=>t-s.t0<0.2);M.pops=M.pops.filter(p=>t-p.t0<1.25);
+  if(M.stroke&&M.stroke.n&&t-M.stroke.last>0.35)slashCombo(M,M.stroke,t);
+  miniStat(M.earned);
+}
+function slashResults(M){
+  const f=v=>'+'+v.toLocaleString('en-US'),clean=M.booms===0&&M.shattered===0&&M.cut>=8,cb=clean?Math.round(M.earned*0.15):0;
+  const rows=[['Boulders split',`${M.cut} of ${M.thrown}`],['Best geode',M.best>=0?SLASH_GEO[M.best].name:'–'],['Best combo',M.bestCombo>=3?`${M.bestCombo} boulders`:'–'],
+    ['Gems saved',M.gemsThrown?`${M.saved} of ${M.gemsThrown}`:'–'],['Dynamite hit',M.booms?`${M.booms} (-${M.boomVal})`:'0']];
+  if(M.lodeVal)rows.push(['Mother lode',f(M.lodeVal)]);
+  if(cb)rows.push(['Clean cuts',f(cb)]);
+  const great=clean&&M.lodeVal>0;
+  return{tag:great?'Clean cuts':M.booms>=2?'Mind the dynamite':'Geodes cracked',title:great?'MASTER CUTTER!':M.booms>=2?'KABOOM!':M.cut>=20?'ROCK STAR!':'NICE SLICING',rows,total:M.earned+cb,great};
+}
+
+/* drawing */
+function slashShape(v,R){ // a lumpy, rounded outline, one of a handful of shapes
+  const rng=mulberry32(v*977+31),n=11,a0=rng()*TAU,pts=[];
+  for(let i=0;i<n;i++){const a=a0+i/n*TAU+(rng()-0.5)*0.3,r=R*(0.86+rng()*0.16);pts.push([Math.cos(a)*r,Math.sin(a)*r]);}
+  return pts;
+}
+function slashPath(g,P,s){
+  const n=P.length;g.beginPath();g.moveTo((P[n-1][0]+P[0][0])/2*s,(P[n-1][1]+P[0][1])/2*s);
+  for(let i=0;i<n;i++){const p=P[i],q=P[(i+1)%n];g.quadraticCurveTo(p[0]*s,p[1]*s,(p[0]+q[0])/2*s,(p[1]+q[1])/2*s);}
+  g.closePath();
+}
+function slashCanvas(R){const S=Math.ceil(R*2.3*DPR),c=document.createElement('canvas');c.width=c.height=S;const g=c.getContext('2d');g.setTransform(DPR,0,0,DPR,S/2,S/2);return[c,g];}
+function slashRockImg(M,v,R){ // the outside: a geode's lumpy, cauliflower skin in this depth's rock colour
+  const[c,g]=slashCanvas(R),C=bandFor(M.L).rock,P=slashShape(v,R),rng=mulberry32(v*131+7),k=R/SLASH_RB;
+  slashPath(g,P,1);
+  const gr=g.createRadialGradient(-R*0.35,-R*0.4,R*0.1,0,0,R*1.1);gr.addColorStop(0,hsl(C[0],C[1],C[2]+16));gr.addColorStop(0.55,hsl(C[0],C[1],C[2]-4));gr.addColorStop(1,hsl(C[0],C[1],C[2]-24));
+  g.fillStyle=gr;g.fill();g.fillStyle=PAT.rock;g.fill();
+  g.save();g.clip();
+  for(let i=0;i<10;i++){const a=rng()*TAU,d=rng()*0.72*R;blob(g,Math.cos(a)*d,Math.sin(a)*d,(4+rng()*7)*k,(3+rng()*5)*k,'rgba(20,15,12,0.22)');}
+  for(let i=0;i<6;i++){const a=rng()*TAU,d=rng()*0.6*R;blob(g,Math.cos(a)*d-1.5,Math.sin(a)*d-1.5,(2+rng()*4)*k,(1.5+rng()*3)*k,'rgba(255,245,230,0.13)');}
+  slashPath(g,P,1);g.lineWidth=R*0.16;g.strokeStyle='rgba(0,0,0,0.28)';g.stroke();
+  g.restore();
+  slashPath(g,P,1);g.lineWidth=Math.max(2,R*0.075);g.lineJoin='round';g.strokeStyle='#120d0d';g.stroke();
+  blob(g,-R*0.32,-R*0.4,R*0.3,R*0.13,'rgba(255,248,235,0.24)');
+  return c;
+}
+function slashFace(M,R,P,K,rng){ // the inside, cut through: rock crust, pale agate bands, crystals pointing in to a glowing hollow
+  const[c,g]=slashCanvas(R),C=bandFor(M.L).rock,ol='#120d0d';
+  slashPath(g,P,1);g.fillStyle=hsl(C[0],C[1],C[2]-8);g.fill();g.fillStyle=PAT.rock;g.fill();
+  slashPath(g,P,0.84);g.fillStyle='#ddd3c4';g.fill();g.lineWidth=Math.max(1,R*0.03);g.strokeStyle='rgba(18,13,13,0.6)';g.stroke();
+  slashPath(g,P,0.78);g.fillStyle='#b8a994';g.fill();
+  slashPath(g,P,0.73);g.fillStyle=K.deep;g.fill();
+  const n=22,base=0.68*R;
+  for(let i=0;i<n;i++){ // crystals grow in from the agate band
+    const a=i/n*TAU+(rng()-0.5)*0.22,L=base*(0.4+rng()*0.38),w=R*(0.07+rng()*0.05);
+    const bx=Math.cos(a)*base,by=Math.sin(a)*base,tx=Math.cos(a)*(base-L),ty=Math.sin(a)*(base-L),nx=-Math.sin(a)*w,ny=Math.cos(a)*w;
+    g.beginPath();g.moveTo(bx+nx,by+ny);g.lineTo(tx,ty);g.lineTo(bx-nx,by-ny);g.closePath();g.fillStyle=K.col;g.fill();
+    g.save();g.beginPath();g.moveTo(bx,by);g.lineTo(tx,ty);g.lineTo(bx-nx,by-ny);g.closePath();g.fillStyle=K.deep;g.globalAlpha=0.45;g.fill();g.restore();
+    g.beginPath();g.moveTo(bx+nx,by+ny);g.lineTo(tx,ty);g.lineTo(bx-nx,by-ny);g.lineWidth=Math.max(0.8,R*0.025);g.strokeStyle=ol;g.stroke();
+    g.save();g.beginPath();g.moveTo(bx+nx*0.4,by+ny*0.4);g.lineTo(tx,ty);g.lineWidth=Math.max(0.8,R*0.025);g.strokeStyle=K.hi;g.globalAlpha=0.85;g.stroke();g.restore();
+  }
+  const cg=g.createRadialGradient(0,0,0,0,0,base);cg.addColorStop(0,hexA(K.hi,0.7));cg.addColorStop(0.6,hexA(K.col,0.25));cg.addColorStop(1,hexA(K.col,0));
+  g.fillStyle=cg;g.beginPath();g.arc(0,0,base,0,TAU);g.fill();
+  slashPath(g,P,1);g.lineWidth=Math.max(2,R*0.075);g.lineJoin='round';g.strokeStyle=ol;g.stroke();
+  return c;
+}
+function slashFaceImg(M,v,k){const key=v*10+k;let c=M.art.face.get(key);if(!c){const R=SLASH_RB*M.u;c=slashFace(M,R,slashShape(v,R),SLASH_GEO[k],mulberry32(key*7+3));M.art.face.set(key,c);}return c;}
+function slashTntImg(M){ // three sticks of dynamite bound together
+  const u=M.u,[c,g]=slashCanvas(30*u),ol='#120d0d';
+  for(const dx of[-11,0,11]){const x=dx*u;roundRect(g,x-6*u,-20*u,12*u,40*u,3*u);
+    const gr=g.createLinearGradient(x-6*u,0,x+6*u,0);gr.addColorStop(0,'#8e1c16');gr.addColorStop(0.35,'#ee6a5c');gr.addColorStop(1,'#a3241c');
+    g.fillStyle=gr;g.fill();g.lineWidth=Math.max(1.4,1.8*u);g.strokeStyle=ol;g.stroke();
+    blob(g,x,-20*u,5.2*u,2*u,'#e9cfa3',ol,Math.max(1,1.2*u));}
+  roundRect(g,-18.5*u,-5*u,37*u,10*u,2.5*u);g.fillStyle='#2a1a12';g.fill();g.lineWidth=Math.max(1.4,1.8*u);g.strokeStyle=ol;g.stroke();
+  g.font=`800 ${Math.round(8*u)}px ${UIFONT}`;g.textAlign='center';g.textBaseline='middle';g.fillStyle='#f1d9b0';g.fillText('TNT',0,0.5*u);
+  return c;
+}
+function slashArt(M){
+  const key=M.u.toFixed(3)+'/'+DPR+'/'+M.L;if(M.artKey===key)return;M.artKey=key;
+  M.art={rock:[],face:new Map(),tnt:slashTntImg(M),lode:null,lodeFace:null};
+  for(let v=0;v<6;v++)M.art.rock.push(slashRockImg(M,v,SLASH_RB*M.u));
+  const L=M.lode||M.objs.find(o=>o.kind==='lode');
+  if(L){const P=slashShape(9,64*M.u);M.art.lode=slashRockImg(M,9,64*M.u);M.art.lodeFace=slashFace(M,64*M.u,P,SLASH_GEO[L.geo],mulberry32(77));}
+}
+function slashDecor(M,g){ // steam vents in the floor, and crystal chips from geodes split down here before
+  const u=M.u,rng=mulberry32(M.seed+9);
+  for(let i=0;i<16;i++){const x=rng()*M.W,y=M.top+M.ph*(0.5+rng()*0.45),s=(3+rng()*5)*u,a=rng()*TAU,K=SLASH_GEO[1+Math.floor(rng()*4)];
+    if(M.vents.some(V=>Math.hypot(V.x-x,(V.y-y)*2.5)<46*u))continue;drawXtal(g,x,y,s,a,K,0.5);}
+  for(const V of M.vents){
+    blob(g,V.x+3,V.y+5,35*u,13*u,'rgba(0,0,0,0.4)');
+    blob(g,V.x,V.y,32*u,12*u,'#3a2d26','#120d0d',2.5);
+    const gr=g.createRadialGradient(V.x,V.y+2*u,2,V.x,V.y,24*u);gr.addColorStop(0,'rgba(255,170,70,0.95)');gr.addColorStop(0.45,'rgba(200,70,20,0.65)');gr.addColorStop(1,'rgba(20,8,4,1)');
+    blob(g,V.x,V.y+1*u,23*u,8*u,gr);
+    for(let i=0;i<7;i++){const a=rng()*TAU;blob(g,V.x+Math.cos(a)*30*u,V.y+Math.sin(a)*11*u,(3+rng()*4)*u,(2+rng()*3)*u,'#4a3a30','#120d0d',1.2);}
+  }
+}
+function slashDrawRest(M,g){ // boulders lying on the floor until the vents throw them up
+  const u=M.u;
+  for(const r of M.rest){const x=M.W*r.f,y=M.H-(40+r.dy)*u,img=M.art.rock[r.v],S=img.width/DPR*r.r/SLASH_RB;
+    blob(g,x+4*u,y+r.r*u*0.75,r.r*u*0.95,r.r*u*0.3,'rgba(0,0,0,0.35)');
+    g.save();g.translate(x,y);g.rotate(r.rot);g.drawImage(img,-S/2,-S/2,S,S);g.restore();}
+}
+function slashDrawTnt(M,g,o,t){
+  const u=M.u,img=M.art.tnt,S=img.width/DPR,fl=0.6+0.4*Math.sin(t*40+o.seed*9);
+  g.save();g.translate(o.x,o.y);g.rotate(o.rot);g.drawImage(img,-S/2,-S/2,S,S);
+  g.lineCap='round';g.beginPath();g.moveTo(0,-20*u);g.quadraticCurveTo(7*u,-26*u,4*u,-31*u);g.strokeStyle='#120d0d';g.lineWidth=Math.max(2.4,3.2*u);g.stroke();g.strokeStyle='#e8dcc8';g.lineWidth=Math.max(1.2,1.6*u);g.stroke();
+  g.globalCompositeOperation='lighter';blob(g,4*u,-31*u,(6+fl*4)*u,(6+fl*4)*u,'rgba(255,150,40,0.45)');g.globalCompositeOperation='source-over';
+  blob(g,4*u,-31*u,(2+fl*1.4)*u,(2+fl*1.4)*u,`rgb(255,${(200+50*fl)|0},120)`);
+  g.restore();
+}
+function slashDrawLode(M,g,o,t){
+  const u=M.u,img=M.art.lode,S=img.width/DPR,K=SLASH_GEO[o.geo],sh=t-o.shake<0.12?Math.sin((t-o.shake)*90)*3*u:0;
+  if(o.hover){const p=0.5+0.5*Math.sin(t*5);g.save();g.lineWidth=3*u;g.strokeStyle=hexA(K.hi,0.25+0.3*p);g.beginPath();g.arc(o.x,o.y,o.r*(1.16+0.05*p),0,TAU);g.stroke();g.restore();} // come and get it
+  g.save();g.translate(o.x+sh,o.y);g.rotate(o.rot);g.drawImage(img,-S/2,-S/2,S,S);
+  g.lineCap='round';g.lineJoin='round';
+  const glow=clamp(0.35+0.05*o.hits+0.1*Math.sin(t*6),0,1);
+  for(const c of o.cracks){const path=()=>{g.beginPath();c.forEach(([a,b],i)=>i?g.lineTo(a*o.r,b*o.r):g.moveTo(a*o.r,b*o.r));};
+    g.save();g.shadowColor=K.col;g.shadowBlur=10+o.hits;g.globalAlpha=glow;path();g.lineWidth=5*u;g.strokeStyle=K.col;g.stroke();g.restore();
+    path();g.lineWidth=2.2*u;g.strokeStyle='#0d0909';g.stroke();path();g.lineWidth=1;g.strokeStyle=K.hi;g.stroke();}
+  g.restore();
+}
+function slashDrawObjs(M,g,t){
+  const u=M.u;
+  for(const o of M.objs){
+    if(o.kind==='boulder'){const img=M.art.rock[o.v],S=img.width/DPR*o.r/(SLASH_RB*u);g.save();g.translate(o.x,o.y);g.rotate(o.rot);g.drawImage(img,-S/2,-S/2,S,S);g.restore();}
+    else if(o.kind==='gem'){const col=LOOT[o.type].col;
+      g.save();g.globalCompositeOperation='lighter';const gr=g.createRadialGradient(o.x,o.y,2,o.x,o.y,o.r*1.7);gr.addColorStop(0,hexA(col,0.45));gr.addColorStop(1,hexA(col,0));g.fillStyle=gr;g.fillRect(o.x-o.r*1.7,o.y-o.r*1.7,o.r*3.4,o.r*3.4);g.restore();
+      drawLoot(g,o.x,o.y,o.type,2.3*u,o.rot*0.35,1,o.seed);
+      const ph=(t*1.1+o.seed)%1;if(ph<0.25)drawGlint(g,o.x+o.r*0.35,o.y-o.r*0.45,Math.sin(ph/0.25*Math.PI)*1.1*u);}
+    else if(o.kind==='tnt')slashDrawTnt(M,g,o,t);
+    else slashDrawLode(M,g,o,t);
+  }
+}
+function slashDrawHalves(M,g,t){
+  for(const h of M.halves){const S=h.img.width/DPR*h.sc,al=clamp(1-(t-h.t0-1.6)/0.6,0,1);if(al<=0)continue;
+    g.save();g.globalAlpha=al;g.translate(h.x,h.y);g.rotate(h.a);
+    g.beginPath();g.rect(-S,h.side>0?0:-S,2*S,S);g.clip(); // one side of the cut
+    g.rotate(h.imgRot);g.drawImage(h.img,-S/2,-S/2,S,S);g.restore();}
+}
+function slashPick(g,u){ // the pick, point first, as it bites through
+  g.lineCap='round';g.lineJoin='round';
+  g.beginPath();g.moveTo(-2*u,4*u);g.lineTo(-9*u,34*u);g.strokeStyle='#120d0d';g.lineWidth=7*u;g.stroke();g.strokeStyle='#8a5a34';g.lineWidth=4*u;g.stroke();
+  g.beginPath();g.moveTo(-20*u,-1*u);g.quadraticCurveTo(-4*u,-10*u,24*u,1*u);g.quadraticCurveTo(-2*u,-1*u,-18*u,6*u);g.closePath();
+  const gr=g.createLinearGradient(0,-10*u,0,6*u);gr.addColorStop(0,'#eef2f5');gr.addColorStop(1,'#6c757d');g.fillStyle=gr;g.fill();g.lineWidth=Math.max(1.2,1.8*u);g.strokeStyle='#120d0d';g.stroke();
+  blob(g,-2*u,0,3.5*u,3.5*u,'#4a4f55','#120d0d',1.2);
+}
+function slashDrawStrikes(M,g,t){
+  const u=M.u;
+  for(const s of M.strikes){const p=(t-s.t0)/0.2;if(p<0||p>=1)continue;const al=p<0.2?p/0.2:1-(p-0.2)/0.8,d=lerp(-26,30,p)*u;
+    g.save();g.globalAlpha=al*0.9;g.translate(s.x+Math.cos(s.a)*d,s.y+Math.sin(s.a)*d);g.rotate(s.a);slashPick(g,u);g.restore();}
+}
+function slashDrawTrails(M,g,t){ // a hot white streak with an orange glow, tapering to nothing behind the finger
+  const u=M.u;g.save();g.lineCap='round';g.lineJoin='round';
+  for(const tr of M.trails){const P=tr.pts.filter(p=>t-p.t<0.17);if(P.length<2)continue;
+    for(const pass of[0,1]){g.globalCompositeOperation=pass?'source-over':'lighter';
+      for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],k=clamp(1-(t-b.t)/0.17,0,1);
+        g.beginPath();g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);
+        if(pass===0){g.strokeStyle=tr.stun?`rgba(140,130,120,${(0.35*k).toFixed(3)})`:`rgba(255,140,40,${(0.5*k).toFixed(3)})`;g.lineWidth=(12*k+2)*u;}
+        else{g.strokeStyle=tr.stun?`rgba(190,185,180,${(0.55*k).toFixed(3)})`:`rgba(255,251,238,${(0.95*k).toFixed(3)})`;g.lineWidth=(4.5*k+0.8)*u;}
+        g.stroke();}}}
+  g.restore();
+}
+function slashOverlay(M,t){
+  const u=M.u;
+  for(const p of M.pops){const a=t-p.t0,k=a<0.15?lerp(0.6,1.1,a/0.15):a<0.3?lerp(1.1,1,(a-0.15)/0.15):1,al=a>0.95?1-(a-0.95)/0.3:1,x=clamp(p.x,M.W*0.3,M.W*0.7),y=clamp(p.y,M.top+60*u,M.H-90*u)-a*18*u;
+    bigText(p.str,x,y,22*k*u,'molten',al);bigText(p.sub,x,y+26*u,22*k*u,'#ffd34d',al);}
+  const fp=(t-M.flashT)/0.3;if(fp>=0&&fp<1){ctx.fillStyle=`rgba(255,226,180,${(0.6*(1-fp)).toFixed(3)})`;ctx.fillRect(0,0,M.W,M.H);}
+}
+function slashStill(M,g){slashDrawRest(M,g);}
+function slashPeek(M,g,t){ // from the layer above: steam keeps puffing out of the vents
+  const u=M.u;
+  M.vents.forEach((V,i)=>{const ph=(t*0.55+i*0.31)%1;if(ph>0.6)return;const p=ph/0.6;
+    for(let k=0;k<3;k++){const q=clamp(p-k*0.12,0,1);if(q<=0)continue;
+      blob(g,V.x+Math.sin(t*2+k+i)*6*u,V.y-6*u-q*70*u,(8+q*18)*u,(6+q*14)*u,`rgba(235,228,220,${(0.32*(1-q)).toFixed(3)})`);}});
+}
+function slashDraw(M,t){
+  slashDrawRest(M,ctx);
+  slashDrawObjs(M,ctx,t);
+  slashDrawHalves(M,ctx,t);
+  slashDrawStrikes(M,ctx,t);
+  slashDrawTrails(M,ctx,t);
 }
 
 /* ---------- lava, obsidian and the Ice Sprayer ---------- */
