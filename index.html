@@ -492,6 +492,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
         <button id="tPlay-bones" class="tbtn primary" type="button">Play Bone Xylophone</button>
         <button id="tPlay-moles" class="tbtn primary" type="button">Play Mole Whack</button>
         <button id="tPlay-geode" class="tbtn primary" type="button">Play Geode Crack</button>
+        <button id="tPlay-crawl" class="tbtn primary" type="button">Play Crawler Blast</button>
         <button id="tSeed" class="tbtn" type="button">New seed</button>
         <button id="tCoins" class="tbtn" type="button">+1,000 coins</button>
         <button id="tSkip" class="tbtn" type="button">Skip to next layer</button>
@@ -977,6 +978,7 @@ function sfx(name,k=1){if(!AU.c||state.muted)return;const t=AU.c.currentTime;if(
     case'sizzle':nz(t,0.3,{type:'highpass',f:3000*r(),gain:0.14});tn(t,0.1,{type:'triangle',f:240*r(),f2:120,gain:0.05});break;
     case'lavaburst':nz(t,0.9,{f:500,f2:90,q:0.7,gain:0.6});tn(t,0.7,{f:70,f2:35,gain:0.35});nz(t+0.2,0.5,{type:'bandpass',f:900,f2:300,q:1,gain:0.2});break;
     case'freeze':tn(t,0.25,{type:'triangle',f:2400*r(),f2:3600,gain:0.05});nz(t,0.3,{type:'highpass',f:5000,gain:0.12});tn(t+0.06,0.3,{f:1800*r(),gain:0.04});break;
+    case'zap':tn(t,0.07,{type:'triangle',f:1700*r(),f2:640,gain:0.045});break;
   }}catch(e){}}
 function drillSound(on){
   if(on&&!AU.drill&&AU.c&&!state.muted){const c=AU.c,o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain(),lfo=c.createOscillator(),lg=c.createGain(),f=c.createBiquadFilter();
@@ -1320,7 +1322,7 @@ function renderMiniBg(M){
   const gr=g.createRadialGradient(M.cx,M.cy,10,M.cx,M.cy,Math.max(M.W,M.H)*0.75);
   gr.addColorStop(0,hsl(D[0],D[1],D[2]-10));gr.addColorStop(0.55,hsl(D[0],D[1],D[2]-23));gr.addColorStop(1,'#0c0806');
   g.fillStyle=gr;g.fillRect(0,0,M.W,M.H);g.globalAlpha=0.85;g.fillStyle=PAT.dirt;g.fillRect(0,0,M.W,M.H);g.globalAlpha=1;
-  for(let i=0;i<26;i++){ // rocks around the rim, kept away from the hoard
+  for(let i=0;i<(M.G.bare?0:26);i++){ // rocks around the rim, kept away from the hoard (none where rocks are in play)
     let x=0,y=0;for(let n=0;n<30;n++){x=rng()*M.W;y=M.top+rng()*ph;if(Math.hypot((x-M.cx)/M.W,(y-M.cy)/ph)>0.36)break;}
     const r=(6+rng()*16)*M.u,m=6+Math.floor(rng()*3),a0=rng()*TAU,pts=[];
     for(let j=0;j<m;j++){const a=a0+j/m*TAU+(rng()-0.5)*0.5,rr=r*(0.75+rng()*0.4);pts.push([x+Math.cos(a)*rr,y+Math.sin(a)*rr*0.85]);}
@@ -1380,7 +1382,7 @@ function endPhase(reason){
 // Every cavern is a small module: init, layout, still (static scene), peek (live bits seen from the layer above),
 // begin, update, draw, tap and results. The cavern is built while you dig the layer above it, so the scene you
 // glimpse through the holes is the same object that becomes the game when you drop.
-const MINI_ORDER=['bugs','bones','moles','geode'];
+const MINI_ORDER=['bugs','bones','moles','geode','crawl'];
 const MOLTEN=['#ff9b2e','#fc6315','#e3301a'];
 const GAMES={
   bugs:{title:'BUG CRUSHER',stat:'HAUL',timed:true,go:'SMASH!',
@@ -1399,6 +1401,11 @@ const GAMES={
     tip:'Tap when the spark crosses the glowing crack. Three clean hits split it open.',
     teaser:'Something is glowing inside a rock below.',
     init:geodeInit,layout:geodeLayout,decor:geodeDecor,still:geodeStill,peek:geodePeek,hud0:geodeHud0,begin:geodeBegin,update:geodeUpdate,draw:geodeDraw,tap:geodeTap,results:geodeResults},
+  crawl:{title:'CRAWLER BLAST',stat:'EARNED',timed:true,go:'BLAST!',bare:true, // bare: no loose rocks painted on the floor, the rocks here are in play
+    tip:'Hold to fire, drag to move. Stop the centipede before it reaches you.',
+    teaser:'Something long is crawling between the rocks below.',
+    init:crawlInit,layout:crawlLayout,decor:crawlDecor,still:crawlStill,peek:crawlPeek,hud0:crawlHud0,begin:crawlBegin,update:crawlUpdate,draw:crawlDraw,overlay:drawCombo,
+    down:crawlDown,move:crawlMove,up:crawlUp,results:crawlResults}, // played by dragging: down, move and up instead of tap
 };
 let cavernPrev=null; // the cavern waiting under the current layer, if the next drop leads into one
 function miniKindFor(L){const n=Math.max(1,state.tune.miniEvery|0),i=Math.max(0,Math.floor((L-1)/n)-1);return MINI_ORDER[i%MINI_ORDER.length];}
@@ -1505,15 +1512,28 @@ function miniDraw(t){
   const fp=(t-M.s0)/0.45;if(fp<1){ctx.fillStyle=`rgba(0,0,0,${(1-fp).toFixed(3)})`;ctx.fillRect(0,0,M.W,M.H);}
 }
 function miniPointer(e){
-  const M=MG;if(!M||M.phase!=='play')return;
+  const M=MG;if(!M)return;
+  const r=appEl.getBoundingClientRect();
+  if(M.G.down){ // a drag cavern takes the thumb during the countdown too, so a thumb already down is ready at GO
+    if(M.phase!=='play'&&M.phase!=='count')return;
+    e.preventDefault();auInit();try{cv.setPointerCapture(e.pointerId);}catch(_){}
+    M.G.down(M,e.pointerId,e.clientX-r.left,e.clientY-r.top,now());return;}
+  if(M.phase!=='play')return;
   e.preventDefault();auInit();
-  const r=appEl.getBoundingClientRect();M.G.tap(M,e.clientX-r.left,e.clientY-r.top,now());
+  M.G.tap(M,e.clientX-r.left,e.clientY-r.top,now());
+}
+function miniDrag(e,kind){ // moves and lifts, for the caverns you play by dragging
+  const M=MG;if(!M||!M.G.down)return;
+  if(kind==='up'){M.G.up(M,e.pointerId,now());return;}
+  const r=appEl.getBoundingClientRect();M.G.move(M,e.pointerId,e.clientX-r.left,e.clientY-r.top,now());
 }
 function miniPause(hidden){ // stop every cavern clock while the app is in the background
-  const M=MG;if(!M||(M.phase!=='play'&&M.phase!=='count'))return;
+  const M=MG;if(!M)return;
+  if(hidden&&M.G.up)M.G.up(M,null,now()); // no thumb is still down when the app comes back
+  if(M.phase!=='play'&&M.phase!=='count')return;
   if(hidden){M.pausedAt=now();return;}
   if(!M.pausedAt)return;const d=now()-M.pausedAt;M.pausedAt=0;
-  for(const k of['t0','c0','i0','spawnT','lastKill','showT','nextT','gt','nextSpawn','rattleT','cheerT'])if(typeof M[k]==='number')M[k]+=d;
+  for(const k of['t0','c0','i0','spawnT','lastKill','showT','nextT','gt','nextSpawn','rattleT','cheerT','spiderT','waveT','stunT','safeT','fireT','shotT'])if(typeof M[k]==='number')M[k]+=d;
   for(const q of M.queue||[])q.t+=d;
   for(const m of M.moles||[]){m.t0+=d;m.st+=d;}
 }
@@ -2290,6 +2310,429 @@ function geodeResults(M){
   rows.push(['Perfect strikes',`${M.perfectN} of ${M.strikesN}`]);
   const fl=M.geodes.filter(g=>g.grade==='FLAWLESS').length,sh=M.geodes.filter(g=>g.grade==='SHATTERED').length;
   return{tag:fl===3?'Master splitter':'Geode pocket cleared',title:fl===3?'FLAWLESS SET!':fl?'BRILLIANT!':sh===3?'ALL SHATTERED':'CRACKED IT',rows,total:M.earned,great:fl===3};
+}
+
+/* ---------- Crawler Blast ---------- */
+// A cave centipede winds down through a field of rocks toward your miner. Hold to fire, drag to move.
+// Everything lives on a grid of cells: rocks sit in cells and the centipede steps from cell to cell, while the
+// miner, the bolt and the spider move freely in cell units. Pixels only come in when drawing, so a resize
+// just rescales the grid.
+// The centipede is a chain: path[0] is the cell its head is heading for, path[i+1] the cell segment i is
+// leaving. Shoot a segment and it curls into a rock; the segment behind it becomes the head of a new chain.
+const CRAWL_PAL={
+  body:{hi:'#f39a58',mid:'#b9552b',lo:'#4f1d10',mark:'#4a170c',spot:'#ffc58a'},
+  head:{hi:'#ff9a66',mid:'#c23f27',lo:'#4a120a',mark:'#3e0f08',spot:'#ffb27a'},
+  gold:{hi:'#fff4b8',mid:'#e8ae2c',lo:'#6e4206',mark:'#8a5a0a',spot:'#fffbe0'},
+};
+function crawlInit(M){
+  const T=state.tune,L=M.L;
+  M.spd=T.bugSpeed*Math.min(1.3,1+0.018*(L-1));
+  Object.assign(M,{df:1+0.1*(L-1),cspd:7.5*M.spd,sspd:5*M.spd,n0:clamp(10+Math.floor(L/4),10,14),
+    C:0,R:0,Z:0,rocks:null,chains:[],spider:null,bolt:null,splats:[],art:null,artKey:'',
+    ptr:null,px:0,py:0,mx:0,my:0,fireT:0,shotT:-9,stunT:-9,safeT:-9,spiderT:null,waveT:null,fadeT:null,pk:null,
+    wave:1,earned:0,segs:0,heads:0,golds:0,waves:0,spiders:0,ores:0,bites:0,bitVal:0,combo:0,best:0,lastKill:-9});
+}
+function crawlLayout(M){
+  if(!M.C){ // the grid is fixed the first time the cavern is laid out; later layouts (a turned phone) rescale it
+    M.C=clamp(Math.round(M.W/(30*M.u)),11,17);
+    M.R=clamp(Math.floor((M.ph-8*M.u)/(M.W/M.C)),14,40);M.Z=clamp(Math.round(M.R*0.24),4,8);
+    crawlField(M);crawlFirstChain(M);
+    M.mx=(M.C-1)/2;M.my=M.R-2;
+  }
+  M.cs=Math.min(M.W/M.C,(M.ph-8*M.u)/M.R);M.gx=(M.W-M.C*M.cs)/2;M.gy=M.top+(M.ph-M.R*M.cs)*0.3;
+  crawlArt(M);
+}
+function crawlField(M){ // scattered rocks; the top two rows stay clear for the centipede to pace
+  const rng=mulberry32(M.seed+11),d=0.095+0.004*Math.min(10,M.L);
+  M.rocks=new Array(M.C*M.R).fill(null);
+  for(let r=2;r<M.R-1;r++)for(let c=0;c<M.C;c++){const zone=r>=M.R-M.Z;if(rng()<(zone?0.035:d))crawlRock(M,c,r,rng()<0.16,rng(),-9);}
+}
+function crawlRock(M,c,r,ore,seed,born){M.rocks[r*M.C+c]={c,r,hp:4,ore,seed,v:Math.floor(seed*6),born,hit:-9};}
+function crawlRockAt(M,c,r){return c>=0&&c<M.C&&r>=0&&r<M.R?M.rocks[r*M.C+c]:null;}
+function crawlChain(n,mode,speed){
+  return{segs:Array.from({length:n},()=>({gold:false,ox:0,oy:0,ang:0,seed:Math.random()})),path:[],p:0,dir:1,vdir:1,mode,speed,walk:0,entered:true};
+}
+function crawlFirstChain(M){ // it is already down there, pacing the top of the cavern
+  const rng=mulberry32(M.seed+23),n=M.n0,left=rng()<0.5,ch=crawlChain(n,'patrol',M.cspd);
+  for(let i=0;i<=n;i++)ch.path.push({c:left?-i:M.C-1+i,r:0});
+  ch.dir=left?1:-1;for(const s of ch.segs)s.ang=left?0:Math.PI;
+  if(rng()<0.5)ch.segs[1+Math.floor(rng()*(n-1))].gold=true;
+  M.chains=[ch];
+}
+function crawlBlocked(M,ch,c,r){
+  if(c<0||c>=M.C||crawlRockAt(M,c,r))return true;
+  for(const o of M.chains){if(o===ch)continue;const P=o.path;for(let j=0;j<P.length-1;j++)if(P[j].c===c&&P[j].r===r)return true;}
+  return false;
+}
+function crawlNext(M,ch,from){ // where the head goes after reaching a cell
+  if(from.r<0)return{c:from.c,r:from.r+1}; // still coming down out of the ceiling
+  let c=from.c+ch.dir,r=from.r;
+  if(crawlBlocked(M,ch,c,r)){ // a wall, a rock or another centipede: drop a row and turn around
+    if(ch.mode==='patrol')r=from.r>0?0:1;
+    else{if(ch.vdir>0&&from.r>=M.R-1)ch.vdir=-1;else if(ch.vdir<0&&from.r<=M.R-M.Z)ch.vdir=1;r=from.r+ch.vdir;} // down at the bottom it winds back and forth
+    c=from.c;ch.dir=-ch.dir;
+  }
+  return{c,r};
+}
+function crawlDirs(c,ch){ // a new head reads its headings off the trail it was following
+  let dir=0,flips=0,v=0;const P=c.path;
+  for(let j=0;j<P.length-1;j++){const a=P[j],b=P[j+1];
+    if(a.r===b.r){if(a.c!==b.c){dir=Math.sign(a.c-b.c);break;}}
+    else{flips++;if(!v)v=Math.sign(a.r-b.r);}}
+  c.dir=dir?(flips%2?-dir:dir):ch.dir;c.vdir=v||ch.vdir;
+}
+function crawlSegAt(ch,i){ // a Catmull-Rom curve through the trail rounds off every corner of the grid
+  const P=ch.path,b=P[i],a=P[i+1],z=P[i+2]||{c:2*a.c-b.c,r:2*a.r-b.r},n=i>0?P[i-1]:{c:2*b.c-a.c,r:2*b.r-a.r},t=ch.p,t2=t*t,t3=t2*t;
+  const f=(p0,p1,p2,p3)=>0.5*(2*p1+(p2-p0)*t+(2*p0-5*p1+4*p2-p3)*t2+(3*p1-p0-3*p2+p3)*t3);
+  const d=(p0,p1,p2,p3)=>0.5*((p2-p0)+2*(2*p0-5*p1+4*p2-p3)*t+3*(3*p1-p0-3*p2+p3)*t2);
+  return{x:f(z.c,a.c,b.c,n.c),y:f(z.r,a.r,b.r,n.r),dx:d(z.c,a.c,b.c,n.c),dy:d(z.r,a.r,b.r,n.r)};
+}
+function crawlMoveChains(M,dt){
+  for(const ch of M.chains){
+    const sp=ch.mode==='patrol'?ch.speed*0.55:ch.speed;
+    ch.p+=sp*dt;ch.walk+=sp*dt;
+    while(ch.p>=1){ch.p-=1;ch.path.unshift(crawlNext(M,ch,ch.path[0]));ch.path.length=ch.segs.length+1;}
+    const k=Math.exp(-dt*14),turn=Math.min(1,dt*22);
+    for(let i=0;i<ch.segs.length;i++){const s=ch.segs[i],q=crawlSegAt(ch,i);
+      if(q.dx||q.dy){let d=Math.atan2(q.dy,q.dx)-s.ang;d=Math.atan2(Math.sin(d),Math.cos(d));s.ang+=d*turn;}
+      s.ox*=k;s.oy*=k;}
+  }
+}
+function crawlHud0(M){miniStat(0);miniHud(1,M.dur+' s',false);}
+function crawlBegin(M,t){
+  for(const ch of M.chains){ch.mode='run';ch.vdir=1;}
+  M.spiderT=t+4+Math.random()*2.5;
+}
+function crawlDown(M,id,x,y){if(M.ptr!=null)return;M.ptr=id;M.px=x;M.py=y;} // one thumb steers
+function crawlMove(M,id,x,y){
+  if(id!==M.ptr)return;
+  const k=1.25/M.cs,dx=(x-M.px)*k,dy=(y-M.py)*k;M.px=x;M.py=y; // the miner follows the thumb's motion, not its spot, so the thumb never hides it
+  if(M.phase!=='play'&&M.phase!=='count')return;
+  M.mx=clamp(M.mx+dx,0.2,M.C-1.2);M.my=clamp(M.my+dy,M.R-M.Z,M.R-1); // kept just inside the edges so the whole miner shows
+}
+function crawlUp(M,id){if(id==null||id===M.ptr)M.ptr=null;}
+function crawlUpdate(M,dt,t){
+  if(M.phase==='play'){
+    const rem=Math.max(0,M.dur-(t-M.t0));timerHud(M,rem);
+    if(rem<=0){M.phase='end';M.e0=t;M.endDelay=1.3;M.fadeT=t;M.bolt=null;
+      callout('TIME!','#62e3ff');sfx('buzzer');buzz([20,30,20]);miniHud(0,'0 s',true);}
+  }
+  crawlMoveChains(M,dt);
+  crawlMoveSpider(M,dt,t);
+  if(M.phase==='play'){
+    if(M.ptr!=null&&!M.bolt&&t>=M.stunT&&t>=M.fireT){M.bolt={x:M.mx,y:M.my-0.95};M.fireT=t+0.08;M.shotT=t;sfx('zap');}
+    if(M.bolt)crawlMoveBolt(M,dt,t);
+    if(M.spiderT!=null&&t>=M.spiderT){M.spiderT=null;crawlSpawnSpider(M);}
+    if(!M.chains.length&&M.waveT==null)crawlCleared(M,t);
+    if(M.waveT!=null&&t>=M.waveT){M.waveT=null;crawlWave(M);}
+    crawlEntries(M);
+    if(t>=M.safeT)crawlBites(M,t);
+  }
+  M.splats=M.splats.filter(s=>t-s.t0<4);
+  if(M.combo>0&&t-M.lastKill>1.4)M.combo=0;
+  miniStat(M.earned);
+}
+function crawlMoveBolt(M,dt,t){ // fast enough to need sub-steps, so it can never skip over a segment
+  const dist=62*dt,n=Math.max(1,Math.ceil(dist/0.3)),step=dist/n;
+  for(let i=0;i<n;i++){M.bolt.y-=step;if(crawlBoltHits(M,t)){M.bolt=null;return;}}
+  if(M.bolt.y<-1)M.bolt=null;
+}
+function crawlBoltHits(M,t){
+  const bx=M.bolt.x,by=M.bolt.y;
+  let hit=null,hk=-1,hy=-1e9; // the centipede first: it crawls over the rocks
+  for(const ch of M.chains)for(let i=0;i<ch.segs.length;i++){const q=crawlSegAt(ch,i);if(Math.abs(q.x-bx)<0.5&&Math.abs(q.y-by)<0.55&&q.y>hy){hy=q.y;hit=ch;hk=i;}}
+  if(hit){crawlKill(M,hit,hk,t);return true;}
+  const s=M.spider;
+  if(s&&Math.abs(s.x-bx)<0.75&&Math.abs(s.y-by)<0.65){crawlSpiderDie(M,t);return true;}
+  const rc=Math.round(bx),rr=Math.round(by),rk=crawlRockAt(M,rc,rr);
+  if(rk&&Math.abs(bx-rc)<=0.46){crawlChip(M,rk,t);return true;}
+  return false;
+}
+function crawlPx(M,q){return{x:M.gx+(q.x+0.5)*M.cs,y:M.gy+(q.y+0.5)*M.cs};}
+function crawlKill(M,ch,k,t){
+  const n=ch.segs.length,P=ch.path,seg=ch.segs[k],q=crawlSegAt(ch,k),X=ch.p<0.5?P[k+1]:P[k],before=ch.segs.map((s,i)=>crawlSegAt(ch,i));
+  // the segment curls up into a rock where it fell
+  const placed=X.c>=0&&X.c<M.C&&X.r>=0&&X.r<M.R;
+  if(placed){const ex=crawlRockAt(M,X.c,X.r);if(ex){ex.hp=4;ex.born=t;ex.ore=ex.ore||seg.gold;}else crawlRock(M,X.c,X.r,seg.gold,Math.random(),t);}
+  // the front keeps going; the segment behind the hit becomes a new head
+  M.chains.splice(M.chains.indexOf(ch),1);
+  const parts=[];
+  if(k>0)parts.push([Object.assign({},ch,{segs:ch.segs.slice(0,k),path:P.slice(0,k+1)}),0]);
+  if(k<n-1){const b=Object.assign({},ch,{segs:ch.segs.slice(k+1),path:P.slice(k+1),entered:true});crawlDirs(b,ch);parts.push([b,k+1]);}
+  for(const[c]of parts)M.chains.push(c);
+  for(const[c,off]of parts){
+    if(off&&placed&&c.path[0].c===X.c&&c.path[0].r===X.r)c.path[0]=crawlNext(M,c,c.path[1]); // it was about to crawl into the new rock
+    for(let i=0;i<c.segs.length;i++){const a=before[off+i],b=crawlSegAt(c,i);c.segs[i].ox+=a.x-b.x;c.segs[i].oy+=a.y-b.y;} // no jumps on screen
+  }
+  const head=k===0,gold=seg.gold,u=M.u,p=crawlPx(M,q);
+  M.combo=t-M.lastKill<1.0?M.combo+1:1;M.lastKill=t;M.best=Math.max(M.best,M.combo);
+  const val=Math.round((gold?10:head?3:1)*M.df*(1+0.15*Math.min(5,M.combo-1))); // heads are the hard ones; combos top out at ×1.75
+  M.earned+=val;M.segs++;if(head)M.heads++;if(gold)M.golds++;
+  const goo=gold?'#ffd34d':'#c9d23c';
+  addSplat(p.x,p.y,goo,head?0.95:0.75);
+  for(let i=0;i<7;i++)spawn('goo',p.x,p.y,{color:goo,speed:40+Math.random()*80,vz:60+Math.random()*60,size:1.4+Math.random()*1.4});
+  for(let i=0;i<5;i++)spawn('chunk',p.x,p.y,{color:['#b9552b','#7a3018','#f39a58'][i%3],size:1.4+Math.random()*1.8,speed:50+Math.random()*80,vz:70+Math.random()*60});
+  if(gold){spawn('ring',p.x,p.y,{color:'rgba(255,211,77,1)',size:1.4*M.cs,life:0.4,speed:0});
+    for(let i=0;i<12;i++)spawn('spark',p.x,p.y,{color:i%2?'#ffd34d':'#fff6c2',speed:80+Math.random()*140,life:0.45});
+    floatText(p.x,p.y-26*u,`+${val} GOLDEN`,'#ffd34d',17);sfx('scarab');}
+  else{floatText(p.x,p.y-20*u,`+${val}`,'#ffd34d',head?17:14);sfx(head?'crunch':'squish');}
+  buzz(head||gold?14:8);addShake(head?2.2:1.2);
+}
+function crawlChip(M,rk,t){
+  rk.hp--;rk.hit=t;const p=crawlPx(M,{x:rk.c,y:rk.r}),R=bandFor(M.L).rock;
+  if(rk.hp>0){sfx('chip');
+    for(let i=0;i<3;i++)spawn('chunk',p.x,p.y+0.25*M.cs,{ang:Math.PI/2+(Math.random()-0.5)*1.6,color:hsl(R[0],R[1],R[2]-12+Math.random()*14),size:1+Math.random()*1.4,speed:40+Math.random()*50,vz:50+Math.random()*50,life:0.45});
+    return;}
+  M.rocks[rk.r*M.C+rk.c]=null;crawlCrumble(M,rk,8);sfx('break');
+  if(rk.ore){const val=Math.round(3*M.df);M.earned+=val;M.ores++;floatText(p.x,p.y-18*M.u,`+${val} ORE`,'#ffd34d',15);sfx('gem');
+    for(let i=0;i<8;i++)spawn('spark',p.x,p.y,{color:'#ffd34d',speed:60+Math.random()*90,life:0.35});}
+}
+function crawlCrumble(M,rk,n){
+  const p=crawlPx(M,{x:rk.c,y:rk.r}),R=bandFor(M.L).rock;
+  for(let i=0;i<n;i++)spawn('chunk',p.x,p.y,{color:hsl(R[0],R[1],R[2]-14+Math.random()*16),size:1.4+Math.random()*2.2,speed:40+Math.random()*90,vz:60+Math.random()*80});
+  spawn('dust',p.x,p.y,{color:'#3a2a1d',speed:10,size:7,life:0.45});
+}
+function crawlSpawnSpider(M){
+  const left=Math.random()<0.5;
+  M.spider={x:left?-1.2:M.C+0.2,y:M.R-M.Z-1+Math.random()*1.5,dir:left?1:-1,vx:0,vy:0,leg:0,phase:0,hit:-9};
+  crawlSpiderLeg(M,M.spider);
+}
+function crawlSpiderLeg(M,s){ // the next stretch of its zig-zag: mostly diagonal hops, now and then straight up or down
+  const top=M.R-M.Z-1.2,bot=M.R-1,up=s.y>bot-0.8?true:s.y<top+0.8?false:Math.random()<0.5,vert=Math.random()<0.28,sp=M.sspd;
+  s.vx=vert?0:s.dir*sp*0.6;s.vy=(up?-1:1)*sp*(vert?0.9:0.75);s.leg=0.22+Math.random()*0.4;
+}
+function crawlMoveSpider(M,dt,t){
+  const s=M.spider;if(!s)return;
+  if(M.phase==='end'){s.vx=s.dir*M.sspd*1.6;s.vy=0;} // scuttles off when time runs out
+  else{s.leg-=dt;if(s.leg<=0)crawlSpiderLeg(M,s);}
+  s.x+=s.vx*dt;s.y+=s.vy*dt;s.phase+=dt*16;
+  const top=M.R-M.Z-1.2,bot=M.R-1;if(s.y<top){s.y=top;s.vy=Math.abs(s.vy);}else if(s.y>bot){s.y=bot;s.vy=-Math.abs(s.vy);}
+  const rc=Math.round(s.x),rr=Math.round(s.y),rk=crawlRockAt(M,rc,rr); // it chews through any rubble it crosses
+  if(rk&&Math.abs(s.x-rc)<0.4&&Math.abs(s.y-rr)<0.4){M.rocks[rr*M.C+rc]=null;crawlCrumble(M,rk,4);sfx('chip');}
+  if((s.dir>0&&s.x>M.C+0.6)||(s.dir<0&&s.x<-1.6)){M.spider=null;if(M.phase==='play')M.spiderT=t+(5+Math.random()*4)/M.spd;}
+}
+function crawlSpiderDie(M,t){ // worth more the closer it got
+  const s=M.spider,d=Math.hypot(s.x-M.mx,s.y-M.my),close=d<2.6,p=crawlPx(M,s),u=M.u;
+  M.combo=t-M.lastKill<1.0?M.combo+1:1;M.lastKill=t;M.best=Math.max(M.best,M.combo);
+  const val=Math.round((close?12:d<5?8:4)*M.df);M.earned+=val;M.spiders++;
+  addSplat(p.x,p.y,'#7fd16a',1.1);
+  for(let i=0;i<9;i++)spawn('goo',p.x,p.y,{color:'#7fd16a',speed:40+Math.random()*90,vz:70+Math.random()*60,size:1.6+Math.random()*1.6});
+  floatText(p.x,p.y-26*u,close?`CLOSE! +${val}`:`+${val}`,close?'#ffd34d':'#f0c060',close?18:15);
+  sfx('squish');sfx('crunch');buzz(16);addShake(2.6);
+  M.spider=null;M.spiderT=t+(5+Math.random()*4)/M.spd;
+}
+function crawlBites(M,t){
+  for(const ch of M.chains)for(let i=0;i<ch.segs.length;i++){const q=crawlSegAt(ch,i);if(Math.hypot(q.x-M.mx,q.y-M.my)<0.78){crawlBite(M,t,q);return;}}
+  const s=M.spider;if(s&&Math.hypot(s.x-M.mx,s.y-M.my)<0.95)crawlBite(M,t,s);
+}
+function crawlBite(M,t,from){ // costs coins, knocks the miner back and jams the blaster for a moment
+  const take=Math.min(M.earned,Math.round(4*M.df)),u=M.u;M.earned-=take;M.bites++;M.bitVal+=take;M.combo=0;
+  M.stunT=t+0.85;M.safeT=t+2.1;M.lossT=t;M.bolt=null;
+  const dx=M.mx-from.x,dy=M.my-from.y,d=Math.hypot(dx,dy)||1;
+  M.mx=clamp(M.mx+dx/d*0.8,0.2,M.C-1.2);M.my=clamp(M.my+dy/d*0.8,M.R-M.Z,M.R-1);
+  const p=crawlPx(M,{x:M.mx,y:M.my});
+  floatText(p.x,p.y-30*u,'OUCH!','#ff5b47',20);if(take)floatText(p.x+28*u,p.y-12*u,`-${take}`,'#ff5b47',15);
+  sfx('ouch');buzz([30,40,30]);addShake(4);
+}
+function crawlCleared(M,t){
+  M.waves++;M.waveT=t+1.3;const val=Math.round(6*M.df);M.earned+=val;
+  callout('CLEARED!','molten');floatText(M.cx,M.callY+44*M.u,`+${val} BONUS`,'#ffd34d',18);sfx('fanfare');buzz([15,30,15]);
+}
+function crawlWave(M){ // a longer, quicker one burrows out of the ceiling, with loose heads from wave two on
+  const w=++M.wave,n=clamp(M.n0+w-1,10,16),speed=M.cspd*(1+0.06*(w-1)),cols=[];
+  const pick=()=>{for(let k=0;k<30;k++){const c=1+Math.floor(Math.random()*(M.C-2));if(cols.every(o=>Math.abs(o-c)>1)){cols.push(c);return c;}}return Math.floor(Math.random()*M.C);};
+  const main=crawlChain(n,'run',speed),c0=pick();
+  for(let i=0;i<=n;i++)main.path.push({c:c0,r:-i});
+  main.dir=Math.random()<0.5?1:-1;main.entered=false;for(const s of main.segs)s.ang=Math.PI/2;
+  if(Math.random()<0.75)main.segs[1+Math.floor(Math.random()*(n-1))].gold=true;
+  M.chains.push(main);
+  for(let j=0;j<Math.min(3,w-1);j++){const h=crawlChain(1,'run',speed*1.08),c=pick(),d=3+j*3; // loose heads drop in a little later
+    h.path.push({c,r:-d},{c,r:-d-1});h.dir=c<M.C/2?1:-1;h.entered=false;h.segs[0].ang=Math.PI/2;M.chains.push(h);}
+}
+function crawlEntries(M){ // dirt showers down where a centipede breaks through the ceiling
+  for(const ch of M.chains){if(ch.entered)continue;const q=crawlSegAt(ch,0);if(q.y<-0.6)continue;
+    ch.entered=true;const x=M.gx+(q.x+0.5)*M.cs,y=M.gy;
+    for(let i=0;i<9;i++)spawn('chunk',x,y,{ang:Math.PI*(0.15+Math.random()*0.7),color:['#6e4330','#8a5236','#4a2e20'][i%3],size:1.4+Math.random()*2,speed:40+Math.random()*70,vz:30+Math.random()*50});
+    spawn('dust',x,y+0.3*M.cs,{color:'#2a1a10',speed:12,size:9,life:0.5});sfx('crunch');addShake(1.5);}
+}
+function crawlResults(M){
+  const clean=M.bites===0,pb=clean&&M.segs>0?Math.round(M.earned*0.25):0,f=v=>'+'+v.toLocaleString('en-US');
+  const rows=[['Segments blasted',String(M.segs)],['Centipedes cleared',String(M.waves)],['Spiders squashed',String(M.spiders)],['Ore rocks mined',String(M.ores)],
+    ['Best combo',M.best>1?`×${M.best}`:'–'],['Bites taken',M.bites?`${M.bites} (-${M.bitVal})`:'0']];
+  if(pb)rows.push(['Not a scratch',f(pb)]);
+  const great=clean&&M.waves>0;
+  return{tag:great?'Not a scratch':M.waves?'Centipede cleared':'Time ran out',title:great?'EXTERMINATOR!':M.waves?'CRAWLERS DOWN':'STILL CRAWLING',rows,total:M.earned+pb,great};
+}
+
+/* drawing */
+function crawlPlate(cs,pal,head){ // one chitin plate, pre-painted; x points the way the segment is heading
+  const P=CRAWL_PAL[pal],W=cs*1.3,S=Math.ceil(W*DPR),c=document.createElement('canvas');c.width=c.height=S;
+  const g=c.getContext('2d');g.setTransform(S/W,0,0,S/W,S/2,S/2);
+  const rx=(head?0.43:0.37)*cs,ry=(head?0.45:0.47)*cs,ol='#140a08';
+  const shape=()=>{g.beginPath();g.ellipse(0,0,rx,ry,0,0,TAU);};
+  shape();const gr=g.createRadialGradient(0,0,ry*0.05,0,0,ry*1.05);gr.addColorStop(0,P.hi);gr.addColorStop(0.5,P.mid);gr.addColorStop(1,P.lo);g.fillStyle=gr;g.fill();
+  g.save();shape();g.clip();
+  if(head){ // a darker face up front, a pale brow, and the big glossy eyes every critter down here has
+    blob(g,rx*0.75,0,rx*0.55,ry*0.7,'rgba(40,8,4,0.45)');
+    blob(g,-rx*0.3,0,rx*0.4,ry*0.55,P.spot+'55');
+  }else{ // a dark diamond down the spine and a pale spot on each flank
+    g.fillStyle=P.mark;g.globalAlpha=0.75;g.beginPath();g.moveTo(-rx*0.7,0);g.lineTo(0,-ry*0.28);g.lineTo(rx*0.7,0);g.lineTo(0,ry*0.28);g.closePath();g.fill();
+    g.globalAlpha=0.6;blob(g,-rx*0.05,-ry*0.66,rx*0.26,ry*0.13,P.spot);blob(g,-rx*0.05,ry*0.66,rx*0.26,ry*0.13,P.spot);g.globalAlpha=1;
+    g.lineWidth=0.09*cs;g.strokeStyle='rgba(30,8,2,0.5)';g.beginPath();g.ellipse(rx*0.25,0,rx*1.02,ry*1.04,0,Math.PI*0.6,Math.PI*1.4);g.stroke(); // tucks under the plate ahead
+  }
+  g.restore();
+  if(head)for(const sd of[-1,1]){
+    const ex=rx*0.38,ey=sd*ry*0.42;
+    blob(g,ex,ey,0.13*cs,0.12*cs,'#0d0605',ol,Math.max(1,0.03*cs));
+    blob(g,ex+0.035*cs,ey-0.035*cs,0.04*cs,0.035*cs,'rgba(255,255,255,0.92)');
+    blob(g,ex-0.04*cs,ey+0.04*cs,0.018*cs,0.016*cs,'rgba(255,255,255,0.55)');
+  }
+  shape();g.lineWidth=Math.max(1.3,0.07*cs);g.strokeStyle=ol;g.stroke();
+  return c;
+}
+function crawlArt(M){
+  const key=M.cs.toFixed(2)+'/'+DPR+'/'+M.L;if(M.artKey===key)return;M.artKey=key;
+  M.art={size:M.cs*1.3,body:crawlPlate(M.cs,'body',false),gold:crawlPlate(M.cs,'gold',false),head:crawlPlate(M.cs,'head',true),headGold:crawlPlate(M.cs,'gold',true),rocks:new Map()};
+}
+function crawlRockImg(M,rk){ // each of six shapes at four sizes (it shrinks as it is chipped), plain or with ore
+  const A=M.art,key=rk.v*10+rk.hp*2+(rk.ore?1:0);let c=A.rocks.get(key);if(c)return c;
+  const cs=M.cs,W=cs*1.2,S=Math.ceil(W*DPR);c=document.createElement('canvas');c.width=c.height=S;
+  const g=c.getContext('2d');g.setTransform(DPR,0,0,DPR,S/2,S/2);
+  const band=bandFor(M.L),R=band.rock,rng=mulberry32(rk.v*7919+3),r=0.45*cs*[0,0.55,0.7,0.85,1][rk.hp],m=6+rk.v%3,a0=rng()*TAU,pts=[];
+  for(let j=0;j<m;j++){const a=a0+j/m*TAU+(rng()-0.5)*0.5,rr=r*(0.8+rng()*0.28);pts.push([Math.cos(a)*rr,Math.sin(a)*rr*0.88]);}
+  const poly=(dx,dy)=>{g.beginPath();pts.forEach(([x,y],j)=>j?g.lineTo(x+dx,y+dy):g.moveTo(x+dx,y+dy));g.closePath();};
+  poly(0.06*cs,0.09*cs);g.fillStyle='rgba(0,0,0,0.42)';g.fill();
+  poly(0,0);g.fillStyle=hsl(R[0],R[1],R[2]-6+(rk.v%3)*3);g.fill();g.fillStyle=PAT.rock;g.fill();
+  const sh=g.createLinearGradient(-r,-r,r,r);sh.addColorStop(0,'rgba(255,246,230,0.22)');sh.addColorStop(0.5,'rgba(255,246,230,0)');sh.addColorStop(1,'rgba(0,0,0,0.34)');g.fillStyle=sh;g.fill();
+  g.save();g.clip();
+  if(rk.ore)for(let j=0;j<3;j++){const a=rng()*TAU,d=r*(0.12+rng()*0.42),x=Math.cos(a)*d,y=Math.sin(a)*d,s=cs*(0.06+rng()*0.035)*(0.6+0.4*rk.hp/4);
+    g.beginPath();g.moveTo(x,y-s);g.lineTo(x+s*0.8,y);g.lineTo(x,y+s);g.lineTo(x-s*0.8,y);g.closePath();g.fillStyle='#ffd34d';g.fill();g.lineWidth=Math.max(0.8,0.022*cs);g.strokeStyle='#6a4008';g.stroke();
+    blob(g,x-s*0.2,y-s*0.35,s*0.24,s*0.16,'#fffbe0');}
+  if(rk.hp<4){const cr=mulberry32(rk.v*31+rk.hp);g.strokeStyle='#120d0d';g.lineWidth=Math.max(1,0.04*cs);g.lineJoin='round';
+    for(let j=0;j<4-rk.hp;j++){let x=(cr()-0.5)*r*0.5,y=(cr()-0.5)*r*0.5;g.beginPath();g.moveTo(x,y);for(let s=0;s<3;s++){x+=(cr()-0.5)*r*0.9;y+=(cr()-0.5)*r*0.9;g.lineTo(x,y);}g.stroke();}}
+  g.restore();
+  poly(0,0);g.lineWidth=Math.max(1.2,0.05*cs);g.lineJoin='round';g.strokeStyle=band.line;g.stroke();
+  blob(g,-r*0.28,-r*0.34,r*0.34,r*0.18,'rgba(255,248,235,0.2)');
+  A.rocks.set(key,c);return c;
+}
+function crawlDecor(M,g){ // the trodden strip the miner works from, and the dark ceiling the centipedes come out of
+  const cs=M.cs,y0=M.gy+(M.R-M.Z)*cs,rng=mulberry32(M.seed+31);
+  const gr=g.createLinearGradient(0,y0-0.7*cs,0,M.H);gr.addColorStop(0,'rgba(255,214,150,0)');gr.addColorStop(0.18,'rgba(255,214,150,0.06)');gr.addColorStop(1,'rgba(255,214,150,0.11)');
+  g.fillStyle=gr;g.fillRect(0,y0-0.7*cs,M.W,M.H-y0+0.7*cs);
+  for(let x=rng()*8;x<M.W;x+=5+rng()*9)blob(g,x,y0-0.5*cs+(rng()-0.5)*5,1+rng()*1.6,0.8+rng()*1.1,`rgba(255,236,210,${(0.07+rng()*0.09).toFixed(3)})`);
+  const cg=g.createLinearGradient(0,M.top,0,M.gy+1.4*cs);cg.addColorStop(0,'rgba(0,0,0,0.6)');cg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=cg;g.fillRect(0,M.top,M.W,M.gy+1.4*cs-M.top);
+}
+function crawlDrawRocks(M,g,t){
+  const cs=M.cs,W=cs*1.2;
+  for(const rk of M.rocks){if(!rk)continue;
+    const img=crawlRockImg(M,rk),x=M.gx+(rk.c+0.5)*cs,y=M.gy+(rk.r+0.5)*cs,age=t-rk.born;
+    let s=1;if(age>=0&&age<0.22){const e=age/0.22-1;s=1+2.2*e*e*e+1.2*e*e;} // a new rock pops up with a little overshoot
+    const j=t-rk.hit<0.1?Math.sin((t-rk.hit)*120)*0.05*cs:0;
+    g.drawImage(img,x-W*s/2+j,y-W*s/2,W*s,W*s);
+    if(rk.ore){const ph=(t*0.5+rk.seed*7.3)%1;if(ph<0.14)drawGlint(g,x+0.12*cs,y-0.14*cs,Math.sin(ph/0.14*Math.PI)*cs/34);}}
+}
+function crawlHeadBits(g,cs,t,s){ // feelers and pincers, in head space (x points forward)
+  const aw=Math.sin(t*6+s.seed*20)*0.1,mw=0.16+0.16*Math.sin(t*11+s.seed*9),ol='#140a08';
+  g.lineCap='round';g.beginPath();
+  for(const sd of[-1,1]){g.moveTo(0.3*cs,sd*0.15*cs);g.quadraticCurveTo(0.64*cs,sd*(0.2+aw*sd)*cs,0.84*cs,sd*(0.46+aw)*cs);}
+  g.strokeStyle=ol;g.lineWidth=Math.max(1.4,0.075*cs);g.stroke();g.strokeStyle='#b0643a';g.lineWidth=Math.max(0.6,0.03*cs);g.stroke();
+  for(const sd of[-1,1]){g.save();g.translate(0.36*cs,sd*0.12*cs);g.scale(1,sd);g.rotate(mw);
+    g.beginPath();g.moveTo(-0.02*cs,0.06*cs);g.quadraticCurveTo(0.2*cs,0.08*cs,0.27*cs,-0.08*cs);g.quadraticCurveTo(0.14*cs,-0.01*cs,-0.02*cs,-0.04*cs);g.closePath();
+    g.fillStyle='#e9d3b0';g.fill();g.lineWidth=Math.max(1,0.035*cs);g.strokeStyle=ol;g.stroke();g.restore();}
+}
+function crawlDrawChains(M,g,t,alpha){
+  if(alpha<=0||!M.chains.length)return;
+  const cs=M.cs,A=M.art,W=A.size,all=[];
+  g.save();g.globalAlpha=alpha;g.lineCap='round';g.lineJoin='round';
+  for(const ch of M.chains){const pts=[];
+    for(let i=0;i<ch.segs.length;i++){const s=ch.segs[i],q=crawlSegAt(ch,i);pts.push({x:M.gx+(q.x+0.5+s.ox)*cs,y:M.gy+(q.y+0.5+s.oy)*cs,s,i,ch});}
+    all.push(pts);}
+  g.fillStyle='rgba(0,0,0,0.3)';g.beginPath();
+  for(const pts of all)for(const p of pts){g.moveTo(p.x+0.52*cs,p.y+0.12*cs);g.ellipse(p.x+0.08*cs,p.y+0.12*cs,0.44*cs,0.42*cs,0,0,TAU);}
+  g.fill();
+  // one pair of legs per segment, the stride rippling back along the body
+  const L=[];
+  for(const pts of all)for(const p of pts){const ca=Math.cos(p.s.ang),sa=Math.sin(p.s.ang);
+    for(const sd of[-1,1]){const sw=Math.sin(p.ch.walk*5.2-p.i*0.85+(sd>0?Math.PI:0))*0.2,ox=-sa*sd,oy=ca*sd;
+      L.push(p.x+ox*0.26*cs,p.y+oy*0.26*cs,p.x+(ox*0.56+ca*sw)*cs,p.y+(oy*0.56+sa*sw)*cs,p.x+(ox*0.7+ca*(sw*1.5-0.1))*cs,p.y+(oy*0.7+sa*(sw*1.5-0.1))*cs);}}
+  const legs=(col,w)=>{g.strokeStyle=col;g.lineWidth=w;g.beginPath();for(let j=0;j<L.length;j+=6){g.moveTo(L[j],L[j+1]);g.lineTo(L[j+2],L[j+3]);g.lineTo(L[j+4],L[j+5]);}g.stroke();};
+  legs('#1a0a05',Math.max(2,0.12*cs));legs('#8a4a2a',Math.max(0.9,0.05*cs));
+  g.fillStyle='#ecd7b8';g.beginPath();for(let j=0;j<L.length;j+=6){g.moveTo(L[j+4]+0.04*cs,L[j+5]);g.arc(L[j+4],L[j+5],0.04*cs,0,TAU);}g.fill();
+  for(const pts of all)if(pts.length>1){ // the soft joints between plates
+    g.beginPath();g.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)g.lineTo(pts[i].x,pts[i].y);
+    g.strokeStyle='#1a0a05';g.lineWidth=0.46*cs;g.stroke();g.strokeStyle='#6a2c16';g.lineWidth=0.26*cs;g.stroke();}
+  for(const pts of all)for(let i=pts.length-1;i>=0;i--){ // tail first, so each plate overlaps the one behind it
+    const p=pts[i],s=p.s,img=i===0?(s.gold?A.headGold:A.head):(s.gold?A.gold:A.body);
+    g.save();g.translate(p.x,p.y);g.rotate(s.ang);g.drawImage(img,-W/2,-W/2,W,W);if(i===0)crawlHeadBits(g,cs,t,s);g.restore();
+    blob(g,p.x-0.1*cs,p.y-0.17*cs,0.15*cs,0.07*cs,'rgba(255,244,226,0.38)'); // the light comes from the same side whichever way it turns
+    if(s.gold){const ph=(t*1.3+s.seed)%1;if(ph<0.3)drawGlint(g,p.x+0.16*cs,p.y-0.2*cs,Math.sin(ph/0.3*Math.PI)*cs/30);}}
+  g.restore();
+}
+function crawlDrawSpider(M,g,t,alpha){
+  const s=M.spider;if(!s||alpha<=0)return;const cs=M.cs,p=crawlPx(M,s);
+  g.save();g.globalAlpha=alpha; // the painted spider, always facing the miner and leaning into its hops
+  drawBug(g,{type:'spider',x:p.x,y:p.y,a:Math.PI/2+clamp(-s.vx*0.07,-0.35,0.35),phase:s.phase,hp:1,max:1,hit:s.hit,mode:'run',carry:null},t,1.9*cs/52.2);
+  g.restore();
+}
+function crawlDrawShots(M,g,t){ // the headlamp beam that lights the column you're aiming at, the bolt and the muzzle flash
+  const cs=M.cs,x=M.gx+(M.mx+0.5)*cs,y=M.gy+(M.my+0.5)*cs,y0=y-0.4*cs,fl=t<M.stunT?0.3+0.5*Math.random():1;
+  g.save();g.globalCompositeOperation='lighter';
+  const gr=g.createLinearGradient(0,y0,0,M.gy);gr.addColorStop(0,`rgba(255,232,160,${(0.15*fl).toFixed(3)})`);gr.addColorStop(1,'rgba(255,232,160,0.015)');
+  g.fillStyle=gr;g.beginPath();g.moveTo(x-0.1*cs,y0);g.lineTo(x-1.05*cs,M.gy);g.lineTo(x+1.05*cs,M.gy);g.lineTo(x+0.1*cs,y0);g.closePath();g.fill();
+  const b=M.bolt;
+  if(b){const bx=M.gx+(b.x+0.5)*cs,by=M.gy+(b.y+0.5)*cs,tr=g.createLinearGradient(0,by,0,by+1.4*cs);
+    tr.addColorStop(0,'rgba(255,190,90,0.6)');tr.addColorStop(1,'rgba(255,120,40,0)');
+    g.strokeStyle=tr;g.lineCap='round';g.lineWidth=0.16*cs;g.beginPath();g.moveTo(bx,by);g.lineTo(bx,by+1.4*cs);g.stroke();
+    blob(g,bx,by,0.2*cs,0.3*cs,'rgba(255,170,60,0.45)');}
+  const mf=t-M.shotT;
+  if(mf<0.06){const my=y-1.22*cs,k=1-mf/0.06;blob(g,x,my,0.3*cs*k+0.1*cs,0.26*cs*k+0.08*cs,'rgba(255,180,70,0.7)');}
+  g.restore();
+  if(b)blob(g,M.gx+(b.x+0.5)*cs,M.gy+(b.y+0.5)*cs,0.07*cs,0.17*cs,'#fff6d0');
+  if(mf<0.04)blob(g,x,y-1.22*cs,0.09*cs,0.09*cs,'#fffbe8');
+}
+function crawlDrawMiner(M,g,t){ // seen from above: hard hat and headlamp, shoulders, and the rock blaster held out in front
+  const s=M.cs*1.2,x=M.gx+(M.mx+0.5)*M.cs,y=M.gy+(M.my+0.5)*M.cs,stun=t<M.stunT,ol='#140a08',rc=t-M.shotT<0.05?0.07*s:0;
+  g.save();
+  if(!stun&&t<M.safeT&&Math.floor(t*14)%2)g.globalAlpha=0.45; // blinks while it can't be bitten again
+  g.translate(x,y);if(stun)g.rotate(Math.sin(t*28)*0.16*(M.stunT-t));
+  blob(g,0.08*s,0.2*s,0.62*s,0.48*s,'rgba(0,0,0,0.36)');
+  g.save();g.translate(0,rc); // the blaster kicks back a touch with every shot
+  roundRect(g,-0.11*s,-1.02*s,0.22*s,0.72*s,0.07*s);
+  let gr=g.createLinearGradient(-0.11*s,0,0.11*s,0);gr.addColorStop(0,'#3a3f45');gr.addColorStop(0.45,'#8b939b');gr.addColorStop(1,'#2c3036');g.fillStyle=gr;g.fill();
+  g.lineWidth=Math.max(1,0.05*s);g.strokeStyle=ol;g.stroke();
+  g.fillStyle='#fc6a1c';g.fillRect(-0.11*s,-0.68*s,0.22*s,0.1*s);g.strokeRect(-0.11*s,-0.68*s,0.22*s,0.1*s);
+  blob(g,0,-1.0*s,0.075*s,0.045*s,'#120d0d');
+  g.restore();
+  g.lineCap='round';g.beginPath(); // arms out to the grips
+  g.moveTo(-0.42*s,0.08*s);g.quadraticCurveTo(-0.38*s,-0.3*s,-0.12*s,-0.45*s+rc);g.moveTo(0.42*s,0.08*s);g.quadraticCurveTo(0.38*s,-0.3*s,0.12*s,-0.43*s+rc);
+  g.strokeStyle=ol;g.lineWidth=0.27*s;g.stroke();g.strokeStyle='#dccbab';g.lineWidth=0.17*s;g.stroke();
+  blob(g,-0.12*s,-0.45*s+rc,0.1*s,0.1*s,'#7a4a2a',ol,Math.max(1,0.04*s));blob(g,0.12*s,-0.43*s+rc,0.1*s,0.1*s,'#7a4a2a',ol,Math.max(1,0.04*s));
+  const back=()=>{g.beginPath();g.ellipse(0,0.2*s,0.58*s,0.33*s,0,0,TAU);};
+  back();gr=g.createLinearGradient(0,-0.13*s,0,0.53*s);gr.addColorStop(0,'#f1e6d0');gr.addColorStop(1,'#a38b69');g.fillStyle=gr;g.fill();
+  g.save();g.clip();g.strokeStyle='#6a3f22';g.lineWidth=0.09*s;g.beginPath();g.moveTo(-0.27*s,-0.15*s);g.lineTo(-0.2*s,0.6*s);g.moveTo(0.27*s,-0.15*s);g.lineTo(0.2*s,0.6*s);g.stroke();g.restore();
+  back();g.lineWidth=Math.max(1,0.05*s);g.strokeStyle=ol;g.stroke();
+  blob(g,0,0,0.41*s,0.39*s,'#cf8414',ol,Math.max(1,0.05*s)); // brim
+  g.beginPath();g.ellipse(0,0.02*s,0.31*s,0.3*s,0,0,TAU);
+  gr=g.createRadialGradient(-0.1*s,-0.1*s,0.02*s,0,0.02*s,0.34*s);gr.addColorStop(0,'#ffe9a0');gr.addColorStop(0.5,'#f5b22a');gr.addColorStop(1,'#b8690c');g.fillStyle=gr;g.fill();
+  g.lineWidth=Math.max(1,0.04*s);g.strokeStyle=ol;g.stroke();
+  g.beginPath();g.moveTo(0,-0.26*s);g.lineTo(0,0.3*s);g.strokeStyle='rgba(120,60,6,0.55)';g.lineWidth=0.07*s;g.stroke();
+  blob(g,0,-0.36*s,0.1*s,0.08*s,'#c9d1d8',ol,Math.max(1,0.035*s));blob(g,0,-0.37*s,0.065*s,0.05*s,stun?'#8a8070':'#fff6c8');
+  g.restore();
+  if(stun)for(let i=0;i<3;i++){const a=t*7+i*TAU/3;drawGlint(g,x+Math.cos(a)*0.42*s,y-0.05*s+Math.sin(a)*0.18*s,s/48);} // seeing stars
+}
+function crawlStill(M,g){crawlDrawRocks(M,g,-1);}
+function crawlPeek(M,g,t){ // from the layer above you can watch it pace the top of the cavern
+  const dt=M.pk==null?0:clamp(t-M.pk,0,0.05);M.pk=t;
+  crawlMoveChains(M,dt);crawlDrawChains(M,g,t,1);
+}
+function crawlDraw(M,t){
+  const fade=M.fadeT==null?1:clamp(1-(t-M.fadeT)/0.6,0,1);
+  for(const s of M.splats)drawSplat(ctx,s,t);
+  crawlDrawRocks(M,ctx,t);
+  crawlDrawChains(M,ctx,t,fade);
+  crawlDrawSpider(M,ctx,t,fade);
+  crawlDrawShots(M,ctx,t);
+  crawlDrawMiner(M,ctx,t);
 }
 
 /* ---------- lava, obsidian and the Ice Sprayer ---------- */
@@ -4053,9 +4496,9 @@ cv.addEventListener('pointerdown',e=>{
   else if(tool==='dynamite'){placeTNT(w.x,w.y);ptrs.delete(e.pointerId);}
   else if(tool==='pump'){placePump(w.x,w.y);ptrs.delete(e.pointerId);}
 });
-cv.addEventListener('pointermove',e=>{const p=ptrs.get(e.pointerId);if(!p)return;const w=toWorld(e);p.x=clamp(w.x,0,FW);p.y=clamp(w.y,0,FH);});
-cv.addEventListener('pointerup',e=>{const p=ptrs.get(e.pointerId);if(!p)return;ptrs.delete(e.pointerId);if(p.tool==='sledge'){chargeSound(false);if(p.charging&&mode==='play'&&!dropping)sledgeRelease(p);}});
-cv.addEventListener('pointercancel',e=>{const p=ptrs.get(e.pointerId);if(p&&p.tool==='sledge')chargeSound(false);ptrs.delete(e.pointerId);});
+cv.addEventListener('pointermove',e=>{if(MG){miniDrag(e,'move');return;}const p=ptrs.get(e.pointerId);if(!p)return;const w=toWorld(e);p.x=clamp(w.x,0,FW);p.y=clamp(w.y,0,FH);});
+cv.addEventListener('pointerup',e=>{if(MG){miniDrag(e,'up');return;}const p=ptrs.get(e.pointerId);if(!p)return;ptrs.delete(e.pointerId);if(p.tool==='sledge'){chargeSound(false);if(p.charging&&mode==='play'&&!dropping)sledgeRelease(p);}});
+cv.addEventListener('pointercancel',e=>{if(MG){miniDrag(e,'up');return;}const p=ptrs.get(e.pointerId);if(p&&p.tool==='sledge')chargeSound(false);ptrs.delete(e.pointerId);});
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('gesturestart',e=>e.preventDefault());
 window.addEventListener('keydown',e=>{
