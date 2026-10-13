@@ -494,6 +494,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
         <button id="tPlay-geode" class="tbtn primary" type="button">Play Geode Crack</button>
         <button id="tPlay-crawl" class="tbtn primary" type="button">Play Crawler Blast</button>
         <button id="tPlay-slash" class="tbtn primary" type="button">Play Boulder Slash</button>
+        <button id="tPlay-beam" class="tbtn primary" type="button">Play Beam Bender</button>
         <button id="tSeed" class="tbtn" type="button">New seed</button>
         <button id="tCoins" class="tbtn" type="button">+1,000 coins</button>
         <button id="tSkip" class="tbtn" type="button">Skip to next layer</button>
@@ -984,6 +985,7 @@ function sfx(name,k=1){if(!AU.c||state.muted)return;const t=AU.c.currentTime;if(
     case'slice':nz(t,0.1,{type:'bandpass',f:2600*r(),f2:900,q:1.4,gain:0.35});tn(t,0.12,{f:180*r(),f2:70,gain:0.22});break;
     case'shatter':nz(t,0.3,{type:'highpass',f:4500,gain:0.28});[2637,3136,3520,2349].forEach((f,i)=>tn(t+i*0.035,0.14,{type:'triangle',f:f*r(),gain:0.05}));break;
     case'puff':nz(t,0.22,{type:'highpass',f:1600*r(),gain:0.07});break;
+    case'turn':tn(t,0.05,{type:'square',f:1100*r(),f2:700,gain:0.03});nz(t,0.03,{type:'highpass',f:3000,gain:0.08});break;
   }}catch(e){}}
 function drillSound(on){
   if(on&&!AU.drill&&AU.c&&!state.muted){const c=AU.c,o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain(),lfo=c.createOscillator(),lg=c.createGain(),f=c.createBiquadFilter();
@@ -1387,7 +1389,7 @@ function endPhase(reason){
 // Every cavern is a small module: init, layout, still (static scene), peek (live bits seen from the layer above),
 // begin, update, draw, tap and results. The cavern is built while you dig the layer above it, so the scene you
 // glimpse through the holes is the same object that becomes the game when you drop.
-const MINI_ORDER=['bugs','bones','moles','geode','crawl','slash'];
+const MINI_ORDER=['bugs','bones','moles','geode','crawl','slash','beam'];
 const MOLTEN=['#ff9b2e','#fc6315','#e3301a'];
 const GAMES={
   bugs:{title:'BUG CRUSHER',stat:'HAUL',timed:true,go:'SMASH!',
@@ -1416,6 +1418,11 @@ const GAMES={
     teaser:'Steam vents are tossing boulders around down there.',
     init:slashInit,layout:slashLayout,decor:slashDecor,still:slashStill,peek:slashPeek,hud0:slashHud0,begin:slashBegin,update:slashUpdate,draw:slashDraw,overlay:slashOverlay,
     down:slashDown,move:slashMove,up:slashUp,results:slashResults},
+  beam:{title:'BEAM BENDER',stat:'EARNED',timed:false,bare:true,
+    tip:'Tap gems to turn them. Bend the laser into every crystal.',
+    teaser:'A laser is humming below. Gems glint in its light.',
+    init:beamInit,layout:beamLayout,still:beamStill,peek:beamPeek,hud0:beamHud0,begin:beamBegin,update:beamUpdate,draw:beamDraw,
+    down:beamDown,move:beamMove,up:beamUp,results:beamResults}, // a puzzle: tap to turn a gem, drag sideways to turn it either way
 };
 let cavernPrev=null; // the cavern waiting under the current layer, if the next drop leads into one
 function miniKindFor(L){const n=Math.max(1,state.tune.miniEvery|0),i=Math.max(0,Math.floor((L-1)/n)-1);return MINI_ORDER[i%MINI_ORDER.length];}
@@ -3139,6 +3146,314 @@ function slashDraw(M,t){
   slashDrawHalves(M,ctx,t);
   slashDrawStrikes(M,ctx,t);
   slashDrawTrails(M,ctx,t);
+}
+
+/* ---------- Beam Bender ---------- */
+// A puzzle cavern. The crew's mining laser fires up into a floor of hex tiles, and gems on the floor bend the light,
+// each by its own angle. Turn the gems (tap, or drag sideways to turn either way) until the light reaches every crystal.
+// Light only travels in the six hex directions, 60° apart, so every bend is exact.
+// Each cavern has three boards, built from its seed so the board you glimpse from above is the one you play. A board
+// is made backwards: lay a light path that works, then scramble the gems. A small search finds the fewest turns that
+// solve it (par), which sets the grade and the charge you get.
+const BEAM_GEMS={
+  topaz:   {name:'Topaz',   col:'#ffb52e',hi:'#fff1c2',deep:'#8a4a00',bend:1}, // pulls light up to 60° toward its point
+  sapphire:{name:'Sapphire',col:'#3b7bff',hi:'#d6e4ff',deep:'#0e2a77',bend:2}, // sends it out its point, up to 120°
+  emerald: {name:'Emerald', col:'#2fd27a',hi:'#d8ffe9',deep:'#0c5a34',split:true}, // a prism: out of both front corners
+};
+const BEAM_LASER={col:'#ff4a3d',hi:'#ffe0d8'};
+const BEAM_HINT={topaz:'Topaz bends light up to 60° toward its point.',sapphire:'Sapphire sends light out its point, up to 120°.',emerald:'Emerald splits light out of both front corners.'};
+const BEAM_DORMANT={col:'#8d97a1',hi:'#e8edf2',deep:'#353b42'};
+function beamStep(c,r,d){ // the next hex in direction d (0 is up, then clockwise); flat-topped, odd columns sit half a hex lower
+  const o=c&1;
+  return d===0?[c,r-1]:d===1?[c+1,o?r:r-1]:d===2?[c+1,o?r+1:r]:d===3?[c,r+1]:d===4?[c-1,o?r+1:r]:[c-1,o?r:r-1];
+}
+function beamOut(type,p,d){ // which way light leaves a gem pointing p when it comes in heading d
+  const G=BEAM_GEMS[type],back=(d+3)%6;
+  if(G.split)return[(p+5)%6,(p+1)%6].filter(o=>o!==back);
+  const diff=(p-d+6)%6;if(diff===3)return[]; // pointing straight back at the light: it is swallowed
+  if(diff===0)return[d];
+  const cw=diff<3,amt=Math.min(G.bend,cw?diff:6-diff);return[(d+(cw?amt:6-amt))%6];
+}
+function beamDist(a,b){const d=((a-b)%6+6)%6;return Math.min(d,6-d);}
+function beamIndex(P){P.gat=new Int16Array(P.C*P.R).fill(-1);P.tat=new Int16Array(P.C*P.R).fill(-1);P.gems.forEach((g,i)=>P.gat[g.r*P.C+g.c]=i);P.targets.forEach((g,i)=>P.tat[g.r*P.C+g.c]=i);}
+function beamWalk(P,rot){ // follow the light: the straight pieces it travels, which crystals it lights and which gems it passes through
+  const{C,R,cells,gems,targets,gat,tat}=P,seen=new Uint8Array(C*R*6),segs=[],beams=[{c:P.ec,r:R-1,d:0,col:null,from:null}],gemsLit=new Set();
+  let lit=0,wrong=0,n=0;
+  while(beams.length&&n++<80){
+    const b=beams.shift();let c=b.c,r=b.r,end='out',last=b.from;
+    while(true){
+      if(c<0||c>=C||r<0||r>=R){end='out';break;}
+      const k=r*C+c;
+      if(seen[k*6+b.d]){end='loop';break;}seen[k*6+b.d]=1;
+      if(cells[k]){end='wall';break;}
+      if(tat[k]>=0){const ti=tat[k],T=targets[ti];if(!T.need||T.need===b.col)lit|=1<<ti;else wrong|=1<<ti;end='target';break;}
+      if(gat[k]>=0){end='gem';const gi=gat[k],G=gems[gi];gemsLit.add(gi);
+        for(const o of beamOut(G.type,rot[gi],b.d)){const[nc,nr]=beamStep(c,r,o);beams.push({c:nc,r:nr,d:o,col:G.type,from:[c,r]});}break;}
+      last=[c,r];[c,r]=beamStep(c,r,b.d);
+    }
+    segs.push({from:b.from,last,at:[c,r],end,col:b.col});
+  }
+  return{segs,lit,wrong,gemsLit};
+}
+function beamSolve(P,start){ // the fewest turns from start that light every crystal: a search over just the gems the light reaches
+  const{C,R,cells,gems,targets,gat,tat}=P,full=(1<<targets.length)-1,asg=start.slice(),fixed=new Uint8Array(gems.length),seen=new Uint8Array(C*R*6);
+  let best=99,bestAsg=null,nodes=0;
+  function go(beams,lit,cost){
+    if(cost>=best||++nodes>60000)return;
+    if(!beams.length){if(lit===full){best=cost;bestAsg=asg.slice();}return;}
+    const b=beams[beams.length-1],rest=beams.slice(0,-1),marks=[];
+    let c=b.c,r=b.r,hit=0;
+    while(c>=0&&c<C&&r>=0&&r<R){const k=r*C+c,sk=k*6+b.d;if(seen[sk])break;seen[sk]=1;marks.push(sk);
+      if(cells[k])break;if(tat[k]>=0){hit=1;break;}if(gat[k]>=0){hit=2;break;}[c,r]=beamStep(c,r,b.d);}
+    if(hit===1){const ti=tat[r*C+c],T=targets[ti];go(rest,(!T.need||T.need===b.col)?lit|1<<ti:lit,cost);}
+    else if(hit===2){
+      const gi=gat[r*C+c],G=gems[gi];let opts;
+      if(fixed[gi])opts=[asg[gi]];
+      else{const by=new Map();for(let p=0;p<6;p++){const o=beamOut(G.type,p,b.d);if(!o.length)continue;const key=o.join(),cur=by.get(key);if(cur==null||beamDist(p,start[gi])<beamDist(cur,start[gi]))by.set(key,p);}opts=[...by.values()];}
+      for(const p of opts){
+        const was=fixed[gi],wp=asg[gi];fixed[gi]=1;asg[gi]=p;
+        go(rest.concat(beamOut(G.type,p,b.d).map(o=>{const[nc,nr]=beamStep(c,r,o);return{c:nc,r:nr,d:o,col:G.type};})),lit,cost+(was?0:beamDist(p,start[gi])));
+        fixed[gi]=was;asg[gi]=wp;}
+    }
+    else go(rest,lit,cost);
+    for(const m of marks)seen[m]=0;
+  }
+  go([{c:P.ec,r:R-1,d:0,col:null}],0,0);
+  return{par:best,asg:bestAsg};
+}
+function beamBuild(rng,C,R,spec){ // lay a working light path, add rock and decoys, then scramble the gems until par lands in range
+  const idx=(c,r)=>r*C+c,inside=(c,r)=>c>=0&&c<C&&r>=0&&r<R,pick=a=>a[Math.floor(rng()*a.length)];
+  for(let attempt=0;attempt<220;attempt++){
+    const used=new Uint8Array(C*R),gems=[],targets=[],ec=1+Math.floor(rng()*(C-2)),open=[{c:ec,r:R-1,d:0,col:null,budget:spec.gems}];
+    let placed=0,fail=false;
+    while(open.length&&!fail){
+      const b=open.shift();let c=b.c,r=b.r;const d=b.d,run=Math.floor(rng()*(placed?3:2)); // a few clear tiles before the next thing
+      for(let i=0;i<run&&!fail;i++){if(!inside(c,r)||used[idx(c,r)])fail=true;else{used[idx(c,r)]=1;[c,r]=beamStep(c,r,d);}}
+      if(fail||!inside(c,r)||used[idx(c,r)]){fail=true;break;}
+      if(b.budget<=0){used[idx(c,r)]=1;targets.push({c,r,need:spec.colored&&b.col&&rng()<spec.colorP?b.col:null});continue;} // this branch ends in a crystal
+      const split=spec.split&&placed===spec.splitAt,type=split?'emerald':placed===spec.newAt&&spec.newType?spec.newType:pick(spec.types),choices=[];
+      if(split){for(let p=0;p<6;p++){const outs=[(p+5)%6,(p+1)%6];if(!outs.includes((d+3)%6))choices.push({p,outs});}}
+      else for(const tu of BEAM_GEMS[type].bend===1?[-1,1,-1,1,0]:[-2,-1,1,2,-2,2,0]){
+        const o=(d+tu+6)%6;let p=o;if(type==='topaz'&&tu)p=(d+(tu>0?1:-1)*(rng()<0.5?1:2)+6)%6;choices.push({p,outs:[o]});}
+      for(let i=choices.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[choices[i],choices[j]]=[choices[j],choices[i]];}
+      const ch=choices.find(x=>x.outs.every(o=>{const[nc,nr]=beamStep(c,r,o);return inside(nc,nr)&&!used[idx(nc,nr)];}));
+      if(!ch){fail=true;break;}
+      used[idx(c,r)]=1;gems.push({c,r,type,sol:ch.p});placed++;
+      const rem=b.budget-1,a=Math.floor(rng()*(rem+1));
+      ch.outs.forEach((o,k)=>{const[nc,nr]=beamStep(c,r,o);open.push({c:nc,r:nr,d:o,col:type,budget:ch.outs.length===2?(k?rem-a:a):rem});});
+    }
+    if(fail||placed!==spec.gems||!targets.length||targets.length>4)continue;
+    const cells=new Uint8Array(C*R);
+    for(let k=0;k<C*R;k++)if(!used[k]&&rng()<spec.walls)cells[k]=1; // rock pillars, never on the path
+    const free=[];for(let k=0;k<C*R;k++)if(!used[k]&&!cells[k])free.push(k);
+    for(let i=0;i<spec.decoys&&free.length;i++){const k=free.splice(Math.floor(rng()*free.length),1)[0];gems.push({c:k%C,r:Math.floor(k/C),type:pick(spec.types),sol:Math.floor(rng()*6),decoy:true});}
+    const P={C,R,ec,cells,gems,targets};beamIndex(P);
+    if(beamWalk(P,gems.map(g=>g.sol)).lit!==(1<<targets.length)-1)continue;
+    for(let s=0;s<30;s++){
+      const start=gems.map(()=>Math.floor(rng()*6));
+      if(beamWalk(P,start).lit)continue; // start with every crystal dark
+      const S=beamSolve(P,start);
+      if(S.asg&&S.par>=spec.minPar&&S.par<=spec.maxPar){P.start=start;P.par=S.par;P.best=S.asg;return P;}
+    }
+  }
+  return null;
+}
+function beamSpecs(L){ // board 1 teaches topaz, board 2 brings in sapphire, board 3 an emerald that splits the light
+  const deep=L>=7,deeper=L>=12;
+  return[
+    {gems:2,types:deep?['topaz','sapphire']:['topaz'],newType:'topaz',newAt:0,split:false,walls:0.1,decoys:0,colored:false,colorP:0,minPar:2,maxPar:5},
+    {gems:3,types:['topaz','sapphire'],newType:'sapphire',newAt:1,split:false,walls:0.14,decoys:L>=5?1:0,colored:false,colorP:0,minPar:3,maxPar:8},
+    {gems:deeper?4:3,types:['topaz','sapphire'],split:true,splitAt:deeper?1:0,walls:0.14,decoys:L>=10?1:0,colored:deep,colorP:0.6,minPar:3,maxPar:10},
+  ];
+}
+function beamInit(M){
+  Object.assign(M,{C:7,R:8,pi:0,bs:'aim',gt:0,showT:0,shown:false,fadeT:-9,boards:[],rot:[],vt:[],va:[],used:0,budget:0,taps:0,parTotal:0,litOnce:0,litBonus:0,
+    results:[],drag:null,segs:[],lit:0,wrong:0,gemsLit:new Set(),taught:new Set(),earned:0,df:1+0.1*(M.L-1),board:null,boardKey:''});
+  M.boards=[beamBoardFor(M,0),null,null]; // only the first board is built while you dig above; the others during the fade between boards
+  beamSetup(M,0);
+}
+function beamBoardFor(M,i){
+  const sp=beamSpecs(M.L)[i];
+  for(let k=0;k<6;k++){const P=beamBuild(mulberry32(M.seed+101*(i+1)+7919*k),M.C,M.R,sp);if(P)return P;}
+  for(let k=0;;k++){const P=beamBuild(mulberry32(M.seed+31+k),M.C,M.R,beamSpecs(1)[0]);if(P)return P;} // the easy kind always comes together
+}
+function beamSetup(M,i){
+  if(!M.boards[i])M.boards[i]=beamBoardFor(M,i);
+  const P=M.boards[i];M.pi=i;M.P=P;M.rot=P.start.slice();M.vt=P.start.slice();M.va=P.start.slice();
+  M.used=0;M.budget=P.par+[10,8,7][i];M.bs='aim';M.gt=now();M.litOnce=0;M.shown=false;M.board=null;M.drag=null;
+  beamRetrace(M);
+}
+function beamRetrace(M){const W=beamWalk(M.P,M.rot);M.segs=W.segs;M.lit=W.lit;M.wrong=W.wrong;M.gemsLit=W.gemsLit;}
+function beamLayout(M){ // the board, the laser, the turns line and the hints sit together as one block, centred
+  const u=M.u,top=M.top+14*u,bottom=M.H-10*u,below=118*u,h3=Math.sqrt(3);
+  M.s=Math.min((M.W-18*u)/(1.5*(M.C-1)+2),(bottom-top-below)/(h3*(M.R+0.5)));
+  const bw=M.s*(1.5*(M.C-1)+2),bh=M.s*h3*(M.R+0.5);
+  M.bx=(M.W-bw)/2;M.by=top+Math.max(0,(bottom-top-bh-below)/2);M.bh=bh;M.callY=M.by+bh*0.42;
+  M.board=null;
+}
+function beamXY(M,c,r){const s=M.s,h=s*Math.sqrt(3);return[M.bx+s+1.5*s*c,M.by+h/2+h*r+(c&1?h/2:0)];}
+function beamLens(M){const[x,y]=beamXY(M,M.P.ec,M.R-1);return[x,y+M.s*Math.sqrt(3)/2+0.32*M.s];}
+function beamHud0(M){miniStat(0);miniHud(0,'Puzzle 1/3',false);}
+function beamBegin(M,t){M.gt=t;}
+
+/* turning gems */
+function beamHit(M,x,y){let best=-1,bd=M.s*0.95;M.P.gems.forEach((g,i)=>{const[gx,gy]=beamXY(M,g.c,g.r),d=Math.hypot(x-gx,y-gy);if(d<bd){bd=d;best=i;}});return best;}
+function beamDown(M,id,x,y){if(M.drag)return;M.drag={id,gi:beamHit(M,x,y),x0:x,y0:y,lx:x,acc:0,moved:false};}
+function beamMove(M,id,x,y,t){ // drag sideways across a gem to turn it either way, one step per short stroke
+  const D=M.drag;if(!D||D.id!==id)return;
+  if(Math.hypot(x-D.x0,y-D.y0)>10)D.moved=true;
+  if(D.gi<0)return;D.acc+=x-D.lx;D.lx=x;const step=30*M.u;
+  while(D.acc>=step){D.acc-=step;beamTurn(M,D.gi,1,t);}
+  while(D.acc<=-step){D.acc+=step;beamTurn(M,D.gi,-1,t);}
+}
+function beamUp(M,id,t){const D=M.drag;if(!D||(id!=null&&D.id!==id))return;M.drag=null;if(id!=null&&!D.moved&&D.gi>=0)beamTurn(M,D.gi,1,t);} // a tap turns it clockwise
+function beamTurn(M,gi,dir,t){
+  if(M.phase!=='play'||M.bs!=='aim')return;
+  const P=M.P,u=M.u;M.rot[gi]=(M.rot[gi]+dir+6)%6;M.vt[gi]+=dir;M.used++;M.taps++;
+  sfx('turn');buzz(6);
+  const before=M.lit;beamRetrace(M);
+  for(let ti=0;ti<P.targets.length;ti++)if(M.lit>>ti&1&&!(before>>ti&1)){ // a crystal lights up
+    const T=P.targets[ti],[x,y]=beamXY(M,T.c,T.r);
+    if(!(M.litOnce>>ti&1)){M.litOnce|=1<<ti;const val=Math.round(2*M.df);M.earned+=val;M.litBonus+=val;floatText(x,y-M.s*0.7,`+${val}`,'#ffd34d',15);}
+    spawn('ring',x,y,{color:'rgba(255,255,255,0.9)',size:M.s*1.2,life:0.35,speed:0});sfx('gem');}
+  if(M.lit===(1<<P.targets.length)-1)beamWin(M,t);
+  else if(M.used>=M.budget)beamFail(M,t);
+}
+function beamWin(M,t){
+  const P=M.P,i=M.pi,grade=M.used<=P.par?'PERFECT':M.used<=P.par+3?'CLEAN':'SOLVED',val=Math.round((18+(grade==='PERFECT'?12:grade==='CLEAN'?6:0))*M.df);
+  M.bs='solved';M.gt=t;M.earned+=val;M.results.push({grade,val,taps:M.used,par:P.par});M.parTotal+=P.par;
+  callout(grade==='SOLVED'?'SOLVED!':grade+'!','molten');floatText(M.cx,M.callY+46*M.u,`+${val}`,'#ffd34d',22);
+  for(const T of P.targets){const[x,y]=beamXY(M,T.c,T.r),seg=M.segs.find(s=>s.end==='target'&&s.at[0]===T.c&&s.at[1]===T.r),K=seg&&seg.col?BEAM_GEMS[seg.col]:BEAM_LASER;
+    spawn('ring',x,y,{color:K.hi,size:M.s*2,life:0.5,speed:0});
+    for(let k=0;k<16;k++)spawn('spark',x,y,{color:k%2?K.col:K.hi,speed:90+Math.random()*170,life:0.45+Math.random()*0.25});}
+  sfx('unlock');if(grade==='PERFECT')sfx('fanfare');buzz([15,30,15]);addShake(2);
+}
+function beamFail(M,t){ // out of charge: the board shows you the answer, then moves on
+  M.bs='fail';M.gt=t;M.showT=t+0.8;M.shown=false;M.results.push({grade:'BURNED OUT',val:0,taps:M.used,par:M.P.par});M.parTotal+=M.P.par;
+  callout('OUT OF CHARGE','#ff5b47');sfx('deny');buzz([30,40,30]);
+}
+function beamUpdate(M,dt,t){
+  const k=Math.min(1,dt*16);for(let i=0;i<M.va.length;i++)M.va[i]+=(M.vt[i]-M.va[i])*k; // gems swing round smoothly
+  if(M.phase!=='play')return;
+  if(M.bs==='fail'&&!M.shown&&t>=M.showT){M.shown=true;const B=M.P.best;
+    B.forEach((p,i)=>{let d=((p-M.rot[i])%6+6)%6;if(d>3)d-=6;M.vt[i]+=d;});M.rot=B.slice();beamRetrace(M);sfx('turn');}
+  if((M.bs==='solved'&&t-M.gt>1.7)||(M.bs==='fail'&&t-M.gt>3)){
+    if(M.pi>=2){M.phase='end';M.e0=t;M.endDelay=0.6;miniHud(1,'Done',false);}
+    else{M.bs='swap';M.gt=t;}
+  }
+  if(M.bs==='swap'&&t-M.gt>0.32){beamSetup(M,M.pi+1);M.fadeT=t;miniHud(M.pi/3,`Puzzle ${M.pi+1}/3`,false);sfx('select');}
+  miniStat(M.earned);
+}
+function beamResults(M){
+  const f=v=>'+'+v.toLocaleString('en-US'),rows=M.results.map((R,i)=>[`Puzzle ${i+1} · ${capWord(R.grade)}`,R.val?f(R.val):'–']);
+  rows.push(['Turns',`${M.taps} (par ${M.parTotal})`]);
+  if(M.litBonus)rows.push(['Crystals lit',f(M.litBonus)]);
+  const perfect=M.results.filter(R=>R.grade==='PERFECT').length,solved=M.results.filter(R=>R.val>0).length;
+  return{tag:perfect===3?'Flawless optics':solved===3?'Every crystal lit':'Some crystals stayed dark',title:perfect===3?'BRILLIANT!':solved===3?'ALL LIT UP!':solved?'PARTLY LIT':'LIGHTS OUT',rows,total:M.earned,great:perfect===3};
+}
+
+/* drawing */
+function beamHex(g,x,y,s){g.beginPath();for(let i=0;i<6;i++){const a=i*Math.PI/3,px=x+Math.cos(a)*s,py=y+Math.sin(a)*s;i?g.lineTo(px,py):g.moveTo(px,py);}g.closePath();}
+function beamBoard(M){ // the floor, rock pillars, gem mounts and the laser rig, painted once per board
+  const c=document.createElement('canvas');c.width=Math.max(1,Math.round(M.W*DPR));c.height=Math.max(1,Math.round(M.H*DPR));
+  const g=c.getContext('2d');g.setTransform(DPR,0,0,DPR,0,0);
+  const P=M.P,s=M.s,u=M.u,band=bandFor(M.L),D=band.dirt,R=band.rock,ol='#120d0d';
+  for(let r=0;r<M.R;r++)for(let cc=0;cc<M.C;cc++){
+    const[x,y]=beamXY(M,cc,r),k=r*M.C+cc;
+    if(P.cells[k]){ // a rock pillar standing up out of the floor
+      beamHex(g,x,y+0.16*s,s*0.95);g.fillStyle=hsl(R[0],R[1],R[2]-26);g.fill();g.lineWidth=Math.max(1.2,1.6*u);g.strokeStyle=ol;g.stroke();
+      beamHex(g,x,y-0.06*s,s*0.95);const gr=g.createLinearGradient(x-s,y-s,x+s,y+s);gr.addColorStop(0,hsl(R[0],R[1],R[2]+10));gr.addColorStop(1,hsl(R[0],R[1],R[2]-12));
+      g.fillStyle=gr;g.fill();g.fillStyle=PAT.rock;g.fill();g.stroke();
+      const cr=mulberry32(k*131+7);g.strokeStyle='rgba(18,13,13,0.7)';g.lineWidth=Math.max(1,1.2*u);g.beginPath();let px=x+(cr()-0.5)*s*0.6,py=y-0.06*s+(cr()-0.5)*s*0.5;g.moveTo(px,py);
+      for(let j=0;j<3;j++){px+=(cr()-0.5)*s*0.45;py+=(cr()-0.5)*s*0.45;g.lineTo(px,py);}g.stroke();
+      continue;}
+    beamHex(g,x,y,s*0.94);g.fillStyle=hsl(D[0],D[1]*0.7,D[2]-15);g.fill();g.globalAlpha=0.6;g.fillStyle=PAT.dirt;g.fill();g.globalAlpha=1;
+    g.lineWidth=Math.max(1,1.3*u);g.strokeStyle='rgba(10,6,4,0.65)';g.stroke();
+    beamHex(g,x,y,s*0.8);g.strokeStyle='rgba(255,240,220,0.05)';g.lineWidth=Math.max(1,1.5*u);g.stroke();
+  }
+  for(const G of P.gems){const[x,y]=beamXY(M,G.c,G.r); // a brass mount with six notches: this one turns
+    blob(g,x,y+0.05*s,0.66*s,0.62*s,'rgba(0,0,0,0.35)');
+    g.beginPath();g.arc(x,y,0.6*s,0,TAU);g.lineWidth=0.08*s;g.strokeStyle='#8a6a3a';g.stroke();g.lineWidth=Math.max(1,1.2*u);g.strokeStyle=ol;g.stroke();
+    for(let i=0;i<6;i++){const a=-Math.PI/2+i*Math.PI/3;g.beginPath();g.moveTo(x+Math.cos(a)*0.55*s,y+Math.sin(a)*0.55*s);g.lineTo(x+Math.cos(a)*0.68*s,y+Math.sin(a)*0.68*s);g.strokeStyle='#d8b878';g.lineWidth=Math.max(1,0.04*s);g.stroke();}}
+  for(const T of P.targets){const[x,y]=beamXY(M,T.c,T.r); // the stone each crystal grows from; a coloured ring if it needs coloured light
+    blob(g,x,y+0.18*s,0.5*s,0.26*s,'rgba(0,0,0,0.4)');blob(g,x,y+0.12*s,0.44*s,0.22*s,'#4a403a',ol,Math.max(1,1.2*u));
+    if(T.need){g.save();g.setLineDash([0.12*s,0.08*s]);g.beginPath();g.arc(x,y,0.7*s,0,TAU);g.lineWidth=0.07*s;g.strokeStyle=BEAM_GEMS[T.need].col;g.stroke();g.restore();}}
+  const[lx,ly]=beamLens(M); // the mining laser
+  blob(g,lx+3*u,ly+0.62*s,0.62*s,0.2*s,'rgba(0,0,0,0.45)');
+  roundRect(g,lx-0.42*s,ly-0.02*s,0.84*s,0.62*s,0.12*s);const gr=g.createLinearGradient(lx-0.42*s,0,lx+0.42*s,0);gr.addColorStop(0,'#3a3f45');gr.addColorStop(0.45,'#9aa2aa');gr.addColorStop(1,'#2c3036');
+  g.fillStyle=gr;g.fill();g.lineWidth=Math.max(1.4,1.8*u);g.strokeStyle=ol;g.stroke();
+  g.save();roundRect(g,lx-0.42*s,ly+0.3*s,0.84*s,0.14*s,0);g.clip();for(let i=-4;i<5;i++){g.beginPath();g.moveTo(lx+i*0.16*s,ly+0.3*s);g.lineTo(lx+i*0.16*s+0.14*s,ly+0.44*s);g.lineTo(lx+i*0.16*s+0.22*s,ly+0.44*s);g.lineTo(lx+i*0.16*s+0.08*s,ly+0.3*s);g.closePath();g.fillStyle='#fc6a1c';g.fill();}g.restore();
+  blob(g,lx,ly,0.17*s,0.13*s,'#5a0d08',ol,Math.max(1.2,1.4*u));
+  return c;
+}
+function beamCol(col){return col?BEAM_GEMS[col]:BEAM_LASER;}
+function beamEnd(M,S){ // where a straight piece of light stops: at a gem or crystal it reaches the middle, at rock or the edge it stops at the boundary
+  const[x,y]=beamXY(M,S.at[0],S.at[1]);if(S.end==='gem'||S.end==='target'||S.end==='loop')return[x,y];
+  const[px,py]=S.last?beamXY(M,S.last[0],S.last[1]):beamLens(M);return[(px+x)/2,(py+y)/2];
+}
+function beamDrawBeams(M,g,t,al,flick){
+  const s=M.s;g.save();g.globalCompositeOperation='lighter';g.lineCap='round';
+  for(const S of M.segs){
+    const[x0,y0]=S.from?beamXY(M,S.from[0],S.from[1]):beamLens(M),[x1,y1]=beamEnd(M,S),K=beamCol(S.col),len=Math.hypot(x1-x0,y1-y0);if(len<1)continue;
+    const w=1+0.08*Math.sin(t*23+x0*0.1);
+    g.globalAlpha=al*(flick||1)*0.22;g.strokeStyle=K.col;g.lineWidth=0.42*s*w;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();
+    g.globalAlpha=al*(flick||1)*0.5;g.lineWidth=0.17*s*w;g.stroke();
+    g.globalAlpha=al*(flick||1)*0.95;g.strokeStyle=K.hi;g.lineWidth=0.06*s;g.stroke();
+    const ux=(x1-x0)/len,uy=(y1-y0)/len,gap=0.9*s,ph=(t*3.2*s)%gap; // motes of light running along it
+    for(let d=ph;d<len;d+=gap)blob(g,x0+ux*d,y0+uy*d,0.07*s,0.07*s,K.hi);
+    if(S.end==='wall'||S.end==='out'){g.globalAlpha=al*(flick||1)*(0.5+0.3*Math.sin(t*30));blob(g,x1,y1,0.2*s,0.2*s,K.col);}
+  }
+  g.restore();
+}
+function beamDrawGem(g,x,y,s,type,ang,lit,t){
+  const G=BEAM_GEMS[type],ol='#120d0d';
+  const pts=type==='topaz'?[[0.64,0],[0.12,0.34],[-0.3,0.3],[-0.42,0],[-0.3,-0.3],[0.12,-0.34]]:type==='sapphire'?[[0.72,0],[-0.06,0.38],[-0.38,0.16],[-0.38,-0.16],[-0.06,-0.38]]:[[0.3,0.52],[-0.6,0],[0.3,-0.52]];
+  g.save();g.translate(x,y);
+  if(lit){g.globalCompositeOperation='lighter';const gl=g.createRadialGradient(0,0,0,0,0,0.95*s);gl.addColorStop(0,hexA(G.col,0.55+0.1*Math.sin(t*9)));gl.addColorStop(1,hexA(G.col,0));g.fillStyle=gl;g.fillRect(-s,-s,2*s,2*s);g.globalCompositeOperation='source-over';}
+  g.rotate(ang); // local +x is the gem's point
+  const path=k=>{g.beginPath();pts.forEach(([a,b],i)=>i?g.lineTo(a*s*k,b*s*k):g.moveTo(a*s*k,b*s*k));g.closePath();};
+  path(1);const gr=g.createRadialGradient(-0.12*s,-0.14*s,0.02*s,0,0,0.7*s);gr.addColorStop(0,G.hi);gr.addColorStop(0.45,G.col);gr.addColorStop(1,G.deep);g.fillStyle=gr;g.fill();
+  g.strokeStyle='rgba(18,13,13,0.45)';g.lineWidth=Math.max(0.8,0.025*s);g.beginPath();pts.forEach(([a,b])=>{g.moveTo(a*s*0.45,b*s*0.45);g.lineTo(a*s,b*s);});g.stroke(); // facets
+  path(0.45);g.fillStyle=hexA(G.hi,0.45);g.fill();
+  path(1);g.lineWidth=Math.max(1.4,0.06*s);g.lineJoin='round';g.strokeStyle=ol;g.stroke();
+  const tips=type==='emerald'?[pts[0],pts[2]]:[pts[0]]; // the corners light leaves from
+  for(const[a,b]of tips){blob(g,a*s*0.92,b*s*0.92,0.08*s,0.08*s,lit?'#ffffff':hexA(G.hi,0.9));}
+  g.restore();
+}
+function beamDrawTarget(M,g,T,lit,col,t){
+  const s=M.s,[x,y]=beamXY(M,T.c,T.r),K=lit?beamCol(col):T.need?{col:shade(BEAM_GEMS[T.need].col,-0.35),deep:'#2a2e33',hi:'#cfd6dd'}:BEAM_DORMANT;
+  if(lit){g.save();g.globalCompositeOperation='lighter';const p=0.6+0.25*Math.sin(t*6+x),gl=g.createRadialGradient(x,y,0,x,y,1.1*s);gl.addColorStop(0,hexA(K.col,0.6*p));gl.addColorStop(1,hexA(K.col,0));g.fillStyle=gl;g.fillRect(x-1.1*s,y-1.1*s,2.2*s,2.2*s);g.restore();}
+  drawXtal(g,x-0.21*s,y+0.12*s,0.19*s,-0.38,K,1);drawXtal(g,x+0.22*s,y+0.14*s,0.18*s,0.4,K,1);drawXtal(g,x,y+0.08*s,0.25*s,0,K,1);
+  if(lit){const ph=(t*1.2+T.c*0.3)%1;if(ph<0.3)drawGlint(g,x+0.12*s,y-0.25*s,Math.sin(ph/0.3*Math.PI)*s/30);}
+}
+function beamDrawPieces(M,g,t,al){
+  const P=M.P;g.save();g.globalAlpha=al;
+  for(let ti=0;ti<P.targets.length;ti++){const T=P.targets[ti],lit=!!(M.lit>>ti&1),seg=lit&&M.segs.find(s=>s.end==='target'&&s.at[0]===T.c&&s.at[1]===T.r);beamDrawTarget(M,g,T,lit,seg?seg.col:null,t);}
+  P.gems.forEach((G,i)=>{const[x,y]=beamXY(M,G.c,G.r);beamDrawGem(g,x,y,M.s,G.type,-Math.PI/2+M.va[i]*Math.PI/3,M.gemsLit.has(i),t);});
+  const[lx,ly]=beamLens(M);g.globalCompositeOperation='lighter';blob(g,lx,ly,0.26*M.s,0.22*M.s,hexA(BEAM_LASER.col,0.5+0.2*Math.sin(t*12)));
+  g.restore();
+}
+function beamDrawText(M,t,al){ // turns left and par under the laser, and a line on any gem you haven't met yet
+  const u=M.u,P=M.P,[,ly]=beamLens(M),left=Math.max(0,M.budget-M.used),yy=ly+0.98*M.s;
+  ctx.save();ctx.globalAlpha=al;ctx.font=`800 ${Math.round(14*u)}px ${UIFONT}`;ctx.textBaseline='middle';ctx.lineJoin='round';
+  const label=(str,x,y,align,col)=>{ctx.textAlign=align;ctx.lineWidth=4;ctx.strokeStyle='rgba(12,8,5,0.9)';ctx.strokeText(str,x,y);ctx.fillStyle=col;ctx.fillText(str,x,y);};
+  label(`TURNS LEFT ${left}`,M.cx-9*u,yy,'right',left<=3?'#ff5b47':'#f2e8da');label('·',M.cx,yy,'center','#8a7666');label(`PAR ${P.par}`,M.cx+9*u,yy,'left','#c2ad96');
+  const lines=[...(M.taughtNow||[])].map(ty=>BEAM_HINT[ty]);
+  if(P.targets.some(T=>T.need))lines.push('Ringed crystals need light of their color.');
+  ctx.font=`700 ${Math.round(15*u)}px ${UIFONT}`;
+  lines.slice(-2).forEach((str,i)=>label(str,M.cx,yy+30*u+i*20*u,'center','#e2d6c6'));
+  ctx.restore();
+}
+function beamStill(M,g){M.board=null;g.drawImage(beamBoard(M),0,0,M.W,M.H);beamDrawPieces(M,g,0,1);}
+function beamPeek(M,g,t){beamDrawBeams(M,g,t,1,0.65+0.35*Math.sin(t*4));} // from above you can see the laser light flicker between the gems
+function beamDraw(M,t){
+  if(!M.board)M.board=beamBoard(M);
+  if(!M.taughtNow||M.taughtFor!==M.pi){M.taughtFor=M.pi;M.taughtNow=new Set();for(const G of M.P.gems)if(!M.taught.has(G.type)){M.taught.add(G.type);M.taughtNow.add(G.type);}}
+  const al=M.bs==='swap'?clamp(1-(t-M.gt)/0.32,0,1):clamp((t-M.fadeT)/0.3,0,1);
+  ctx.save();ctx.globalAlpha=al;ctx.drawImage(M.board,0,0,M.W,M.H);ctx.restore();
+  beamDrawBeams(M,ctx,t,al);
+  beamDrawPieces(M,ctx,t,al);
+  beamDrawText(M,t,al);
 }
 
 /* ---------- lava, obsidian and the Ice Sprayer ---------- */
