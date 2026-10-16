@@ -366,6 +366,26 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
 .buy small{font-weight:800;letter-spacing:.06em}
 .buy.alt{background:var(--panel-lo);color:var(--paper);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14)}
 .thumb.broke{background:radial-gradient(circle at 50% 40%,#ffc2b8,var(--danger) 70%)}
+/* The opening: the hire card's second button, the find card, the chest of finds */
+#app{overflow:clip}
+#hud .prog .tune-mini{width:30px;height:28px;margin:-9px -4px -9px -2px;border-radius:8px;background:transparent;box-shadow:none;color:var(--paper-dim)}
+#hud .prog .tune-mini svg{width:18px;height:18px}
+@media (max-width:400px){#hud .hud-row{gap:6px}#hud .hud-row .icon-btn{width:35px}#hud .coins{font-size:18px;gap:6px;padding:0 10px 0 5px}}
+.card .alt{display:block;margin:12px auto 0;padding:6px 16px;font-size:15px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--card-dim);background:none}
+.card .go .coin-ico.sm{vertical-align:-3px;margin:0 3px 0 2px}
+.well.find{align-items:center;background:radial-gradient(circle at 50% 54%,#6a4c22 0%,#2a1c0d 52%,#130c06 100%)}
+.finds-btn{position:relative;color:#ffd23a}
+.finds-btn .fcount{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:#ffd23a;color:#2a1600;font-size:12.5px;font-weight:800;display:grid;place-items:center;box-shadow:0 0 0 2px var(--seam)}
+.finds-btn.pop{animation:fbPop .8s cubic-bezier(.2,1.6,.4,1)}
+@keyframes fbPop{0%{transform:scale(.3)}55%{transform:scale(1.22)}100%{transform:scale(1)}}
+.finds{display:grid;gap:10px}
+.find-row{display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:12px;background:var(--panel-hi)}
+.find-art{flex:none;width:72px;height:72px;border-radius:10px;background:radial-gradient(circle at 50% 56%,#4f3a1b,#1a120a 75%)}
+.find-row .fn{font-family:var(--display);font-size:19px;line-height:1.1;color:#ffd23a}
+.find-row .fw{margin-top:3px;font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--paper-dim)}
+.find-row .fd{margin-top:6px;font-size:16px;line-height:1.3;text-wrap:pretty}
+.find-row .fd b{color:#ff9b2e}
+.fmore{margin:12px 2px 2px;font-size:14.5px;line-height:1.35;color:var(--paper-dim);text-align:center;text-wrap:balance}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 
@@ -376,12 +396,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
     <div class="hud-row">
       <div class="depth"><div id="lyr" class="lyr">LAYER 1</div><div id="band" class="band"><span id="bandName" class="bn">Dirt and Rocks</span><span id="bandKm" class="bk"></span></div></div>
       <div id="coins" class="coins" aria-label="Coins"><span id="coinIco" class="coin-ico"></span><span id="coinTxt">0</span></div>
+      <button id="btnFinds" class="icon-btn finds-btn" type="button" aria-label="Rare finds" hidden><b id="findsCount" class="fcount">0</b></button>
       <button id="btnTeam" class="icon-btn team-btn" type="button" aria-label="Team"><b id="teamBadge" class="tbadge" hidden></b><i id="teamDot" class="tdot" hidden></i></button>
-      <button id="btnTune" class="icon-btn" type="button" aria-label="Tuning"></button>
     </div>
     <div class="prog">
       <div id="bar" class="bar"><div id="progFill" class="fill"></div><div id="progMark" class="mark"></div></div>
       <div id="progTxt" class="ptxt">0% clear</div>
+      <button id="btnTune" class="icon-btn tune-mini" type="button" aria-label="Tuning"></button>
     </div>
   </header>
 
@@ -450,6 +471,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
       <div id="introRole" class="role">Moves dirt and debris</div>
       <div id="introHow" class="how"></div>
       <button id="introGo" class="go" type="button">LET'S DIG</button>
+      <button id="introAlt" class="alt" type="button" hidden>NOT NOW</button>
     </div>
   </div>
 
@@ -670,18 +692,18 @@ const ICON={
 
 /* ---------- state + persistence ---------- */
 const SAVE_KEY='groundbreaking-race-v1';
-const freshState=()=>({seed:(Math.random()*4294967296)>>>0,L:1,coins:0,owned:{shovel:true,pickaxe:true},dyn:0,seen:{},tune:Object.assign({},TUNE_DEFAULT),muted:false,tool:'shovel',best:1,x:null,at:0,gear:{}});
+const freshState=()=>({seed:(Math.random()*4294967296)>>>0,L:1,coins:0,owned:{shovel:true},dyn:0,seen:{},finds:{},tune:Object.assign({},TUNE_DEFAULT),muted:false,tool:'shovel',best:1,x:null,at:0,gear:{}});
 let state=freshState();
-function saveData(){return{seed:state.seed,L:state.L,coins:state.coins,owned:state.owned,dyn:state.dyn,seen:state.seen,tune:state.tune,muted:state.muted,tool:state.tool,best:state.best,x:myX(),at:state.at,v:2,gear:state.gear};}
+function saveData(){return{seed:state.seed,L:state.L,coins:state.coins,owned:state.owned,dyn:state.dyn,seen:state.seen,tune:state.tune,muted:state.muted,tool:state.tool,best:state.best,x:myX(),at:state.at,v:2,gear:state.gear,finds:state.finds};}
 function save(){if(netNoSave)return;state.at=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(saveData()));}catch(e){}netSaveSoon();}
 function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 function applySave(d){
   if(!d||typeof d!=='object'||typeof d.seed!=='number'||d.v!==2)return false; // saves from before the race start fresh
   state.seed=d.seed>>>0;state.L=Math.max(1,d.L|0);state.coins=Math.max(0,d.coins|0);
-  state.owned=Object.assign({shovel:true,pickaxe:true},d.owned||{});state.dyn=Math.max(0,d.dyn|0);
+  state.owned=Object.assign({shovel:true},d.owned||{});state.dyn=Math.max(0,d.dyn|0);
   state.seen=d.seen&&typeof d.seen==='object'?d.seen:{};state.tune=Object.assign({},TUNE_DEFAULT,d.tune||{});
   state.muted=!!d.muted;state.tool=d.tool&&state.owned[d.tool]?d.tool:'shovel';state.best=Math.max(state.L,d.best|0);
-  state.x=d.x&&typeof d.x==='object'?d.x:null;myX();state.at=Number(d.at)||0;state.gear=d.gear&&typeof d.gear==='object'?d.gear:{};
+  state.x=d.x&&typeof d.x==='object'?d.x:null;myX();state.at=Number(d.at)||0;state.gear=d.gear&&typeof d.gear==='object'?d.gear:{};state.finds=d.finds&&typeof d.finds==='object'?d.finds:{};
   return true;}
 
 /* ---------- layer generation ---------- */
@@ -701,7 +723,7 @@ function genLayer(L){
   let pts=poissonPoints(rng,FW,FH,rFn,sp*1.6);
   let polys=voronoi(pts,FW,FH);
   for(let it=0;it<T.relax;it++){pts=polys.map((P,i)=>{const c=polyCentroid(P);return{x:c.x,y:c.y,r:pts[i].r};});polys=voronoi(pts,FW,FH);}
-  const band=bandFor(L),S=stratumFor(L),Gd=groundFor(L),lv=stratumIndex(L)+1;bandArt(band);
+  const band=bandFor(L),S=stratumFor(L),Gd=groundFor(L),lv=stratumIndex(L)+1,tut=tutAt(L);bandArt(band);
   const cells=polys.map((P0,i)=>{const P=cleanPoly(P0),c=polyCentroid(P);let rad=0;for(const v of P)rad=Math.max(rad,Math.hypot(v.x-c.x,v.y-c.y));
     return{id:i,sx:pts[i].x,sy:pts[i].y,poly:P,cx:c.x,cy:c.y,area:Math.abs(polyArea(P)),rad,tint:rng()*2-1,mat:'dirt',clay:false,hp:1,maxHp:1,cluster:-1,nb:[],
       anim:0,anim0:0,animType:'',wt:0,wd:0,wo:-1,lt:0,ld:0,lo:-1,chill:0,cracks:null,flecks:null,chunks:null,rubCol:null,popFrom:null};});
@@ -710,13 +732,15 @@ function genLayer(L){
   for(const c of cells){const P=c.poly;for(let k=0;k<P.length;k++){const l=P[k].l;if(l<0)continue;const B=P[(k+1)%P.length],len=Math.hypot(B.x-P[k].x,B.y-P[k].y),key=c.id<l?c.id*8192+l:l*8192+c.id;if(len>(edgeLen.get(key)||0))edgeLen.set(key,len);}}
   for(const[key,len]of edgeLen){if(len<1.5)continue;const a=Math.floor(key/8192),b=key%8192;cells[a].nb.push(b);cells[b].nb.push(a);}
   // materials: a noise field picks rocky regions, rock share grows with depth
-  const f=clamp(Gd.rock+T.rockBias,0.02,0.85);
+  const f=tut?tut.rock:clamp(Gd.rock+T.rockBias,0.02,0.85);
   const vals=cells.map(c=>nRock(c.cx/150,c.cy/150)),sorted=vals.slice().sort((a,b)=>a-b);
   const thr=sorted[Math.min(sorted.length-1,Math.floor((1-f)*sorted.length))];
   const clayP=Gd.clay;
-  for(const c of cells){if(vals[c.id]>=thr||rng()<0.035)c.mat='rock';else{c.mat='dirt';c.clay=rng()<clayP;}}
+  for(const c of cells){if(f>0&&(vals[c.id]>=thr||rng()<(tut?0.01:0.035)))c.mat='rock';else{c.mat='dirt';c.clay=rng()<clayP;}}
+  const hugeIds=tut&&tut.huge?openingCarve(tut,cells):null;
   // merge neighbouring rock cells into boulders
   const clusters=[],granP=Gd.gran,rockIds=cells.filter(c=>c.mat==='rock').map(c=>c.id);
+  if(hugeIds)openingHuge(hugeIds,cells,clusters);
   for(let i=rockIds.length-1;i>0;i--){const j=Math.floor(rng()*(i+1)),t=rockIds[i];rockIds[i]=rockIds[j];rockIds[j]=t;}
   for(const id of rockIds){
     const c0=cells[id];if(c0.cluster>=0)continue;
@@ -746,7 +770,7 @@ function genLayer(L){
   for(const c of cells)if(c.mat==='dirt')c.maxHp=c.hp=c.clay?HP_BASE.clay:HP_BASE.dirt;
   // underground springs, only in the strata that leak
   const springs=[];
-  if(S.water){
+  if(S.water&&!tut){
     const count=rng()<0.55?2:1;
     const cand=cells.filter(c=>c.mat==='dirt'&&c.cx>50&&c.cx<FW-50&&c.cy>50&&c.cy<FH-50);
     for(let s=0;s<count&&cand.length;s++){
@@ -757,7 +781,7 @@ function genLayer(L){
     }
   }
   // magma pockets in the volcanic strata; they never sit next to a spring
-  const magma=[],heat=S.heat||0;
+  const magma=[],heat=tut?0:(S.heat||0);
   if(heat){
     const count=heat>=1?(rng()<0.5?3:2):(rng()<0.5?2:1);
     const cand=cells.filter(c=>c.mat==='dirt'&&c.cx>50&&c.cx<FW-50&&c.cy>50&&c.cy<FH-50&&!springs.some(o=>o.cell===c.id||cells[o.cell].nb.includes(c.id)));
@@ -769,11 +793,11 @@ function genLayer(L){
     }
   }
   // every layer takes its stratum's minutes by hand: scale this layer's toughness to fit
-  const cal=calibrateLayer(L,cells,clusters);
+  const cal=tut?openingCalibrate(tut,cells,clusters,rng):calibrateLayer(L,cells,clusters);
   // the layer's coins: a fifth inside ore boulders, the rest in loose finds on its surface (seen from the layer above)
   const budget=layerCoins(L),loot=[];let oreN=0;
   for(const cl of clusters)if(cl.ore)oreN+=cl.cells.length;
-  const oreShare=oreN?0.2:0;
+  const oreShare=oreN?(tut?tut.ore/Math.max(1,tut.ore+tut.surf):0.2):0;
   for(const cl of clusters)if(cl.ore)cl.oreVal=Math.max(1,Math.round(budget*oreShare*cl.cells.length/oreN));
   if(L>=2&&L<=raceLast()){
     const cnt=4+Math.floor(rng()*4),pool=cells.filter(c=>c.mat!=='spring'&&c.mat!=='magma');
@@ -785,6 +809,7 @@ function genLayer(L){
     let sv=0;for(const it of loot)sv+=LOOT[it.type].v;
     for(const it of loot)it.value=Math.max(1,Math.round(budget*(1-oreShare)*LOOT[it.type].v/sv));
   }
+  if(tut&&tut.rare&&!(state.finds&&state.finds[tut.rare]))openingRare(tut,cells,loot,rng);
   const texM=texMatrix(rng()*TEX_SPAN,rng()*TEX_SPAN);
   return{L,band,cells,clusters,springs,magma,loot,pct:0,flood:0,lava:0,hpK:cal.k,rubHp:cal.rub,texM};
 }
@@ -871,11 +896,12 @@ function drawLoot(g,x,y,type,s,rot,alpha,seed){
   g.restore();
 }
 function drawGlint(g,x,y,s){g.save();g.translate(x,y);g.scale(s,s);g.fillStyle='#fff';g.beginPath();g.moveTo(0,-7);g.lineTo(1.3,-1.3);g.lineTo(7,0);g.lineTo(1.3,1.3);g.lineTo(0,7);g.lineTo(-1.3,1.3);g.lineTo(-7,0);g.lineTo(-1.3,-1.3);g.closePath();g.fill();g.restore();}
-function glintFor(g,it,t){const ph=(t*0.45+it.seed*7.3)%1;if(ph>0.16)return;drawGlint(g,it.x+4,it.y-6,Math.sin(ph/0.16*Math.PI));}
+function glintFor(g,it,t,k=1){const ph=(t*0.45+it.seed*7.3)%1;if(ph>0.16)return;drawGlint(g,it.x+4,it.y-6,Math.sin(ph/0.16*Math.PI)*k);}
 function renderBelow(){clearCache(belowC,belowG);cavernPrev=null;
   if(state.L>=raceLast()){drawSealScene(belowG);return;}
   if(!MG&&shouldMini(state.L+1)){cavernPrev=makeCavern(miniKindFor(state.L+1),state.L+1);drawCavernScene(belowG,cavernPrev,0.3);return;}
-  renderLayer(next,belowG,false);belowG.fillStyle='rgba(10,5,2,0.5)';belowG.fillRect(0,0,FW,FH);for(const it of next.loot)drawLoot(belowG,it.x,it.y,it.type,1,it.rot,1,it.seed);}
+  renderLayer(next,belowG,false);for(const it of next.loot)drawLoot(belowG,it.x,it.y,it.type,0.92,it.rot,1,it.seed);
+  belowG.fillStyle=`rgba(6,3,1,${BELOW_SHADE})`;belowG.fillRect(0,0,FW,FH);for(const it of next.loot)drawLoot(belowG,it.x,it.y,it.type,0.92,it.rot,BELOW_LOOT,it.seed);}
 function renderFieldCache(full){clearCache(fieldC,fieldG);renderLayer(layer,fieldG,!full);}
 function renderBright(){clearCache(brightC,brightG);if(cavernPrev)drawCavernScene(brightG,cavernPrev,0);else renderLayer(next,brightG,false);}
 function roundRect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
@@ -1012,6 +1038,7 @@ function clearCell(c,quiet){
   spawn('dust',c.cx,c.cy,{color:col,speed:10,size:c.rad*0.35,life:0.6});
   if(!quiet)sfx('pop');
   for(const it of layer.loot)if(!it.collected&&it.cell===c.id)collect(it);
+  if(c.rare)rareFound(c);
   fieldDirty=true;updateProgress();
 }
 function hitRock(cl,dmg,x,y,style){
@@ -1020,7 +1047,7 @@ function hitRock(cl,dmg,x,y,style){
   if(style==='pick'){for(let i=0;i<3;i++)spawn('chunk',x,y,{color:col,size:1.2+Math.random()*1.6,speed:50+Math.random()*70});for(let i=0;i<4;i++)spawn('spark',x,y,{color:'#ffe7a8',speed:120+Math.random()*120,life:0.18+Math.random()*0.12});sfx('chip');buzz(10);addShake(1.3);}
   else if(style==='laser'){if(Math.random()<0.3)spawn('dust',x,y,{color:'#ffd0dc',speed:20,size:3,life:0.3});}
   else if(style==='drill'){if(Math.random()<0.5)spawn('chunk',x,y,{color:col,size:1+Math.random()*1.4,speed:60+Math.random()*60});if(Math.random()<0.6)spawn('spark',x,y,{color:'#ffd68a',speed:140,life:0.15});}
-  if(cl.hp<=0){breakCluster(cl);if(style==='laser')vaporize(cl);}else setAnim(cl,style==='drill'||style==='laser'?'drill':'hit',style==='drill'||style==='laser'?0.12:0.18,animClusters);
+  if(cl.hp<=0){if(cl.huge){splitHuge(cl);return;}breakCluster(cl);if(style==='laser')vaporize(cl);}else setAnim(cl,style==='drill'||style==='laser'?'drill':'hit',style==='drill'||style==='laser'?0.12:0.18,animClusters);
 }
 function breakCluster(cl){
   cl.broken=true;cl.hp=0;animClusters.delete(cl);
@@ -1049,7 +1076,12 @@ function tapAt(tool,x,y){
   if(c.mat==='spring'){sfx('splash');for(let i=0;i<5;i++)spawn('drop',x,y,{speed:40+Math.random()*50,vz:80});hint('Underground spring. Tools bounce off it, so dig around it.','springTap');return;}
   if(c.mat==='dirt'||c.mat==='rubble'){if(tool==='pickaxe'){hitSoft(c,0.5,x,y);hint('The Shovel is faster in dirt.','pickDirt');}else hitSoft(c,1,x,y);return;}
   const cl=layer.clusters[c.cluster];if(!cl)return;
-  if(tool==='shovel'){clink(c,x,y);if(!state.seen.pickaxe)showIntro('pickaxe',()=>selectTool('pickaxe'));else hint('Too hard for a shovel. Switch to the Pickaxe.','rockShovel');return;}
+  if(tool==='shovel'){
+    if(cl.huge&&state.owned.pickaxe){hugeTap('shovel',cl,c,x,y);return;}
+    clink(c,x,y);
+    if(!state.owned.pickaxe){state.owned.pickaxe=true;buildDock();save();showIntro('pickaxe',()=>selectTool('pickaxe'));}
+    else if(!state.seen.pickaxe)showIntro('pickaxe',()=>selectTool('pickaxe'));else hint('Too hard for a shovel. Switch to the Pickaxe.','rockShovel');return;}
+  if(cl.huge){hugeTap('pickaxe',cl,c,x,y);return;}
   hitRock(cl,1,x,y,'pick');
 }
 function sledgeRelease(p){
@@ -1137,7 +1169,7 @@ function refreshDrop(){
 function doDrop(force){
   if(dropping||mode!=='play')return;
   if(state.L>=raceLast()){if(force||layer.pct>=state.tune.clearPct/100)showCoreSeal();return;}
-  if(!force){if(layer.pct<state.tune.clearPct/100)return;if(layer.flood>0.6){hint('The shaft is flooded. Pump or bail the water first.','flooded');sfx('deny');return;}
+  if(!force){if(layer.pct<state.tune.clearPct/100)return;{const rc=rareLeft();if(rc){clearCell(rc);return;}}if(layer.flood>0.6){hint('The shaft is flooded. Pump or bail the water first.','flooded');sfx('deny');return;}
     if((layer.lava||0)>0.4){hint(state.owned.ice?'Lava in the shaft. Freeze it with the Ice Sprayer first.':'Lava in the shaft. Wait for it to crust over, or buy the Ice Sprayer.','hotDrop');sfx('deny');return;}
     {const sn=seamBlocked();if(sn){enterSeam(sn);return;}}}
   for(const it of layer.loot)if(!it.collected)collect(it);
@@ -1169,6 +1201,7 @@ function drawDynamic(t){
   for(const cl of animClusters){if(cl.broken)continue;const p=clamp((t-cl.anim0)/Math.max(0.001,cl.anim-cl.anim0),0,1),e=1-p;let dx=0,dy=0,s=1;
     if(cl.animType==='hit'){dx=Math.sin(p*TAU*3)*2*e;dy=Math.sin(p*TAU*2.3+1)*1.2*e;s=1+0.025*e;}
     else if(cl.animType==='drill'){dx=(Math.random()-0.5)*1.6;dy=(Math.random()-0.5)*1.6;}
+    else if(cl.animType==='split'&&cl.popFrom){dx=(cl.cx-cl.popFrom.x)*0.22*e*e;dy=(cl.cy-cl.popFrom.y)*0.22*e*e;s=1+0.05*e;}
     drawCluster(ctx,layer,cl,dx,dy,s);}
   for(const d of dying){const p=clamp((t-d.t0)/d.dur,0,1);drawSoft(ctx,d.c,band,0,0,1-p*0.95);}
 }
@@ -1238,7 +1271,7 @@ function draw(t){
   if(dropping)drawDropping(t);
   else{
     ctx.drawImage(belowC,0,0,FW,FH);
-    if(cavernPrev)peekCavern(t);else for(const it of next.loot)glintFor(ctx,it,t);
+    if(cavernPrev){peekCavern(t);ctx.fillStyle=`rgba(6,3,1,${CAVE_SHADE})`;ctx.fillRect(0,0,FW,FH);}else{ctx.save();ctx.globalAlpha=0.5;for(const it of next.loot)glintFor(ctx,it,t,0.7);ctx.restore();}
     drawWater(t);drawLava(t);
     if(fieldDirty){renderFieldCache(false);fieldDirty=false;}
     ctx.drawImage(fieldC,0,0,FW,FH);
@@ -1246,7 +1279,7 @@ function draw(t){
     for(const s of layer.springs){const c=layer.cells[s.cell];if(c.mat==='spring')drawSpring(ctx,c,layer.band,t,s);}
     for(const s of layer.magma||[]){const c=layer.cells[s.cell];if(c.mat==='magma')drawMagma(ctx,c,t,s);}
     drawLavaGlow(t);
-    drawSurfaceLoot(t);drawDevices(t);
+    drawSurfaceLoot(t);drawRareGlints(t);drawRevealing(t);drawDevices(t);drawOpeningMark(t);
   }
   drawParticles();drawIndicators(t);drawTexts(t);
   if(flash>0){ctx.fillStyle=`rgba(255,236,200,${flash.toFixed(3)})`;ctx.fillRect(0,0,FW,FH);}
@@ -1302,7 +1335,7 @@ function drawSplat(g,s,t){
   g.restore();
 }
 /* ---------- mini game: Bug Crusher (logic) ---------- */
-function shouldMini(L){const n=state.tune.miniEvery|0;return n>0&&L>1&&L<=raceLast()&&(L-1)%n===0;}
+function shouldMini(L){const n=state.tune.miniEvery|0;if(!(n>0&&L>1&&L<=raceLast()))return false;if(tutAt(L))return L===OPENING_CAVE;return(L-1)%n===0;}
 function renderMiniBg(M){
   const c=document.createElement('canvas');c.width=Math.max(1,Math.round(M.W*DPR));c.height=Math.max(1,Math.round(M.H*DPR));
   const g=c.getContext('2d');g.setTransform(DPR,0,0,DPR,0,0);
@@ -1474,14 +1507,15 @@ function stratumFor(L){return STRATA[stratumIndex(L)];}
 function raceLast(){return strataLayout().last;}
 function stratumSpan(i){const Y=strataLayout();return{first:Y.first[i],last:Y.first[i]+Y.count[i]-1};}
 function handMin(L){return raceCfg().flat||stratumFor(L).min;} // hand minutes for one layer
-function groundFor(L){return GROUND[stratumFor(L).cls];}
+function groundFor(L){const t=tutAt(L);return t?{rock:t.rock,clay:t.clay,gran:0,boulder:t.boulder}:GROUND[stratumFor(L).cls];} // the opening sets its own
 function depthKm(L){return CORE_KM*clamp(L,0,raceLast())/raceLast();}
 function depthLabel(L){const k=depthKm(L);return(k<10?k.toFixed(1):Math.round(k).toLocaleString('en-US'))+' km';}
 // coins: six for every hand minute, 10% more per stratum down, more in the rich strata; a squeezed race pays more per layer
-function layerCoins(L){const i=stratumIndex(L),S=STRATA[i];return 6*handMin(L)*(1+0.1*i)*(S.coin||1)*strataLayout().coinK*(state.tune.lootMult||1);}
+function layerCoins(L){const t=tutAt(L);if(t)return t.surf+t.ore; // the opening pays the same in every race length
+  const i=stratumIndex(L),S=STRATA[i];return 6*handMin(L)*(1+0.1*i)*(S.coin||1)*strataLayout().coinK*(state.tune.lootMult||1);}
 function layerPtsFor(L){return Math.round(10*handMin(L));} // dig points: ten per hand minute of the layer
-function caveLevel(L){return stratumIndex(L)+1;}           // caverns get harder (and pay a little more) by stratum, 1 to 20
-function caveCoinScale(L){return layerCoins(L)/150;}       // a cavern pays about one layer's coins at its depth
+function caveLevel(L){return tutAt(L)?1:stratumIndex(L)+1;}           // caverns get harder (and pay a little more) by stratum, 1 to 20
+function caveCoinScale(L){return tutAt(L)?1:layerCoins(L)/150;}       // a cavern pays about one layer's coins at its depth
 function caveBonus(M,R){ // the depth bonus on a cavern's results, so a deep cavern keeps up with the deep layers
   if(!MINI_ORDER.includes(M.kind)||!(R.total>0))return;const k=caveCoinScale(M.at);if(k<1.5)return;
   const kk=k>=10?Math.round(k):Math.round(k*10)/10;R.rows.push(['Depth bonus','×'+kk]);R.total*=kk;
@@ -1620,6 +1654,7 @@ function showBanner(){
     $('bannerB1').textContent=S.short.toUpperCase();$('bannerB2').textContent=`Stratum ${i+1} of ${STRATA.length} · ${depthLabel(L)}`;$('bannerB3').textContent=S.flavor;}
   else{$('bannerB1').textContent=`LAYER ${L.toLocaleString('en-US')}`;$('bannerB2').textContent=`${S.short} · ${depthLabel(L)}`;$('bannerB3').textContent='';}
   b.classList.toggle('strat',fresh);b.classList.remove('show');void b.offsetWidth;b.classList.add('show');
+  openingArrive(L);
 }
 
 // ---- the end of the race: the Core Seal (its puzzle comes in a later build) ----
@@ -1850,6 +1885,261 @@ function seamWear(n){ // a power tool wears on the seam just as it does in the g
 }
 function fmtHit(d){return d<10?d.toFixed(1):String(Math.round(d));}
 
+/* ---------- the opening: the first nine layers each teach one thing ---------- */
+// The same in every race length except the quick tour (that one is for looking at the strata). Each opening layer has
+// fixed ground, toughness and coins, so a new digger meets, in order: single-tap dirt, gold and gems to pick up, a rare
+// find, rock and the Pickaxe, a first cavern, and a boulder too big for the Pickaxe, with about enough coins saved for
+// the Sledgehammer that splits it. After layer 9 the race takes over.
+// rock: share of rock cells. clay: clay among the soft cells. boulder: biggest ordinary boulder, in cells.
+// surf: coins lying on the surface, collected by the drop at the latest (layers 2 to 8 add up to 1,510, so the
+// Sledgehammer's 1,500 is always there by the big rock). ore: coins inside the ore boulders. ores: how many ore boulders.
+// hp: taps for [dirt, clay, a one-cell rock, each extra rock cell]. rare: a rare find buried in the dirt.
+// huge: a boulder of at least this many cells (and a fifth of the field) that only the Sledgehammer or explosives split.
+const OPENING=[null,
+  {key:'shovel', rock:0,   clay:0,   boulder:1,surf:0,  ore:0, ores:0,hp:[1,2,3,2]},
+  {key:'collect',rock:0,   clay:0.1, boulder:1,surf:160,ore:0, ores:0,hp:[1,2,3,2],rare:'compass'},
+  {key:'rocks',  rock:0.24,clay:0.1, boulder:2,surf:180,ore:40,ores:1,hp:[1,2,3,2]},
+  {key:'mixed',  rock:0.26,clay:0.2, boulder:3,surf:200,ore:40,ores:1,hp:[1,2,3,2]},
+  {key:'mixed',  rock:0.28,clay:0.25,boulder:3,surf:220,ore:50,ores:1,hp:[1,2,4,2]},
+  {key:'mixed',  rock:0.28,clay:0.25,boulder:3,surf:240,ore:50,ores:1,hp:[1,2,4,2]}, // reached through the first cavern
+  {key:'mixed',  rock:0.3, clay:0.3, boulder:3,surf:250,ore:60,ores:1,hp:[1,2,4,2]},
+  {key:'mixed',  rock:0.3, clay:0.3, boulder:4,surf:260,ore:60,ores:2,hp:[2,3,4,2]},
+  {key:'bigrock',rock:0.12,clay:0.3, boulder:2,surf:160,ore:80,ores:1,hp:[2,3,4,2],huge:22},
+];
+const OPENING_LAST=OPENING.length-1;
+const OPENING_CAVE=6;          // the first cavern waits between layers 5 and 6
+const HUGE_HP=8;               // two full Sledgehammer swings, or one charge of explosives
+const HUGE_CHIP=HUGE_HP/300;   // the Pickaxe only scratches it, and only when you can't afford the Sledgehammer yet
+const BELOW_SHADE=0.64,BELOW_LOOT=0.24,CAVE_SHADE=0.4; // the layer below: its shadow, how much its gold shows through, a cavern's shadow
+function openingOn(){return raceCfg().key!=='tour';}
+function tutAt(L){return openingOn()&&L>=1&&L<=OPENING_LAST?OPENING[L]:null;}
+
+// ---- building an opening layer (called from genLayer) ----
+function openingCarve(tut,cells){ // the big rock: a round patch of cells in the middle, about a fifth of the field
+  const cx=FW/2,cy=FH*0.47,total=cells.reduce((s,c)=>s+c.area,0);let start=cells[0],bd=Infinity;
+  for(const c of cells){const d=Math.hypot(c.cx-cx,c.cy-cy);if(d<bd){bd=d;start=c;}}
+  const seen=new Set([start.id]),front=[start],out=[];let area=0;
+  while(front.length&&(out.length<tut.huge||area<total*0.2)){
+    let bi=0,bv=Infinity;for(let i=0;i<front.length;i++){const d=Math.hypot(front[i].cx-cx,front[i].cy-cy);if(d<bv){bv=d;bi=i;}}
+    const c=front[bi];front[bi]=front[front.length-1];front.pop();out.push(c.id);area+=c.area;
+    for(const id of c.nb)if(!seen.has(id)){seen.add(id);front.push(cells[id]);}
+  }
+  for(const id of out){const c=cells[id];c.mat='rock';c.clay=false;}
+  return out;
+}
+function openingHuge(ids,cells,clusters){ // it becomes the first boulder, so the ordinary ones grow around it
+  const cl={id:clusters.length,cells:ids.slice(),kind:'rock',ore:false,hp:1,maxHp:1,anim:0,anim0:0,animType:'',broken:false,huge:true};
+  for(const id of ids)cells[id].cluster=cl.id;clusters.push(cl);
+}
+function openingCalibrate(tut,cells,clusters,rng){ // fixed taps instead of the stratum's minutes
+  const[hd,hc,rb,rp]=tut.hp,plain=clusters.filter(cl=>!cl.huge);
+  for(const c of cells)if(c.mat==='dirt')c.maxHp=c.hp=c.clay?hc:hd;
+  for(const cl of plain){cl.ore=false;cl.maxHp=cl.hp=rb+rp*(cl.cells.length-1);for(const id of cl.cells)cells[id].flecks=null;}
+  const big=plain.slice().sort((a,b)=>b.cells.length-a.cells.length||a.id-b.id); // the biggest boulders show the gold
+  for(let i=0;i<Math.min(tut.ores||0,big.length);i++){const cl=big[i];cl.ore=true;for(const id of cl.cells)cells[id].flecks=makeFlecks(cells[id],rng,4);}
+  for(const cl of clusters)if(cl.huge){cl.maxHp=cl.hp=HUGE_HP;cl.ore=true;for(const id of cl.cells)cells[id].flecks=makeFlecks(cells[id],rng,2);}
+  return{k:1,rub:1};
+}
+function openingRare(tut,cells,loot,rng){ // a rare find hides in a dirt cell near the middle, away from the loose loot
+  let pool=cells.filter(c=>c.mat==='dirt'&&c.cx>FW*0.25&&c.cx<FW*0.75&&c.cy>FH*0.28&&c.cy<FH*0.72&&!loot.some(it=>it.cell===c.id));
+  if(!pool.length)pool=cells.filter(c=>c.mat==='dirt');if(!pool.length)return;
+  const c=pool[Math.floor(rng()*pool.length)];c.rare=tut.rare;c.maxHp=c.hp=Math.max(c.hp,2); // firmer: it's holding something
+}
+
+// ---- the big rock ----
+function finishCluster(Ly,cl){ // the outline, inner edges and centre of a boulder made at runtime
+  const cells=Ly.cells;let A=0,X=0,Y=0,r=0;
+  for(const id of cl.cells){const c=cells[id];A+=c.area;X+=c.cx*c.area;Y+=c.cy*c.area;}
+  cl.cx=X/A;cl.cy=Y/A;cl.area=A;
+  for(const id of cl.cells)for(const v of cells[id].poly)r=Math.max(r,Math.hypot(v.x-cl.cx,v.y-cl.cy));cl.rad=r;
+  cl.outer=[];cl.inner=[];
+  for(const id of cl.cells){const P=cells[id].poly;for(let k=0;k<P.length;k++){const A2=P[k],B2=P[(k+1)%P.length],l=A2.l,inside=l>=0&&cells[l].cluster===cl.id;
+    if(inside){if(id<l)cl.inner.push([A2,B2]);}else cl.outer.push([A2,B2]);}}
+}
+function hugeTap(tool,cl,c,x,y){ // hand tools on the big rock
+  const price=TOOLS.sledge.price,bounce=()=>{clink(c,x,y);addShake(1.6);buzz(12);floatText(x,y-12,'TOO BIG!','#ff9b2e',15);};
+  if(state.owned.sledge){bounce();hint(`Too big for the ${tool==='shovel'?'Shovel':'Pickaxe'}. Switch to the Sledgehammer.`,'hugeSledge');return;}
+  if(state.owned.dynamite&&state.dyn>0){bounce();hint('Too big for the Pickaxe. Blast it with explosives, or get the Sledgehammer.','hugeTnt');return;}
+  if(state.coins>=price){bounce();if(!layer.hugeOffered){layer.hugeOffered=true;setTimeout(()=>{if(mode==='play'&&!dropping)offerSledge();},380);}
+    else hint('Too big for the Pickaxe. The Sledgehammer in the Shop splits it.','hugeShop');return;}
+  if(tool==='pickaxe')hitRock(cl,HUGE_CHIP,x,y,'pick');else bounce();
+  hint(`Too big for the Pickaxe. A Sledgehammer (${price.toLocaleString('en-US')} coins) splits it in two swings.`,'hugeChip');
+}
+function splitHuge(cl){ // the big rock breaks along its own cracks into boulders the Pickaxe can handle
+  cl.broken=true;cl.hp=0;animClusters.delete(cl);
+  const cells=layer.cells,left=new Set(cl.cells),pieces=[],tut=tutAt(layer.L);
+  const ids=cl.cells.slice().sort((a,b)=>Math.hypot(cells[b].cx-cl.cx,cells[b].cy-cl.cy)-Math.hypot(cells[a].cx-cl.cx,cells[a].cy-cl.cy));
+  for(const id of ids){if(!left.has(id))continue;left.delete(id);const P=[id],want=1+Math.floor(Math.random()*3);
+    for(let k=0;k<P.length&&P.length<want;k++)for(const n of cells[P[k]].nb){if(P.length>=want)break;if(left.has(n)){left.delete(n);P.push(n);}}
+    pieces.push(P);}
+  pieces.sort((a,b)=>b.length-a.length);
+  const oreK=Math.min(pieces.length,3),oreVal=cl.oreVal||0;
+  pieces.forEach((P,i)=>{
+    const nc={id:layer.clusters.length,cells:P,kind:'rock',ore:i<oreK&&oreVal>0,hp:1,maxHp:1,anim:0,anim0:0,animType:'',broken:false,popFrom:{x:cl.cx,y:cl.cy}};
+    for(const id of P){const c=cells[id];c.cluster=nc.id;if(!nc.ore)c.flecks=null;else if(!c.flecks)c.flecks=makeFlecks(c,Math.random,4);}
+    finishCluster(layer,nc);
+    nc.maxHp=nc.hp=tut?tut.hp[2]+tut.hp[3]*(P.length-1):Math.max(1,Math.round(HP_BASE.rock*(1+0.55*(P.length-1))*(layer.hpK||1)));
+    if(nc.ore)nc.oreVal=Math.max(1,Math.round(oreVal/oreK));
+    layer.clusters.push(nc);setAnim(nc,'split',0.42,animClusters);});
+  const col=matColor(cells[cl.cells[0]]);
+  spawn('ring',cl.cx,cl.cy,{color:'rgba(255,232,196,1)',size:cl.rad*1.25,life:0.45,speed:0});
+  spawn('dust',cl.cx,cl.cy,{color:col,size:cl.rad*0.7,speed:5,life:1});
+  for(let i=0;i<34;i++)spawn('chunk',cl.cx+(Math.random()-0.5)*cl.rad,cl.cy+(Math.random()-0.5)*cl.rad,{color:col,size:2+Math.random()*3.5,speed:60+Math.random()*150,vz:100+Math.random()*120});
+  sfx('break');sfx('smash',1);buzz([30,20,60]);addShake(9);flash=0.22;
+  floatText(cl.cx,cl.cy-cl.rad*0.35,'SPLIT!','#fc6a1c',24);
+  fieldDirty=true;state.seen.split=true;save();
+  setTimeout(()=>{if(mode==='play')hint('Split! Now the Pickaxe can break the pieces.');},650);
+}
+
+// ---- the Sledgehammer, offered on the spot ----
+let introAltAfter=null;
+function resetIntroButtons(){$('introGo').textContent="LET'S DIG";$('introAlt').hidden=true;introAltAfter=null;}
+function showCard(){const card=$('introCard');card.style.animation='none';void card.offsetWidth;card.style.animation='';$('ovIntro').hidden=false;mode='modal';sfx('unlock');}
+function offerSledge(){
+  const T=TOOLS.sledge,P=PORTRAITS[T.portrait],well=$('introWell');endPointers();
+  $('introTag').textContent='Too big for the Pickaxe';
+  well.innerHTML='';well.className='well';if(P){const img=new Image(P.w,P.h);img.src=P.src;img.alt='The Sledgehammer expert';well.appendChild(img);}
+  $('introName').textContent='SLEDGEHAMMER';$('introRole').textContent=T.role;
+  $('introHow').innerHTML='The <b>Sledgehammer</b> splits big rocks into pieces your Pickaxe can break. <b>HOLD</b> to wind up, <b>RELEASE</b> to smash.';
+  $('introGo').innerHTML=`HIRE · <span class="coin-ico sm"></span>${T.price.toLocaleString('en-US')}`;$('introAlt').hidden=false;
+  showCard();
+  introAfter=()=>{resetIntroButtons();
+    if(state.coins<T.price||state.owned.sledge){sfx('deny');return;}
+    spendCoins(T.price);sfx('buy');state.owned.sledge=true;state.seen.sledge=true;buildDock();selectTool('sledge');save();
+    setTimeout(()=>{if(mode==='play')hint('Hold on the big rock, then let go.');},250);};
+  introAltAfter=()=>hint('The Sledgehammer waits in the Shop.');
+}
+function closeIntroAlt(){$('ovIntro').hidden=true;mode='play';introAfter=null;const f=introAltAfter;resetIntroButtons();if(f)f();}
+
+// ---- guiding a new digger: a hint when each lesson starts, and a pulsing mark on what to tap ----
+function openingArrive(L){
+  const tut=tutAt(L);
+  const say=(k,msg,d)=>{if(state.seen['op-'+k])return;state.seen['op-'+k]=true;save();setTimeout(()=>{if(mode==='play'&&!MG&&!dropping)hint(msg);},d==null?1300:d);};
+  if(!tut){if(L===OPENING_LAST+1&&openingOn())say('done','The opening is done. The race to the core is on!',600);return;}
+  if(L===1)say('dig','Tap the dirt to dig.',350);
+  else if(tut.key==='collect'){say('collect','Tap the gold and gems to pick them up.');
+    if(!state.seen['op-glint']&&layer&&layer.cells.some(c=>c.rare))setTimeout(()=>{if(state.seen['op-glint']||!layer||!layer.cells.some(c=>c.rare&&c.mat!=='open'))return;
+      if(mode==='play'&&!MG&&!dropping){state.seen['op-glint']=true;hint('Something glints in the dirt. Dig it out!');}},6500);}
+  else if(tut.key==='rocks'&&!state.owned.pickaxe)say('rock','Rock! Give it a tap.');
+  else if(tut.key==='bigrock')say('big','That’s one big rock. Give it a tap.');
+}
+function openingMark(){ // where the pulsing ring sits: a first cell to dig, then the first gold to pick up
+  if(!layer||dropping||!tutAt(layer.L))return null;
+  if(layer.L===1&&layer.pct<0.02){if(!layer.mark){let b=null,bd=Infinity;for(const c of layer.cells){if(c.mat!=='dirt')continue;const d=Math.hypot(c.cx-FW/2,c.cy-FH*0.45);if(d<bd){bd=d;b=c;}}layer.mark=b;}
+    return layer.mark&&layer.mark.mat!=='open'?{x:layer.mark.cx,y:layer.mark.cy}:null;}
+  if(tutAt(layer.L).key==='collect'&&!layer.loot.some(i=>i.collected)){ // the gold nearest the middle
+    let it=null,bd=Infinity;for(const i of layer.loot){const d=Math.hypot(i.x-FW/2,i.y-FH/2);if(d<bd){bd=d;it=i;}}return it?{x:it.x,y:it.y}:null;}
+  return null;
+}
+function drawOpeningMark(t){
+  const m=openingMark();if(!m)return;const p=(t*0.8)%1;
+  ctx.save();ctx.lineWidth=3;ctx.strokeStyle=`rgba(255,226,150,${(0.95*(1-p)).toFixed(3)})`;ctx.beginPath();ctx.arc(m.x,m.y,12+26*p,0,TAU);ctx.stroke();
+  ctx.lineWidth=2;ctx.strokeStyle='rgba(20,12,6,0.6)';ctx.beginPath();ctx.arc(m.x,m.y,7,0,TAU);ctx.stroke();
+  ctx.fillStyle='rgba(255,226,150,0.9)';ctx.beginPath();ctx.arc(m.x,m.y,5.5,0,TAU);ctx.fill();ctx.restore();
+}
+function belowTap(x,y){ // a tap through a hole, on gold that's still on the layer below
+  if(cavernPrev||!next||!layer)return;const c=cellAt(layer,x,y);if(!c||c.mat!=='open')return;
+  if(next.loot.some(it=>Math.hypot(it.x-x,it.y-y)<24))hint('That’s on the layer below. Clear this one and drop down to grab it.','belowLoot');
+}
+
+/* ---------- rare finds: special items buried in the ground, kept in a collection ---------- */
+// The first one waits in layer 2 for every new digger. More will be buried deeper (and badges will join them here).
+// kind: the line under the name. text: the card's story, HTML. draw(g,x,y,R): the art, centred, R is its radius.
+const RARES={
+  compass:{name:'Old Compass',kind:'Expedition relic',
+    text:'Brass, dented, the glass cracked. Its needle doesn’t point north. It points <b>down</b>.',draw:drawCompass},
+};
+function drawCompass(g,x,y,R){
+  g.save();g.translate(x,y);
+  g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(R*0.08,R*0.16,R*1.02,R*0.98,0,0,TAU);g.fill();
+  // the bow and stem it hung from
+  g.lineWidth=R*0.13;g.strokeStyle='#8a5a17';g.beginPath();g.arc(0,-R*1.17,R*0.2,0,TAU);g.stroke();
+  g.lineWidth=R*0.06;g.strokeStyle='#f3d27c';g.beginPath();g.arc(0,-R*1.17,R*0.2,Math.PI*1.1,Math.PI*1.75);g.stroke();
+  g.fillStyle='#b7862c';g.fillRect(-R*0.12,-R*1.06,R*0.24,R*0.16);
+  // the case
+  const cs=g.createRadialGradient(-R*0.35,-R*0.4,R*0.1,0,0,R*1.05);cs.addColorStop(0,'#fbe6a2');cs.addColorStop(0.45,'#d9a743');cs.addColorStop(1,'#7a4f12');
+  g.fillStyle=cs;g.beginPath();g.arc(0,0,R,0,TAU);g.fill();g.lineWidth=Math.max(1,R*0.05);g.strokeStyle='#3d2606';g.stroke();
+  g.fillStyle='#9a6a1d';g.beginPath();g.arc(0,0,R*0.84,0,TAU);g.fill();
+  // the face, ticks and the four letters
+  const fc=g.createRadialGradient(0,0,R*0.1,0,0,R*0.76);fc.addColorStop(0,'#f6ecd2');fc.addColorStop(1,'#d9c79c');
+  g.fillStyle=fc;g.beginPath();g.arc(0,0,R*0.76,0,TAU);g.fill();g.lineWidth=Math.max(0.8,R*0.03);g.strokeStyle='#5c3d0e';g.stroke();
+  g.strokeStyle='#5c3d0e';g.lineCap='round';
+  for(let i=0;i<16;i++){const a=i/16*TAU,big=i%4===0,r0=R*(big?0.6:0.65);g.lineWidth=Math.max(0.6,R*(big?0.04:0.022));
+    g.beginPath();g.moveTo(Math.sin(a)*r0,-Math.cos(a)*r0);g.lineTo(Math.sin(a)*R*0.71,-Math.cos(a)*R*0.71);g.stroke();}
+  if(R>=14){g.fillStyle='#4a300b';g.font=`700 ${Math.round(R*0.2)}px ${UIFONT}`;g.textAlign='center';g.textBaseline='middle';
+    [['N',0,-1],['E',1,0],['S',0,1],['W',-1,0]].forEach(([s,dx,dy])=>g.fillText(s,dx*R*0.5,dy*R*0.5));}
+  // the needle: its red tip points down
+  g.save();g.rotate(0.06);
+  g.fillStyle='#d63a2a';g.beginPath();g.moveTo(0,R*0.4);g.lineTo(R*0.09,0);g.lineTo(-R*0.09,0);g.closePath();g.fill();
+  g.fillStyle='#2b2b33';g.beginPath();g.moveTo(0,-R*0.4);g.lineTo(R*0.09,0);g.lineTo(-R*0.09,0);g.closePath();g.fill();
+  g.restore();
+  g.fillStyle='#e8c46a';g.beginPath();g.arc(0,0,R*0.08,0,TAU);g.fill();g.lineWidth=Math.max(0.6,R*0.02);g.strokeStyle='#3d2606';g.stroke();
+  // the glass: a shine and a crack
+  g.strokeStyle='rgba(255,255,255,0.55)';g.lineWidth=Math.max(1,R*0.06);g.beginPath();g.arc(0,0,R*0.62,Math.PI*1.12,Math.PI*1.42);g.stroke();
+  g.strokeStyle='rgba(255,255,255,0.7)';g.lineWidth=Math.max(0.6,R*0.018);
+  g.beginPath();g.moveTo(R*0.62,-R*0.32);g.lineTo(R*0.3,-R*0.12);g.lineTo(R*0.36,R*0.08);g.lineTo(R*0.12,R*0.3);g.stroke();
+  g.restore();
+}
+
+// ---- finding one ----
+let revealing=null; // a find rising out of its hole, until its card opens
+function rareFound(c){
+  const id=c.rare;c.rare=null;if(!RARES[id])return;
+  if(!state.finds)state.finds={};
+  if(!state.finds[id])state.finds[id]={L:layer.L,at:Date.now()};save();
+  spawn('ring',c.cx,c.cy,{color:'rgba(255,224,150,1)',size:c.rad*2.2,life:0.55,speed:0});
+  for(let i=0;i<18;i++)spawn('spark',c.cx,c.cy,{color:i%2?'#ffd34d':'#fff3c4',speed:80+Math.random()*130,life:0.4+Math.random()*0.35});
+  floatText(c.cx,c.cy-30,'RARE FIND!','#ffd34d',20);sfx('fanfare');buzz([20,30,40]);
+  endPointers();mode='modal';revealing={id,x:c.cx,y:c.cy,t0:now()};
+  setTimeout(()=>{revealing=null;showFind(id);},950);
+}
+function drawRevealing(t){
+  const r=revealing;if(!r)return;const p=clamp((t-r.t0)/0.95,0,1),e=1-Math.pow(1-p,3);
+  const g=ctx.createRadialGradient(r.x,r.y-24*e,2,r.x,r.y-24*e,46);g.addColorStop(0,`rgba(255,226,150,${(0.55*e).toFixed(3)})`);g.addColorStop(1,'rgba(255,226,150,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(r.x,r.y-24*e,46,0,TAU);ctx.fill();
+  RARES[r.id].draw(ctx,r.x,r.y-24*e,9+9*e);
+}
+function drawRareGlints(t){ // something glints in the dirt where a find is buried
+  for(const c of layer.cells){if(!c.rare||c.mat==='open')continue;
+    const pulse=0.5+0.5*Math.sin(t*2.4+c.id);ctx.fillStyle=`rgba(255,214,120,${(0.1+0.12*pulse).toFixed(3)})`;ctx.beginPath();ctx.arc(c.cx,c.cy,c.rad*0.6,0,TAU);ctx.fill();
+    for(let k=0;k<2;k++){const ph=(t*0.55+c.id*0.17+k*0.5)%1;if(ph>0.22)continue;const a=Math.sin(ph/0.22*Math.PI);
+      ctx.save();ctx.globalAlpha=0.9*a;drawGlint(ctx,c.cx+(k?-c.rad*0.28:c.rad*0.22),c.cy+(k?c.rad*0.2:-c.rad*0.25),(k?0.75:1.05)*a);ctx.restore();}}
+}
+function rareLeft(){return layer.cells.find(c=>c.rare&&c.mat!=='open');}
+function showFind(id){
+  const R=RARES[id],F=state.finds[id],well=$('introWell');endPointers();
+  $('introTag').textContent='Rare find';well.innerHTML='';well.className='well find';
+  $('introName').textContent=R.name.toUpperCase();$('introRole').textContent=`${R.kind} · layer ${F.L}`;
+  $('introHow').innerHTML=R.text;$('introGo').textContent='ADD TO MY FINDS';
+  showCard();
+  const c=document.createElement('canvas'),w=well.clientWidth||300,h=well.clientHeight||220,d=Math.min(2,window.devicePixelRatio||1);
+  c.width=Math.round(w*d);c.height=Math.round(h*d);well.appendChild(c);const g=c.getContext('2d');g.scale(d,d);
+  const R0=Math.min(w,h)*0.3;R.draw(g,w/2,h/2+R0*0.12,R0);
+  introAfter=()=>{resetIntroButtons();findsUi(true);setTimeout(()=>{if(mode==='play')hint('Your finds are in the chest at the top.');},300);};
+}
+
+// ---- the collection ----
+ICON.chest='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11V9.6C4 6.3 7.4 4 12 4s8 2.3 8 5.6V11z"/><path fill-rule="evenodd" d="M4 12.4h16v6.7a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19.1zm6.5 1.1v3.7h3v-3.7z"/></svg>';
+function findsCount(){return Object.keys(RARES).filter(id=>state.finds&&state.finds[id]).length;}
+function findsUi(pop){
+  const b=$('btnFinds'),n=findsCount();b.hidden=n===0;$('findsCount').textContent=n;
+  if(pop&&n){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}
+}
+function openFinds(){
+  if(mode!=='play'||dropping)return;endPointers();
+  openPop('Rare finds',B=>{
+    const ids=Object.keys(RARES).filter(id=>state.finds&&state.finds[id]),list=document.createElement('div');list.className='finds';
+    for(const id of ids){const R=RARES[id],F=state.finds[id],row=document.createElement('div');row.className='find-row';
+      const c=document.createElement('canvas'),d=Math.min(2,window.devicePixelRatio||1);c.className='find-art';c.width=c.height=Math.round(72*d);
+      const g=c.getContext('2d');g.scale(d,d);R.draw(g,36,40,24);
+      const info=document.createElement('div'),nm=document.createElement('div'),wh=document.createElement('div'),tx=document.createElement('div');
+      nm.className='fn';nm.textContent=R.name;wh.className='fw';wh.textContent=`${R.kind} · layer ${F.L} · ${depthLabel(F.L)}`;tx.className='fd';tx.innerHTML=R.text;
+      info.append(nm,wh,tx);row.append(c,info);list.appendChild(row);}
+    const more=document.createElement('p');more.className='fmore';more.textContent='More rare finds are buried deeper. They arrive in a later build.';
+    B.append(list,more);
+  });
+}
+
 /* ---------- caverns: shared mini game flow ---------- */
 // Every cavern is a small module: init, layout, still (static scene), peek (live bits seen from the layer above),
 // begin, update, draw, tap and results. The cavern is built while you dig the layer above it, so the scene you
@@ -1890,7 +2180,10 @@ const GAMES={
     down:beamDown,move:beamMove,up:beamUp,results:beamResults}, // a puzzle: tap to turn a gem, drag sideways to turn it either way
 };
 let cavernPrev=null; // the cavern waiting under the current layer, if the next drop leads into one
-function miniKindFor(L){const n=Math.max(1,state.tune.miniEvery|0),i=Math.max(0,Math.floor((L-1)/n)-1);return MINI_ORDER[i%MINI_ORDER.length];}
+function miniKindFor(L){const n=Math.max(1,state.tune.miniEvery|0);
+  if(openingOn()){if(L<=OPENING_LAST)return MINI_ORDER[0]; // the opening's one cavern comes first, then the rotation carries on
+    return MINI_ORDER[Math.max(0,1+Math.floor((L-1)/n)-Math.ceil(OPENING_LAST/n))%MINI_ORDER.length];}
+  const i=Math.max(0,Math.floor((L-1)/n)-1);return MINI_ORDER[i%MINI_ORDER.length];}
 function angDiff(a,b){let d=(a-b)%360;if(d>180)d-=360;if(d<-180)d+=360;return d;}
 function capWord(s){return s.charAt(0)+s.slice(1).toLowerCase();}
 function restartAnim(el){el.style.animation='none';void el.offsetWidth;el.style.animation='';}
@@ -4278,7 +4571,7 @@ function netNoServer(e){ // say why team play is off, in words a player can act 
 }
 async function netApplyCloud(){ // a newer save from another device wins
   try{const cloud=await NET.api.loadSave();
-    if(cloud&&(cloud.at||0)>(state.at||0)&&applySave(cloud)){shownCoins=state.coins;$('coinTxt').textContent=coinFmt(state.coins);regenerate();buildDock();if(mode==='title')setupTitle();}
+    if(cloud&&(cloud.at||0)>(state.at||0)&&applySave(cloud)){shownCoins=state.coins;$('coinTxt').textContent=coinFmt(state.coins);regenerate();buildDock();findsUi();if(mode==='title')setupTitle();}
   }catch(e){console.warn('cloud save',e);}
 }
 
@@ -5367,6 +5660,7 @@ let seamTarget=0;
 function seamBlocked(){ // the seam under this layer, if the team hasn't broken it yet
   const n=state.L>=raceLast()?0:seamAt(state.L);if(!n)return 0;
   if(NET.teamId)return(NET.team.seams||0)>=n?0:n;
+  if(tutAt(state.L))return 0; // no solo seams in the opening
   return myX().solo.seams>=n?0:n;
 }
 function enterSeam(n){
@@ -5618,7 +5912,7 @@ function selectTool(k){if(!state.owned[k]||!TOOL_ORDER.includes(k))return;
 function endPointers(){for(const p of ptrs.values())if(p.tool==='sledge')chargeSound(false);ptrs.clear();drillSound(false);iceSound(false);laserSound(false);}
 let introAfter=null;
 function showIntro(key,after){
-  state.seen[key]=true;save();endPointers();
+  state.seen[key]=true;save();endPointers();resetIntroButtons();
   const T=TOOLS[key],P=T.portrait?PORTRAITS[T.portrait]:null,well=$('introWell');
   $('introTag').textContent=key==='shovel'?'First expert on site':T.crew?'New crew member':'New expert unlocked';
   well.innerHTML='';well.className='well';well.classList.toggle('iconwell',!P);
@@ -5682,7 +5976,7 @@ function openTune(){if(mode==='title'||dropping)return;endPointers();buildTune()
 function closeTune(){$('ovTune').hidden=true;if(mode==='modal')mode='play';disarmReset();}
 let resetArmed=0;
 function disarmReset(){resetArmed=0;const b=$('tReset');b.classList.remove('armed');b.textContent='Reset progress';}
-function newGame(){const tune=state.tune,muted=state.muted;state=freshState();state.tune=tune;state.muted=muted;shownCoins=0;$('coinTxt').textContent='0';regenerate();buildDock();save();}
+function newGame(){const tune=state.tune,muted=state.muted;state=freshState();state.tune=tune;state.muted=muted;shownCoins=0;$('coinTxt').textContent='0';regenerate();buildDock();findsUi();save();}
 function setSoundIcon(){const b=$('btnSound');b.innerHTML=state.muted?ICON.soundOff:ICON.soundOn;b.setAttribute('aria-label',state.muted?'Unmute':'Mute');}
 
 /* ---------- input ---------- */
@@ -5695,7 +5989,7 @@ cv.addEventListener('pointerdown',e=>{
   const tool=state.tool,p={id:e.pointerId,x:w.x,y:w.y,t0:now(),tool,charge:0,charging:false,ready:false};
   ptrs.set(e.pointerId,p);
   if(tool!=='drill'&&tool!=='laser'&&tool!=='ice'&&tryCollectAt(w.x,w.y)){ptrs.delete(e.pointerId);return;}
-  if(tool==='shovel'||tool==='pickaxe'){tapAt(tool,w.x,w.y);ptrs.delete(e.pointerId);}
+  if(tool==='shovel'||tool==='pickaxe'){belowTap(w.x,w.y);tapAt(tool,w.x,w.y);ptrs.delete(e.pointerId);}
   else if(tool==='sledge'){p.charging=true;chargeSound(true);}
   else if(tool==='dynamite'){placeTNT(w.x,w.y);ptrs.delete(e.pointerId);}
   else if(tool==='pump'){placePump(w.x,w.y);ptrs.delete(e.pointerId);}
@@ -5719,6 +6013,9 @@ $('btnTune').addEventListener('click',openTune);
 $('tuneClose').addEventListener('click',closeTune);
 $('ovTune').addEventListener('pointerdown',e=>{if(e.target===$('ovTune'))closeTune();});
 $('introGo').addEventListener('click',closeIntro);
+$('introAlt').addEventListener('click',closeIntroAlt);
+$('btnFinds').addEventListener('click',openFinds);
+appEl.addEventListener('scroll',()=>{if(appEl.scrollLeft||appEl.scrollTop){appEl.scrollLeft=0;appEl.scrollTop=0;}});
 $('mgLeave').addEventListener('click',()=>seamLeave());
 $('raidGo').addEventListener('click',()=>startRaid());
 $('resGo').addEventListener('click',endMini);
@@ -5734,7 +6031,7 @@ $('tDefaults').addEventListener('click',()=>{const dbg=state.tune.debug;state.tu
 $('tReset').addEventListener('click',()=>{const b=$('tReset');if(!resetArmed){resetArmed=1;b.classList.add('armed');b.textContent='Tap again to reset';setTimeout(disarmReset,3000);return;}
   disarmReset();try{localStorage.removeItem(SAVE_KEY);}catch(e){}newGame();closeTune();hasSave=false;setupTitle();$('ovTitle').hidden=false;mode='title';});
 function setupTitle(){$('btnStart').textContent=hasSave&&(state.L>1||state.coins>0)?`CONTINUE · LAYER ${state.L}`:'START DIGGING';$('btnNew').hidden=!(hasSave&&(state.L>1||state.coins>0));}
-$('btnStart').addEventListener('click',()=>{auInit();$('ovTitle').hidden=true;mode='play';if(!state.seen.shovel)showIntro('shovel');else hint(`Layer ${state.L}. Keep digging.`);});
+$('btnStart').addEventListener('click',()=>{auInit();$('ovTitle').hidden=true;mode='play';if(!state.seen.shovel)showIntro('shovel',()=>openingArrive(state.L));else hint(`Layer ${state.L}. Keep digging.`);});
 $('btnNew').addEventListener('click',()=>{newGame();hasSave=false;$('btnStart').click();});
 let resizeQueued=false;
 window.addEventListener('resize',()=>{if(resizeQueued)return;resizeQueued=true;requestAnimationFrame(()=>{resizeQueued=false;layout();});});
@@ -5744,10 +6041,10 @@ function start(hot){
   buildPatterns();loadSprites();strataTuneSetup();
   const saved=hot&&typeof hot.seed==='number'?hot:loadSave();
   hasSave=applySave(saved);
-  $('shopIco').outerHTML=ICON.shop;$('dropIco').outerHTML=ICON.down;$('btnTune').innerHTML=ICON.tune;$('shopClose').innerHTML=ICON.close;$('tuneClose').innerHTML=ICON.close;setSoundIcon();
+  $('btnFinds').insertAdjacentHTML('afterbegin',ICON.chest);$('shopIco').outerHTML=ICON.shop;$('dropIco').outerHTML=ICON.down;$('btnTune').innerHTML=ICON.tune;$('shopClose').innerHTML=ICON.close;$('tuneClose').innerHTML=ICON.close;setSoundIcon();
   layout();
   layer=genLayer(state.L);next=genLayer(state.L+1);renderBelow();fieldDirty=true;
-  buildDock();uiDepth();updateProgress();shownCoins=state.coins;$('coinTxt').textContent=coinFmt(state.coins);
+  buildDock();findsUi();uiDepth();updateProgress();shownCoins=state.coins;$('coinTxt').textContent=coinFmt(state.coins);
   setupTitle();wireTeamUI();netStart();
   if(hot&&hot.inPlay&&hasSave){$('ovTitle').hidden=true;mode='play';}
   try{if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(()=>Object.assign(saveData(),{inPlay:mode!=='title'}));}catch(e){}
