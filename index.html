@@ -386,6 +386,52 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
 .find-row .fd{margin-top:6px;font-size:16px;line-height:1.3;text-wrap:pretty}
 .find-row .fd b{color:#ff9b2e}
 .fmore{margin:12px 2px 2px;font-size:14.5px;line-height:1.35;color:var(--paper-dim);text-align:center;text-wrap:balance}
+/* Finds and badges */
+.fhead{margin:4px 2px 8px;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-dim)}
+.finds+.fmore+.fhead{margin-top:18px}
+.dg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 8px}
+.dg-badge{text-align:center;min-width:0}
+.dg-med{width:58px;height:58px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;color:#fff;
+  background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.55),transparent 42%),var(--bc);
+  box-shadow:inset 0 -4px 0 rgba(0,0,0,.28),0 0 0 3px rgba(255,255,255,.14),0 3px 8px rgba(0,0,0,.4)}
+.dg-med svg{width:28px;height:28px;fill:currentColor;filter:drop-shadow(0 1px 1px rgba(0,0,0,.45))}
+.dg-badge.off .dg-med{filter:grayscale(1) brightness(.55);opacity:.55}
+.dg-name{font-size:13.5px;font-weight:800;line-height:1.15;text-wrap:balance}
+.dg-how{margin-top:2px;font-size:12px;line-height:1.25;color:var(--paper-dim);text-wrap:balance}
+/* The test store */
+.dia-ico{display:inline-block;flex:none;width:20px;height:18px;background:linear-gradient(140deg,#e6fcff 0 14%,#62d8f6 30%,#1c8fd6 62%,#0f5aa0);clip-path:polygon(22% 0,78% 0,100% 34%,50% 100%,0 34%)}
+.dia-ico.sm{width:14px;height:13px;margin:0 3px 0 1px;vertical-align:-1px}
+.panel-head .dias{color:#9fe9ff;box-shadow:inset 0 0 0 1px rgba(98,216,246,.35);padding:0 11px 0 9px}
+@media (max-width:400px){.panel-head{gap:8px}.panel-head h2{font-size:19px}.panel-head .coins{font-size:17px;gap:5px;padding:0 9px 0 5px}.panel-head .dias{padding:0 9px 0 7px}}
+.shop-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 12px;padding:4px;border-radius:13px;background:var(--seam)}
+.shop-tabs button{height:38px;border-radius:10px;font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--paper-dim);background:none}
+.shop-tabs button.on{background:var(--panel-hi);color:var(--paper);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+#ovShop.dia-tab .shop-note{display:none}
+.store-test{margin:0 2px 4px;font-size:14.5px;line-height:1.35;color:var(--paper-dim)}
+.store-test b{color:var(--paper)}
+.store-free{margin:2px 2px 0;font-size:14.5px;line-height:1.45;color:var(--paper-dim)}
+.thumb.dia-thumb{background:radial-gradient(circle at 50% 40%,#c9f5ff,#2a9fd8 72%)}
+.thumb.dia-thumb svg{fill:#05233a}
+.item .ds .dia-ico.sm{vertical-align:-1px}
+.packs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pack{position:relative;display:grid;justify-items:center;gap:1px;padding:12px 4px 10px;border-radius:14px;background:radial-gradient(circle at 50% 22%,rgba(98,216,246,.22),transparent 60%),var(--panel-hi);box-shadow:inset 0 0 0 1px rgba(98,216,246,.18)}
+.pack:disabled{opacity:.5}
+.pack .pk-gem svg{width:30px;height:30px;fill:#62d8f6;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+.pack .pk-n{font-size:19px;font-weight:800;color:#bff0ff;font-variant-numeric:tabular-nums}
+.pack .pk-name{font-size:12.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--paper-dim)}
+.pack .pk-usd{margin-top:5px;padding:3px 10px;border-radius:8px;background:var(--molten);color:var(--hazard-ink);font-weight:800;font-size:14.5px}
+.pack .pk-bonus{position:absolute;top:-6px;right:-4px;padding:2px 6px;border-radius:8px;background:#86e39a;color:#0d2a12;font-style:normal;font-weight:800;font-size:12px}
+.store-ask{padding:12px;border-radius:14px;background:#11303d;box-shadow:inset 0 0 0 1.5px rgba(98,216,246,.5)}
+.store-ask .sa-t{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9fe9ff}
+.store-ask .sa-d{margin:4px 0 10px;font-size:16px;line-height:1.35}
+.store-ask .sa-b{display:grid;grid-template-columns:1fr auto;gap:8px}
+.boost-chip{position:absolute;z-index:4;left:12px;bottom:calc(var(--dockH,86px) + 14px);pointer-events:none;display:flex;align-items:center;gap:5px;height:30px;padding:0 11px 0 8px;border-radius:999px;
+  background:rgba(13,46,60,.92);color:#bff0ff;font-weight:800;font-size:13.5px;letter-spacing:.04em;box-shadow:inset 0 0 0 1.5px rgba(98,216,246,.55)}
+.boost-chip svg{width:16px;height:16px;fill:#62d8f6}
+#btnDrop:not([hidden])~.boost-chip{bottom:calc(var(--dockH,86px) + 84px)}
+#app.mini .boost-chip{visibility:hidden}
+.boost-chip.paused{background:rgba(40,30,24,.92);color:var(--paper-dim);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.18)}
+.boost-chip.paused svg{fill:var(--paper-faint)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 
@@ -422,6 +468,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
   <div id="toasts" aria-live="polite"></div>
   <div id="banner"><div id="bannerB1" class="b1">LAYER 1</div><div id="bannerB2" class="b2">Dirt and Rocks</div><div id="bannerB3" class="b3"></div></div>
   <button id="btnDrop" type="button" hidden><span id="dropLbl">DROP DOWN</span><span id="dropIco"></span></button>
+  <div id="boostChip" class="boost-chip" hidden></div>
 
   <nav id="dock" aria-label="Tools">
     <div class="dock-row">
@@ -490,8 +537,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline
       <div class="panel-head">
         <h2 id="shopTitle">Supply Depot</h2>
         <div class="coins"><span class="coin-ico"></span><span id="shopCoins">0</span></div>
+        <div class="coins dias"><span class="dia-ico"></span><span id="shopDia">0</span></div>
         <button id="shopClose" class="close-btn" type="button" aria-label="Close shop"></button>
       </div>
+      <div class="shop-tabs" role="tablist"><button id="tabTools" class="on" type="button" role="tab">Tools and crew</button><button id="tabDia" type="button" role="tab">Diamonds</button></div>
       <div id="shopList" class="items"></div>
       <p class="shop-note">Coins come from gems and ore. Dig deeper for rarer stones.</p>
     </div>
@@ -643,7 +692,7 @@ function poissonPoints(rng,W,H,rFn,rMax){
 function distToPoly(x,y,P){let m=Infinity;for(let i=0;i<P.length;i++){const A=P[i],B=P[(i+1)%P.length],ex=B.x-A.x,ey=B.y-A.y,l2=ex*ex+ey*ey||1;const t=clamp(((x-A.x)*ex+(y-A.y)*ey)/l2,0,1),dx=A.x+ex*t-x,dy=A.y+ey*t-y;m=Math.min(m,dx*dx+dy*dy);}return Math.sqrt(m);}
 
 /* ---------- content tables ---------- */
-const TUNE_DEFAULT={spacing:44,sizeVar:0.55,relax:1,rockBias:0,maxBoulder:6,dirtTough:1,rockTough:1,lootMult:1,race:1,wear:1,seamEvery:5,seamTough:1,clearPct:85,miniEvery:3,miniLen:30,bugSpeed:1,debug:false};
+const TUNE_DEFAULT={spacing:44,sizeVar:0.55,relax:1,rockBias:0,maxBoulder:6,dirtTough:1,rockTough:1,lootMult:1,race:1,wear:1,charted:0,early:1,seamEvery:5,seamTough:1,clearPct:85,miniEvery:3,miniLen:30,bugSpeed:1,debug:false};
 const bandFor=L=>stratumFor(L).band;
 const hsl=(h,s,l)=>`hsl(${h},${s}%,${clamp(l,0,100).toFixed(1)}%)`;
 const LOOT={
@@ -692,10 +741,10 @@ const ICON={
 
 /* ---------- state + persistence ---------- */
 const SAVE_KEY='groundbreaking-race-v1';
-const freshState=()=>({seed:(Math.random()*4294967296)>>>0,L:1,coins:0,owned:{shovel:true},dyn:0,seen:{},finds:{},tune:Object.assign({},TUNE_DEFAULT),muted:false,tool:'shovel',best:1,x:null,at:0,gear:{}});
+const freshState=()=>({seed:(Math.random()*4294967296)>>>0,L:1,coins:0,owned:{shovel:true},dyn:0,seen:{},finds:{},badges:{},stats:{},loan:null,dia:0,boost:0,bought:{},dug:{},tune:Object.assign({},TUNE_DEFAULT),muted:false,tool:'shovel',best:1,x:null,at:0,gear:{}});
 let state=freshState();
-function saveData(){return{seed:state.seed,L:state.L,coins:state.coins,owned:state.owned,dyn:state.dyn,seen:state.seen,tune:state.tune,muted:state.muted,tool:state.tool,best:state.best,x:myX(),at:state.at,v:2,gear:state.gear,finds:state.finds};}
-function save(){if(netNoSave)return;state.at=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(saveData()));}catch(e){}netSaveSoon();}
+function saveData(){return{seed:state.seed,L:state.L,coins:state.coins,owned:state.owned,dyn:state.dyn,seen:state.seen,tune:state.tune,muted:state.muted,tool:state.tool,best:state.best,x:myX(),at:state.at,v:2,gear:state.gear,finds:state.finds,badges:state.badges,stats:state.stats,loan:state.loan,dia:state.dia,boost:state.boost,bought:state.bought,dug:state.dug};}
+function save(){if(netNoSave)return;state.at=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(saveData()));}catch(e){}walletKeep();netSaveSoon();}
 function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 function applySave(d){
   if(!d||typeof d!=='object'||typeof d.seed!=='number'||d.v!==2)return false; // saves from before the race start fresh
@@ -703,7 +752,7 @@ function applySave(d){
   state.owned=Object.assign({shovel:true},d.owned||{});state.dyn=Math.max(0,d.dyn|0);
   state.seen=d.seen&&typeof d.seen==='object'?d.seen:{};state.tune=Object.assign({},TUNE_DEFAULT,d.tune||{});
   state.muted=!!d.muted;state.tool=d.tool&&state.owned[d.tool]?d.tool:'shovel';state.best=Math.max(state.L,d.best|0);
-  state.x=d.x&&typeof d.x==='object'?d.x:null;myX();state.at=Number(d.at)||0;state.gear=d.gear&&typeof d.gear==='object'?d.gear:{};state.finds=d.finds&&typeof d.finds==='object'?d.finds:{};
+  state.x=d.x&&typeof d.x==='object'?d.x:null;myX();state.at=Number(d.at)||0;state.gear=d.gear&&typeof d.gear==='object'?d.gear:{};state.finds=d.finds&&typeof d.finds==='object'?d.finds:{};state.badges=d.badges&&typeof d.badges==='object'?d.badges:{};state.stats=d.stats&&typeof d.stats==='object'?d.stats:{};state.loan=typeof d.loan==='string'?d.loan:null;state.dia=Math.max(0,+d.dia||0);state.boost=Math.max(0,+d.boost||0);state.bought=d.bought&&typeof d.bought==='object'?d.bought:{};state.dug=d.dug&&typeof d.dug==='object'?d.dug:{};
   return true;}
 
 /* ---------- layer generation ---------- */
@@ -807,11 +856,13 @@ function genLayer(L){
       loot.push({x:lerp(c.cx,v.x,t),y:lerp(c.cy,v.y,t),type,value:0,rot:(rng()-0.5)*0.9,seed:rng(),cell:c.id,collected:false});
     }
     let sv=0;for(const it of loot)sv+=LOOT[it.type].v;
-    for(const it of loot)it.value=Math.max(1,Math.round(budget*(1-oreShare)*LOOT[it.type].v/sv));
+    for(const it of loot)it.value=Math.max(1,Math.round(budget*(1-oreShare-buryShare(L))*LOOT[it.type].v/sv));
   }
-  if(tut&&tut.rare&&!(state.finds&&state.finds[tut.rare]))openingRare(tut,cells,loot,rng);
+  {const rr=tut?tut.rare:earlyRareAt(L);if(rr&&!(state.finds&&state.finds[rr]))openingRare({rare:rr},cells,loot,rng);}
+  earlyCache(L,cells,loot,seed);
   const texM=texMatrix(rng()*TEX_SPAN,rng()*TEX_SPAN);
-  return{L,band,cells,clusters,springs,magma,loot,pct:0,flood:0,lava:0,hpK:cal.k,rubHp:cal.rub,texM};
+  const buried=buryLoot(L,seed,cells,clusters,budget,lv,tut,loot);
+  return{L,band,cells,clusters,springs,magma,loot,buried,pct:0,flood:0,lava:0,hpK:cal.k,rubHp:cal.rub,texM};
 }
 
 /* ---------- canvases ---------- */
@@ -1024,6 +1075,7 @@ function matColor(c){const b=layer.band;
   if(c.mat==='rubble'){const R=c.rubCol||b.rock;return hsl(R[0],R[1],R[2]-4);}
   const cl=c.cluster>=0?layer.clusters[c.cluster]:null,H=cl&&cl.kind==='obsidian'?OBS_HSL:cl&&cl.kind==='granite'?b.gran:b.rock;return hsl(H[0],H[1],H[2]);}
 function hitSoft(c,dmg,x,y,quiet){
+  if(!(quiet&&DIG_BY==='blast')){dmg*=digBoostK();noteDig();}
   c.hp-=dmg;const col=matColor(c);
   for(let i=0;i<(quiet?1:4);i++)spawn('chunk',x+(Math.random()-0.5)*6,y+(Math.random()-0.5)*6,{color:col,size:1.4+Math.random()*2});
   if(!quiet){spawn('dust',x,y,{color:col,speed:15,size:5,life:0.5});sfx('dig');buzz(6);}
@@ -1038,18 +1090,21 @@ function clearCell(c,quiet){
   spawn('dust',c.cx,c.cy,{color:col,speed:10,size:c.rad*0.35,life:0.6});
   if(!quiet)sfx('pop');
   for(const it of layer.loot)if(!it.collected&&it.cell===c.id)collect(it);
+  buriedOut(c,quiet?DIG_BY:'hand');
   if(c.rare)rareFound(c);
+  if(c.cache)cacheFound(c);
   fieldDirty=true;updateProgress();
 }
 function hitRock(cl,dmg,x,y,style){
   if(cl.broken)return;
+  if(style!=='blast'){dmg*=digBoostK();noteDig();}
   cl.hp-=dmg;const col=matColor(layer.cells[cl.cells[0]]);
   if(style==='pick'){for(let i=0;i<3;i++)spawn('chunk',x,y,{color:col,size:1.2+Math.random()*1.6,speed:50+Math.random()*70});for(let i=0;i<4;i++)spawn('spark',x,y,{color:'#ffe7a8',speed:120+Math.random()*120,life:0.18+Math.random()*0.12});sfx('chip');buzz(10);addShake(1.3);}
   else if(style==='laser'){if(Math.random()<0.3)spawn('dust',x,y,{color:'#ffd0dc',speed:20,size:3,life:0.3});}
   else if(style==='drill'){if(Math.random()<0.5)spawn('chunk',x,y,{color:col,size:1+Math.random()*1.4,speed:60+Math.random()*60});if(Math.random()<0.6)spawn('spark',x,y,{color:'#ffd68a',speed:140,life:0.15});}
-  if(cl.hp<=0){if(cl.huge){splitHuge(cl);return;}breakCluster(cl);if(style==='laser')vaporize(cl);}else setAnim(cl,style==='drill'||style==='laser'?'drill':'hit',style==='drill'||style==='laser'?0.12:0.18,animClusters);
+  if(cl.hp<=0){if(cl.huge){splitHuge(cl);return;}breakCluster(cl,style);if(style==='laser')vaporize(cl);}else setAnim(cl,style==='drill'||style==='laser'?'drill':'hit',style==='drill'||style==='laser'?0.12:0.18,animClusters);
 }
-function breakCluster(cl){
+function breakCluster(cl,style){
   cl.broken=true;cl.hp=0;animClusters.delete(cl);
   const cells=layer.cells,H=cl.kind==='obsidian'?OBS_HSL:cl.kind==='granite'?layer.band.gran:layer.band.rock,n=cl.cells.length,col=hsl(H[0],H[1],H[2]);
   for(const id of cl.cells){const c=cells[id];c.mat='rubble';c.cluster=-1;c.maxHp=c.hp=rubbleHp(layer.L);c.chunks=makeChunks(c);c.rubCol=H;c.popFrom={x:cl.cx,y:cl.cy};setAnim(c,'pop',0.32,animCells);
@@ -1057,9 +1112,11 @@ function breakCluster(cl){
   spawn('ring',cl.cx,cl.cy,{color:'rgba(255,240,220,1)',size:cl.rad*1.2,life:0.35,speed:0});
   spawn('dust',cl.cx,cl.cy,{color:col,size:cl.rad*0.6,speed:5,life:0.8});
   sfx('break');buzz(24);addShake(2.5+n*0.7);
-  if(cl.ore){const ob=cl.kind==='obsidian',val=ob?Math.max(1,Math.round(n*layerCoins(layer.L)*0.025)):(cl.oreVal||1),k=Math.min(6,2+n),share=Math.floor(val/k);
+  if(cl.ore&&cl.kind!=='obsidian'&&crushes(style))oreCrushed(cl,cl.oreVal||1,style);
+  else if(cl.ore){const ob=cl.kind==='obsidian',val=ob?Math.max(1,Math.round(n*layerCoins(layer.L)*0.025)):(cl.oreVal||1),k=Math.min(6,2+n),share=Math.floor(val/k);
     for(let i=0;i<k;i++){const c=cells[cl.cells[i%n]];flyToBank(c.cx,c.cy,ob?'obsidian':'nugget',i===0?val-(k-1)*share:share,i*0.06);}
     floatText(cl.cx,cl.cy-8,`+${val} ${ob?'OBSIDIAN':'ORE'}`,ob?'#cdb8ff':'#ffd34d',16);sfx('gem');if(n>=3)netFind('ore');}
+  buriedBreak(cl,style);badgeStat('boulders');if(style==='drill')badgeStat('drilled');
   fieldDirty=true;
   if(!state.seen.rubble){state.seen.rubble=true;hint('Boulder broken. Shovel up the rubble.');}
 }
@@ -1103,7 +1160,7 @@ function sledgeRelease(p){
 }
 function placeTNT(x,y){if(state.dyn<=0){hint('Out of explosives. Restock in the Shop.','noTnt');sfx('deny');return;}state.dyn--;devices.push({type:'tnt',x,y,t0:now(),fuse:1.35});sfx('fuse');buzz(8);updateDock();save();}
 function explode(d){
-  const R=78,hitCl=new Map();
+  const R=78,hitCl=new Map();DIG_BY='blast';badgeEarn('blast');
   for(const c of layer.cells){if(c.mat==='open'||c.mat==='spring'||c.mat==='magma')continue;const dd=Math.max(0,Math.hypot(c.cx-d.x,c.cy-d.y)-c.rad*0.45),f=1-dd/R;if(f<=0)continue;
     if(c.mat==='dirt'||c.mat==='rubble')hitSoft(c,f>0.3?c.hp+1:2*(layer.hpK||1),c.cx,c.cy,true);
     else if(f>(hitCl.get(c.cluster)||0))hitCl.set(c.cluster,f);}
@@ -1146,10 +1203,11 @@ function waterUpdate(dt){
   Ly.flood=fl;
 }
 function tryCollectAt(x,y){let hit=null,bd=24;for(const it of layer.loot){if(it.collected)continue;const d=Math.hypot(it.x-x,it.y-y);if(d<bd){bd=d;hit=it;}}if(hit){collect(hit);return true;}return false;}
-function collect(it){if(it.collected)return;it.collected=true;if(LOOT[it.type].kind==='gem'&&LOOT[it.type].v>=30)netFind('gem',it.type);flyToBank(it.x,it.y,it.type,it.value,0);floatText(it.x,it.y-12,`+${it.value}`,'#ffd34d',15);sfx(LOOT[it.type].kind==='gem'?'gem':'coin');buzz(8);
+function collect(it){if(it.collected)return;it.collected=true;badgeEarn('pocket');if(LOOT[it.type].kind==='gem'&&LOOT[it.type].v>=30)netFind('gem',it.type);flyToBank(it.x,it.y,it.type,it.value,0);floatText(it.x,it.y-12,`+${it.value}`,'#ffd34d',15);sfx(LOOT[it.type].kind==='gem'?'gem':'coin');buzz(8);
   for(let i=0;i<6;i++)spawn('spark',it.x,it.y,{color:LOOT[it.type].col,speed:60+Math.random()*80,life:0.3});}
 function coinTarget(){const a=appEl.getBoundingClientRect(),r=$('coinIco').getBoundingClientRect();return{x:r.left-a.left+r.width/2,y:r.top-a.top+r.height/2};}
-function flyToBank(wx,wy,type,value,delay){const tg=coinTarget();flies.push({x0:view.ox+wx*view.scale,y0:view.oy+wy*view.scale,x1:tg.x,y1:tg.y,type,value,t0:now()+(delay||0),dur:0.55+Math.random()*0.15,seed:Math.random()});}
+function flyToBank(wx,wy,type,value,delay,lay){const tg=coinTarget(); // lay: the layer these coins belong to (0: not a layer's own, like the cache)
+  flies.push({x0:view.ox+wx*view.scale,y0:view.oy+wy*view.scale,x1:tg.x,y1:tg.y,type,value,t0:now()+(delay||0),dur:0.55+Math.random()*0.15,seed:Math.random(),lay:lay===undefined?state.L:lay});}
 
 /* ---------- progress + layer drop ---------- */
 function updateProgress(){let tot=0,open=0;for(const c of layer.cells){if(c.mat==='spring'||c.mat==='magma')continue;tot+=c.area;if(c.mat==='open')open+=c.area;}layer.pct=tot?open/tot:0;uiProgress();}
@@ -1172,6 +1230,7 @@ function doDrop(force){
   if(!force){if(layer.pct<state.tune.clearPct/100)return;{const rc=rareLeft();if(rc){clearCell(rc);return;}}if(layer.flood>0.6){hint('The shaft is flooded. Pump or bail the water first.','flooded');sfx('deny');return;}
     if((layer.lava||0)>0.4){hint(state.owned.ice?'Lava in the shaft. Freeze it with the Ice Sprayer first.':'Lava in the shaft. Wait for it to crust over, or buy the Ice Sprayer.','hotDrop');sfx('deny');return;}
     {const sn=seamBlocked();if(sn){enterSeam(sn);return;}}}
+  buriedFlush();
   for(const it of layer.loot)if(!it.collected)collect(it);
   endPointers();renderFieldCache(true);renderBright();
   dropping={t0:now(),dur:1.05};sfx('drop');buzz(20);
@@ -1180,7 +1239,7 @@ function doDrop(force){
 }
 function finishDrop(){
   const cp=cavernPrev;
-  state.L++;state.best=Math.max(state.best||1,state.L);myX().pts+=layerPts(state.L-1);netProgress();setTimeout(netStatus,0);
+  state.L++;state.best=Math.max(state.best||1,state.L);endLoan();badgeDepth(state.L);myX().pts+=layerPts(state.L-1);netProgress();setTimeout(netStatus,0);
   layer=next;next=genLayer(state.L+1);
   animCells.clear();animClusters.clear();dying.length=0;devices.length=0;pump.active=null;drill.heat=0;drill.over=false;laserHeat.heat=0;laserHeat.over=false;ice.tank=1;
   renderBelow();fieldDirty=true;dropping=null;dropState='';
@@ -1188,7 +1247,7 @@ function finishDrop(){
   if(shouldMini(state.L)){save();startMini(null,cp);}
   else{showBanner();save();if(cavernPrev){const tz=cavernPrev.G.teaser;setTimeout(()=>{if(!MG&&mode==='play')hint(tz);},2300);}}
 }
-function regenerate(){state.L=Math.max(1,Math.min(state.L,raceLast()));layer=genLayer(state.L);next=genLayer(state.L+1);animCells.clear();animClusters.clear();dying.length=0;devices.length=0;parts.length=0;texts.length=0;pump.active=null;renderBelow();fieldDirty=true;dropState='';updateProgress();uiDepth();tuneStats();}
+function regenerate(){upPops.length=0;state.L=Math.max(1,Math.min(state.L,raceLast()));layer=genLayer(state.L);next=genLayer(state.L+1);animCells.clear();animClusters.clear();dying.length=0;devices.length=0;parts.length=0;texts.length=0;pump.active=null;renderBelow();fieldDirty=true;dropState='';updateProgress();uiDepth();tuneStats();}
 
 /* ---------- frame ---------- */
 function drawDynamic(t){
@@ -1279,7 +1338,7 @@ function draw(t){
     for(const s of layer.springs){const c=layer.cells[s.cell];if(c.mat==='spring')drawSpring(ctx,c,layer.band,t,s);}
     for(const s of layer.magma||[]){const c=layer.cells[s.cell];if(c.mat==='magma')drawMagma(ctx,c,t,s);}
     drawLavaGlow(t);
-    drawSurfaceLoot(t);drawRareGlints(t);drawRevealing(t);drawDevices(t);drawOpeningMark(t);
+    drawSurfaceLoot(t);drawRareGlints(t);drawRevealing(t);drawPops(t);drawEarly(t);drawDevices(t);drawOpeningMark(t);
   }
   drawParticles();drawIndicators(t);drawTexts(t);
   if(flash>0){ctx.fillStyle=`rgba(255,236,200,${flash.toFixed(3)})`;ctx.fillRect(0,0,FW,FH);}
@@ -1298,11 +1357,11 @@ function update(dt,t){
   updateParticles(dt);
   if(mode==='play'&&!dropping){
     for(const p of ptrs.values())if(p.charging){p.charge=Math.min(1,(t-p.t0)/0.7);if(p.charge>=1&&!p.ready){p.ready=true;sfx('ready');buzz(12);}}
-    powerUpdate(dt);
+    powerUpdate(dt);boostTick(dt);
     for(let i=devices.length-1;i>=0;i--){const d=devices[i];if(Math.random()<0.5)spawn('spark',d.x+3,d.y-17,{color:'#ffcf6a',speed:30+Math.random()*40,life:0.2});if(t-d.t0>=d.fuse){devices.splice(i,1);explode(d);}}
     pumpUpdate(dt,t);waterUpdate(dt);lavaUpdate(dt,t);iceUpdate(dt,t);raidTick(t);gearTick(t);
   }else{drillSound(false);iceSound(false);laserSound(false);}
-  for(let i=flies.length-1;i>=0;i--){const f=flies[i];if(t>=f.t0+f.dur){flies.splice(i,1);state.coins+=f.value;coinBump();sfx('coin');}}
+  for(let i=flies.length-1;i>=0;i--){const f=flies[i];if(t>=f.t0+f.dur){flies.splice(i,1);state.coins+=f.value;if(f.lay)walletDug(f.lay,f.value);coinBump();sfx('coin');}}
   if(shownCoins!==state.coins){const d=state.coins-shownCoins,step=Math.max(1,Math.round(Math.abs(d)*Math.min(1,dt*12)));shownCoins+=Math.sign(d)*Math.min(step,Math.abs(d));$('coinTxt').textContent=coinFmt(shownCoins);}
   if(dropping&&t-dropping.t0>=dropping.dur)finishDrop();
   updateMeters(false);refreshDrop();
@@ -1507,12 +1566,12 @@ function stratumFor(L){return STRATA[stratumIndex(L)];}
 function raceLast(){return strataLayout().last;}
 function stratumSpan(i){const Y=strataLayout();return{first:Y.first[i],last:Y.first[i]+Y.count[i]-1};}
 function handMin(L){return raceCfg().flat||stratumFor(L).min;} // hand minutes for one layer
-function groundFor(L){const t=tutAt(L);return t?{rock:t.rock,clay:t.clay,gran:0,boulder:t.boulder}:GROUND[stratumFor(L).cls];} // the opening sets its own
+function groundFor(L){const t=tutAt(L);return t?{rock:t.rock,clay:t.clay,gran:0,boulder:t.boulder}:earlyGround(L)||GROUND[stratumFor(L).cls];} // the opening sets its own
 function depthKm(L){return CORE_KM*clamp(L,0,raceLast())/raceLast();}
 function depthLabel(L){const k=depthKm(L);return(k<10?k.toFixed(1):Math.round(k).toLocaleString('en-US'))+' km';}
 // coins: six for every hand minute, 10% more per stratum down, more in the rich strata; a squeezed race pays more per layer
 function layerCoins(L){const t=tutAt(L);if(t)return t.surf+t.ore; // the opening pays the same in every race length
-  const i=stratumIndex(L),S=STRATA[i];return 6*handMin(L)*(1+0.1*i)*(S.coin||1)*strataLayout().coinK*(state.tune.lootMult||1);}
+  const i=stratumIndex(L),S=STRATA[i];return 6*BURY_K*handMin(L)*(1+0.1*i)*(S.coin||1)*strataLayout().coinK*(state.tune.lootMult||1);} // BURY_K: buried.js
 function layerPtsFor(L){return Math.round(10*handMin(L));} // dig points: ten per hand minute of the layer
 function caveLevel(L){return tutAt(L)?1:stratumIndex(L)+1;}           // caverns get harder (and pay a little more) by stratum, 1 to 20
 function caveCoinScale(L){return tutAt(L)?1:layerCoins(L)/150;}       // a cavern pays about one layer's coins at its depth
@@ -1527,7 +1586,7 @@ function calibrateLayer(L,cells,clusters){
   let taps=0;
   for(const c of cells)if(c.mat==='dirt')taps+=c.hp;
   for(const cl of clusters)taps+=cl.hp+cl.cells.length*HP_BASE.rubble;
-  const T=state.tune,need=clamp(T.clearPct/100,0.3,1),k=Math.max(0.05,handMin(L)*60*HAND_TAPS/Math.max(1,taps*need));
+  const T=state.tune,need=clamp(T.clearPct/100,0.3,1),k=Math.max(0.05,digMin(L)*60*HAND_TAPS/Math.max(1,taps*need)); // digMin: early.js eases the first days in
   for(const c of cells)if(c.mat==='dirt')c.maxHp=c.hp=Math.max(1,Math.round(c.hp*k*T.dirtTough));
   for(const cl of clusters)cl.maxHp=cl.hp=Math.max(1,Math.round(cl.hp*k*T.rockTough));
   return{k,rub:Math.max(1,Math.round(HP_BASE.rubble*k*T.dirtTough))};
@@ -1650,11 +1709,11 @@ function uiDepth(){$('lyr').textContent=`LAYER ${state.L.toLocaleString('en-US')
 function newStratum(L){const i=stratumIndex(L);return stratumSpan(i).first===L;}
 function showBanner(){
   const L=state.L,i=stratumIndex(L),S=STRATA[i],b=$('banner'),fresh=newStratum(L)&&state.bannerStratum!==i;
-  if(fresh){state.bannerStratum=i;
+  if(fresh){state.bannerStratum=i;if(i>0&&!state.seen['stratum-'+i]){state.seen['stratum-'+i]=true;diaAdd(FREE_DIA.stratum,'new stratum',{kind:'stratum',n:i});}
     $('bannerB1').textContent=S.short.toUpperCase();$('bannerB2').textContent=`Stratum ${i+1} of ${STRATA.length} · ${depthLabel(L)}`;$('bannerB3').textContent=S.flavor;}
   else{$('bannerB1').textContent=`LAYER ${L.toLocaleString('en-US')}`;$('bannerB2').textContent=`${S.short} · ${depthLabel(L)}`;$('bannerB3').textContent='';}
   b.classList.toggle('strat',fresh);b.classList.remove('show');void b.offsetWidth;b.classList.add('show');
-  openingArrive(L);
+  openingArrive(L);earlyArrive(L);
 }
 
 // ---- the end of the race: the Core Seal (its puzzle comes in a later build) ----
@@ -1742,6 +1801,7 @@ function powerUpdate(dt){
     tryCollectAt(p.x,p.y);
     const c=targetCell(p.x,p.y);if(!c||c.mat==='open'||c.mat==='spring'||c.mat==='magma')continue;
     on[k]=true;const M=TOOL_MULT[k],sp=HAND_TAPS*(G.od?OVERDRIVE:1)*dt;
+    DIG_BY=k; // power tools destroy what's buried in the ground they clear (buried.js)
     if(c.mat==='dirt'||c.mat==='rubble')hitSoft(c,sp*M[c.mat],p.x,p.y,true);
     else{const cl=layer.clusters[c.cluster];if(cl)hitRock(cl,sp*M[matOf(cl)],p.x,p.y,k);}
     if(k==='laser'&&Math.random()<0.5)spawn('spark',p.x,p.y,{color:Math.random()<0.5?'#ff5a8a':'#ffe0ea',speed:90+Math.random()*120,life:0.18});
@@ -1859,14 +1919,14 @@ function coinFmt(n){n=Math.round(n); // the HUD counter: full up to 99,999, then
   return n<1e5?n.toLocaleString('en-US'):n<1e6?parseFloat((n/1e3).toFixed(1))+'K':parseFloat((n/1e6).toFixed(n<1e7?2:n<1e8?1:0))+'M';}
 function startRepair(k){
   const cost=repairCost(k);if(state.coins<cost||!state.owned.ratchet){sfx('deny');return;}
-  const G=gear(k);spendCoins(cost);G.until=Date.now()+repairMs(k);G.od=false;
+  const G=gear(k);spendCoins(cost);walletSpend('repair:'+k,{c:cost});G.until=Date.now()+repairMs(k);G.od=false;
   if(state.tool===k)state.tool=state.owned.pickaxe?'pickaxe':'shovel';
   sfx('buy');toast(`Ratchet took your ${GEAR_NAME[k]}. Ready in ${fmtDur(repairMs(k))}.`,'#62e3ff');
   buildDock();renderShop();save();
 }
 function buyNew(k){
   const T=TOOLS[k];if(state.coins<T.price){sfx('deny');return;}
-  const G=gear(k);spendCoins(T.price);G.c=1;G.until=0;sfx('buy');
+  const G=gear(k);spendCoins(T.price);walletSpend('new:'+k,{c:T.price});G.c=1;G.until=0;sfx('buy');
   hint(`A brand new ${GEAR_NAME[k]}.`);buildDock();renderShop();save();
 }
 
@@ -1987,13 +2047,13 @@ function splitHuge(cl){ // the big rock breaks along its own cracks into boulder
   for(let i=0;i<34;i++)spawn('chunk',cl.cx+(Math.random()-0.5)*cl.rad,cl.cy+(Math.random()-0.5)*cl.rad,{color:col,size:2+Math.random()*3.5,speed:60+Math.random()*150,vz:100+Math.random()*120});
   sfx('break');sfx('smash',1);buzz([30,20,60]);addShake(9);flash=0.22;
   floatText(cl.cx,cl.cy-cl.rad*0.35,'SPLIT!','#fc6a1c',24);
-  fieldDirty=true;state.seen.split=true;save();
+  fieldDirty=true;state.seen.split=true;save();badgeEarn('bigswing');
   setTimeout(()=>{if(mode==='play')hint('Split! Now the Pickaxe can break the pieces.');},650);
 }
 
 // ---- the Sledgehammer, offered on the spot ----
 let introAltAfter=null;
-function resetIntroButtons(){$('introGo').textContent="LET'S DIG";$('introAlt').hidden=true;introAltAfter=null;}
+function resetIntroButtons(){$('introGo').textContent="LET'S DIG";$('introAlt').textContent='NOT NOW';$('introAlt').hidden=true;introAltAfter=null;}
 function showCard(){const card=$('introCard');card.style.animation='none';void card.offsetWidth;card.style.animation='';$('ovIntro').hidden=false;mode='modal';sfx('unlock');}
 function offerSledge(){
   const T=TOOLS.sledge,P=PORTRAITS[T.portrait],well=$('introWell');endPointers();
@@ -2005,7 +2065,7 @@ function offerSledge(){
   showCard();
   introAfter=()=>{resetIntroButtons();
     if(state.coins<T.price||state.owned.sledge){sfx('deny');return;}
-    spendCoins(T.price);sfx('buy');state.owned.sledge=true;state.seen.sledge=true;buildDock();selectTool('sledge');save();
+    spendCoins(T.price);walletSpend('tool:sledge',{c:T.price});sfx('buy');state.owned.sledge=true;state.seen.sledge=true;buildDock();selectTool('sledge');save();
     setTimeout(()=>{if(mode==='play')hint('Hold on the big rock, then let go.');},250);};
   introAltAfter=()=>hint('The Sledgehammer waits in the Shop.');
 }
@@ -2048,7 +2108,107 @@ function belowTap(x,y){ // a tap through a hole, on gold that's still on the lay
 const RARES={
   compass:{name:'Old Compass',kind:'Expedition relic',
     text:'Brass, dented, the glass cracked. Its needle doesn’t point north. It points <b>down</b>.',draw:drawCompass},
+  lamp:   {name:'Miner’s Lamp',kind:'Expedition relic',
+    text:'Tin and glass, soot still on the chimney. Scratched into the base: <b>“Expedition 3. Don’t stop.”</b>',draw:drawLamp},
+  map:    {name:'Torn Map',kind:'Expedition relic',
+    text:'A hand-drawn map of the layers below, every stratum shaded in. The bottom is torn off, right where someone wrote <b>“here”</b>.',draw:drawMap},
+  watch:  {name:'Pocket Watch',kind:'Expedition relic',
+    text:'Stopped at 4:17. The lid is engraved: <b>“For the first one down.”</b>',draw:drawWatch},
+  marker: {name:'Survey Marker',kind:'Expedition relic',
+    text:'A brass disc from a survey crew, stamped with a number and an arrow. The arrow points <b>down</b>. Somebody measured this shaft before you.',draw:drawMarker},
 };
+const RARE_ORDER=['compass','lamp','map','watch','marker'];
+function drawLamp(g,x,y,R){
+  g.save();g.translate(x,y+R*0.1);
+  g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(R*0.1,R*1.02,R*0.72,R*0.2,0,0,TAU);g.fill();
+  g.lineCap='round';g.lineJoin='round';
+  // the wire handle
+  g.lineWidth=Math.max(1,R*0.06);g.strokeStyle='#5a4a36';g.beginPath();g.arc(0,-R*0.92,R*0.42,Math.PI*1.08,Math.PI*1.92);g.stroke();
+  // the cap
+  const tin=(x0,x1)=>{const gr=g.createLinearGradient(x0,0,x1,0);gr.addColorStop(0,'#5d6168');gr.addColorStop(0.35,'#c9ced3');gr.addColorStop(1,'#4a4d52');return gr;};
+  g.fillStyle=tin(-R*0.46,R*0.46);g.beginPath();g.moveTo(-R*0.18,-R*0.96);g.lineTo(R*0.18,-R*0.96);g.lineTo(R*0.46,-R*0.62);g.lineTo(-R*0.46,-R*0.62);g.closePath();g.fill();
+  g.lineWidth=Math.max(0.8,R*0.035);g.strokeStyle='#2b2d31';g.stroke();
+  g.fillStyle='#3a3d42';g.fillRect(-R*0.12,-R*1.06,R*0.24,R*0.12);
+  // the glass, glowing, with the flame
+  const gl=g.createRadialGradient(0,-R*0.1,R*0.05,0,-R*0.1,R*0.55);gl.addColorStop(0,'rgba(255,236,170,0.98)');gl.addColorStop(0.55,'rgba(255,170,60,0.7)');gl.addColorStop(1,'rgba(150,80,20,0.55)');
+  g.fillStyle=gl;roundRect(g,-R*0.36,-R*0.62,R*0.72,R*1.0,R*0.16);g.fill();
+  g.fillStyle='#fff6d2';g.beginPath();g.moveTo(0,-R*0.34);g.quadraticCurveTo(R*0.12,-R*0.12,0,R*0.02);g.quadraticCurveTo(-R*0.12,-R*0.12,0,-R*0.34);g.fill();
+  g.fillStyle='rgba(60,40,20,0.45)';g.fillRect(-R*0.03,R*0.0,R*0.06,R*0.14);
+  g.strokeStyle='rgba(40,30,20,0.35)';g.lineWidth=Math.max(0.6,R*0.02);g.stroke();
+  // the guard wires
+  g.strokeStyle='#4a4d52';g.lineWidth=Math.max(0.8,R*0.045);
+  for(const gx of[-R*0.36,0,R*0.36]){g.beginPath();g.moveTo(gx,-R*0.62);g.lineTo(gx,R*0.38);g.stroke();}
+  // the base, with soot and a dent
+  g.fillStyle=tin(-R*0.5,R*0.5);roundRect(g,-R*0.5,R*0.38,R*1.0,R*0.56,R*0.1);g.fill();g.lineWidth=Math.max(0.8,R*0.035);g.strokeStyle='#2b2d31';g.stroke();
+  g.strokeStyle='rgba(30,30,34,0.5)';g.beginPath();g.moveTo(-R*0.5,R*0.6);g.lineTo(R*0.5,R*0.6);g.stroke();
+  g.fillStyle='rgba(20,18,16,0.35)';g.beginPath();g.ellipse(R*0.22,R*0.75,R*0.13,R*0.08,0.4,0,TAU);g.fill();
+  // the shine
+  g.strokeStyle='rgba(255,255,255,0.55)';g.lineWidth=Math.max(1,R*0.05);g.beginPath();g.moveTo(-R*0.22,-R*0.5);g.lineTo(-R*0.22,R*0.2);g.stroke();
+  g.restore();
+}
+function drawMap(g,x,y,R){
+  g.save();g.translate(x,y);g.rotate(-0.08);
+  const w=R*1.7,h=R*1.45,x0=-w/2,y0=-h/2,tear=[];
+  for(let i=0;i<=10;i++)tear.push([x0+w*i/10,y0+h-R*(0.05+((i*37)%7)/7*0.16)]);
+  const path=()=>{g.beginPath();g.moveTo(x0,y0);g.lineTo(x0+w,y0);for(let i=tear.length-1;i>=0;i--)g.lineTo(tear[i][0],tear[i][1]);g.closePath();};
+  g.fillStyle='rgba(0,0,0,0.35)';g.save();g.translate(R*0.07,R*0.1);path();g.fill();g.restore();
+  const pg=g.createLinearGradient(x0,y0,x0+w,y0+h);pg.addColorStop(0,'#f1dfb0');pg.addColorStop(1,'#d6bb83');g.fillStyle=pg;path();g.fill();
+  g.save();path();g.clip();
+  // the strata, shaded in bands
+  const bands=['rgba(139,90,43,0.32)','rgba(110,110,104,0.3)','rgba(150,72,40,0.3)','rgba(60,70,90,0.32)'];
+  for(let b=0;b<4;b++){const yy=y0+h*(0.16+b*0.22);g.fillStyle=bands[b];g.beginPath();g.moveTo(x0,yy);
+    for(let i=0;i<=8;i++)g.lineTo(x0+w*i/8,yy+Math.sin(i*1.3+b)*R*0.04);g.lineTo(x0+w,yy+h*0.22);g.lineTo(x0,yy+h*0.22);g.closePath();g.fill();}
+  g.strokeStyle='rgba(80,50,20,0.55)';g.lineWidth=Math.max(0.6,R*0.02);
+  for(let b=1;b<4;b++){const yy=y0+h*(0.16+b*0.22);g.beginPath();g.moveTo(x0,yy);for(let i=0;i<=8;i++)g.lineTo(x0+w*i/8,yy+Math.sin(i*1.3+b)*R*0.04);g.stroke();}
+  // the route down, dotted, to the torn edge
+  g.setLineDash([R*0.07,R*0.06]);g.strokeStyle='#8b1e14';g.lineWidth=Math.max(1,R*0.045);
+  g.beginPath();g.moveTo(-R*0.45,y0+h*0.08);g.bezierCurveTo(R*0.3,y0+h*0.3,-R*0.35,y0+h*0.55,R*0.15,y0+h*0.84);g.stroke();g.setLineDash([]);
+  // folds
+  g.strokeStyle='rgba(90,60,25,0.18)';g.lineWidth=Math.max(0.6,R*0.02);g.beginPath();g.moveTo(0,y0);g.lineTo(0,y0+h);g.moveTo(x0,y0+h*0.48);g.lineTo(x0+w,y0+h*0.48);g.stroke();
+  g.restore();
+  g.lineWidth=Math.max(0.8,R*0.03);g.strokeStyle='#7a5a2a';path();g.stroke();
+  g.restore();
+}
+function drawWatch(g,x,y,R){
+  g.save();g.translate(x,y+R*0.08);
+  g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(R*0.1,R*0.16,R*0.98,R*0.95,0,0,TAU);g.fill();
+  // the bow and crown
+  g.lineWidth=R*0.11;g.strokeStyle='#9a6a1d';g.beginPath();g.arc(0,-R*1.18,R*0.22,0,TAU);g.stroke();
+  g.fillStyle='#c9952f';roundRect(g,-R*0.13,-R*1.08,R*0.26,R*0.18,R*0.04);g.fill();g.strokeStyle='#4a300b';g.lineWidth=Math.max(0.6,R*0.025);g.stroke();
+  // the case
+  const cs=g.createRadialGradient(-R*0.35,-R*0.4,R*0.1,0,0,R*0.98);cs.addColorStop(0,'#fff0b8');cs.addColorStop(0.45,'#e0b04a');cs.addColorStop(1,'#80520f');
+  g.fillStyle=cs;g.beginPath();g.arc(0,0,R*0.94,0,TAU);g.fill();g.lineWidth=Math.max(1,R*0.05);g.strokeStyle='#3d2606';g.stroke();
+  // the face
+  g.fillStyle='#f7f1e3';g.beginPath();g.arc(0,0,R*0.76,0,TAU);g.fill();g.lineWidth=Math.max(0.8,R*0.03);g.strokeStyle='#6b4a14';g.stroke();
+  g.strokeStyle='#2b241b';g.lineCap='round';
+  for(let i=0;i<12;i++){const a=i/12*TAU,big=i%3===0;g.lineWidth=Math.max(0.6,R*(big?0.05:0.025));
+    g.beginPath();g.moveTo(Math.sin(a)*R*(big?0.55:0.6),-Math.cos(a)*R*(big?0.55:0.6));g.lineTo(Math.sin(a)*R*0.68,-Math.cos(a)*R*0.68);g.stroke();}
+  // 4:17
+  const hand=(a,len,w)=>{g.lineWidth=Math.max(0.8,R*w);g.beginPath();g.moveTo(0,0);g.lineTo(Math.sin(a)*R*len,-Math.cos(a)*R*len);g.stroke();};
+  g.strokeStyle='#1d1a16';hand((4+17/60)/12*TAU,0.38,0.065);hand(17/60*TAU,0.56,0.04);
+  g.fillStyle='#1d1a16';g.beginPath();g.arc(0,0,R*0.06,0,TAU);g.fill();
+  // the glass shine and a hairline crack
+  g.strokeStyle='rgba(255,255,255,0.6)';g.lineWidth=Math.max(1,R*0.06);g.beginPath();g.arc(0,0,R*0.62,Math.PI*1.1,Math.PI*1.38);g.stroke();
+  g.strokeStyle='rgba(120,110,95,0.6)';g.lineWidth=Math.max(0.5,R*0.015);g.beginPath();g.moveTo(-R*0.6,R*0.3);g.lineTo(-R*0.25,R*0.18);g.lineTo(-R*0.1,R*0.42);g.stroke();
+  g.restore();
+}
+function drawMarker(g,x,y,R){
+  g.save();g.translate(x,y);
+  g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(R*0.1,R*0.12,R*1.0,R*0.96,0,0,TAU);g.fill();
+  // the disc, with a bevelled rim and patina
+  const cs=g.createRadialGradient(-R*0.3,-R*0.35,R*0.1,0,0,R*1.0);cs.addColorStop(0,'#f4d79a');cs.addColorStop(0.5,'#c3913e');cs.addColorStop(1,'#6e4612');
+  g.fillStyle=cs;g.beginPath();g.arc(0,0,R*0.95,0,TAU);g.fill();g.lineWidth=Math.max(1,R*0.05);g.strokeStyle='#3d2606';g.stroke();
+  g.strokeStyle='rgba(60,38,8,0.75)';g.lineWidth=Math.max(0.8,R*0.03);g.beginPath();g.arc(0,0,R*0.72,0,TAU);g.stroke();
+  g.fillStyle='rgba(70,140,120,0.35)';for(const[a,b,r]of[[-0.5,0.55,0.16],[0.62,-0.4,0.12],[0.35,0.7,0.1]]){g.beginPath();g.arc(R*a,R*b,R*r,0,TAU);g.fill();}
+  // ticks round the rim
+  g.strokeStyle='rgba(60,38,8,0.8)';g.lineCap='round';
+  for(let i=0;i<24;i++){const a=i/24*TAU;g.lineWidth=Math.max(0.5,R*0.02);g.beginPath();g.moveTo(Math.sin(a)*R*0.76,-Math.cos(a)*R*0.76);g.lineTo(Math.sin(a)*R*0.86,-Math.cos(a)*R*0.86);g.stroke();}
+  // the arrow, pointing down, and a level line
+  g.fillStyle='#3d2606';g.beginPath();g.moveTo(0,R*0.5);g.lineTo(R*0.22,R*0.16);g.lineTo(R*0.08,R*0.16);g.lineTo(R*0.08,-R*0.42);g.lineTo(-R*0.08,-R*0.42);g.lineTo(-R*0.08,R*0.16);g.lineTo(-R*0.22,R*0.16);g.closePath();g.fill();
+  g.lineWidth=Math.max(0.8,R*0.04);g.strokeStyle='#3d2606';g.beginPath();g.moveTo(-R*0.45,-R*0.05);g.lineTo(R*0.45,-R*0.05);g.stroke();
+  g.strokeStyle='rgba(255,255,255,0.5)';g.lineWidth=Math.max(1,R*0.05);g.beginPath();g.arc(0,0,R*0.84,Math.PI*1.12,Math.PI*1.4);g.stroke();
+  g.restore();
+}
 function drawCompass(g,x,y,R){
   g.save();g.translate(x,y);
   g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(R*0.08,R*0.16,R*1.02,R*0.98,0,0,TAU);g.fill();
@@ -2105,7 +2265,7 @@ function drawRareGlints(t){ // something glints in the dirt where a find is buri
     for(let k=0;k<2;k++){const ph=(t*0.55+c.id*0.17+k*0.5)%1;if(ph>0.22)continue;const a=Math.sin(ph/0.22*Math.PI);
       ctx.save();ctx.globalAlpha=0.9*a;drawGlint(ctx,c.cx+(k?-c.rad*0.28:c.rad*0.22),c.cy+(k?c.rad*0.2:-c.rad*0.25),(k?0.75:1.05)*a);ctx.restore();}}
 }
-function rareLeft(){return layer.cells.find(c=>c.rare&&c.mat!=='open');}
+function rareLeft(){return layer.cells.find(c=>(c.rare||c.cache)&&c.mat!=='open');} // a relic or the gold cache, dug out before the drop
 function showFind(id){
   const R=RARES[id],F=state.finds[id],well=$('introWell');endPointers();
   $('introTag').textContent='Rare find';well.innerHTML='';well.className='well find';
@@ -2115,30 +2275,539 @@ function showFind(id){
   const c=document.createElement('canvas'),w=well.clientWidth||300,h=well.clientHeight||220,d=Math.min(2,window.devicePixelRatio||1);
   c.width=Math.round(w*d);c.height=Math.round(h*d);well.appendChild(c);const g=c.getContext('2d');g.scale(d,d);
   const R0=Math.min(w,h)*0.3;R.draw(g,w/2,h/2+R0*0.12,R0);
-  introAfter=()=>{resetIntroButtons();findsUi(true);setTimeout(()=>{if(mode==='play')hint('Your finds are in the chest at the top.');},300);};
+  introAfter=()=>{resetIntroButtons();findsUi(true);if(findsCount()>=3)badgeEarn('relics');diaAdd(FREE_DIA.relic,'rare find',{kind:'relic',id});setTimeout(()=>{if(mode==='play')hint('Your finds are in the chest at the top.');},300);};
 }
 
 // ---- the collection ----
 ICON.chest='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11V9.6C4 6.3 7.4 4 12 4s8 2.3 8 5.6V11z"/><path fill-rule="evenodd" d="M4 12.4h16v6.7a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19.1zm6.5 1.1v3.7h3v-3.7z"/></svg>';
 function findsCount(){return Object.keys(RARES).filter(id=>state.finds&&state.finds[id]).length;}
 function findsUi(pop){
-  const b=$('btnFinds'),n=findsCount();b.hidden=n===0;$('findsCount').textContent=n;
+  const b=$('btnFinds'),n=findsCount()+badgeCount();b.hidden=n===0;$('findsCount').textContent=n;
   if(pop&&n){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}
 }
 function openFinds(){
   if(mode!=='play'||dropping)return;endPointers();
-  openPop('Rare finds',B=>{
-    const ids=Object.keys(RARES).filter(id=>state.finds&&state.finds[id]),list=document.createElement('div');list.className='finds';
+  openPop('Finds and badges',B=>{
+    const ids=RARE_ORDER.filter(id=>state.finds&&state.finds[id]),list=document.createElement('div');list.className='finds';
+    const h1=document.createElement('div');h1.className='fhead';h1.textContent=`Rare finds · ${ids.length} of ${RARE_ORDER.length}`;
     for(const id of ids){const R=RARES[id],F=state.finds[id],row=document.createElement('div');row.className='find-row';
       const c=document.createElement('canvas'),d=Math.min(2,window.devicePixelRatio||1);c.className='find-art';c.width=c.height=Math.round(72*d);
       const g=c.getContext('2d');g.scale(d,d);R.draw(g,36,40,24);
       const info=document.createElement('div'),nm=document.createElement('div'),wh=document.createElement('div'),tx=document.createElement('div');
       nm.className='fn';nm.textContent=R.name;wh.className='fw';wh.textContent=`${R.kind} · layer ${F.L} · ${depthLabel(F.L)}`;tx.className='fd';tx.innerHTML=R.text;
       info.append(nm,wh,tx);row.append(c,info);list.appendChild(row);}
-    const more=document.createElement('p');more.className='fmore';more.textContent='More rare finds are buried deeper. They arrive in a later build.';
-    B.append(list,more);
+    const more=document.createElement('p');more.className='fmore';
+    more.textContent=ids.length<RARE_ORDER.length?'More relics from the old expedition are buried in the first layers. Watch for a glint in the dirt.':'You’ve found every relic buried so far. More will be buried deeper.';
+    B.append(h1,list,more);badgeList(B);
   });
 }
+
+/* ---------- buried gold and gems: hand tools dig them out, power tools and explosives destroy them ---------- */
+// After the opening a layer's coins are 30% higher than before, split three ways: a fifth in ore boulders, 30% buried in
+// the dirt and rock, and the rest lying loose on the surface. The Shovel, Pickaxe and Sledgehammer turn buried finds up;
+// the Drill, the Laser Cutter and explosives destroy them, and crush the ore in the boulders they break. Speed or coins.
+const BURY_SHARE=0.3,BURY_K=1.3;       // share of a layer's coins buried; how much more every layer pays to make up for it
+const BURY_OPENING=0.25;               // the opening's buried finds: a bonus of a quarter of the layer's surface gold (layers 3 to 8)
+const CRUSH_NAME={drill:'The Drill',laser:'The Laser Cutter',blast:'The blast'};
+let DIG_BY='hand';                     // set by the power tools and explosives just before they clear ground
+const upPops=[];                       // buried finds on their way up out of the ground
+function crushes(by){return by==='drill'||by==='laser'||by==='blast';}
+function buryShare(L){return tutAt(L)?0:BURY_SHARE;}
+function openingBuried(t){return t.key==='rocks'||t.key==='mixed'?Math.round(t.surf*BURY_OPENING):0;}
+function buryLoot(L,seed,cells,clusters,budget,lv,tut,loot){
+  const value=tut?openingBuried(tut):Math.round(budget*BURY_SHARE),out=[];
+  if(value<=0||L<2)return out;
+  const rng=mulberry32(hash2(seed,303)),busy=new Set(loot.map(i=>i.cell)); // its own random stream, so the rest of the layer is unchanged
+  const pool=cells.filter(c=>!busy.has(c.id)&&!c.rare&&!c.cache&&c.cx>14&&c.cx<FW-14&&c.cy>14&&c.cy<FH-14&&
+    (c.mat==='dirt'||(c.mat==='rock'&&c.cluster>=0&&!clusters[c.cluster].huge)));
+  const cnt=tut?2:3+Math.floor(rng()*3);
+  for(let k=0;k<cnt&&pool.length;k++){const i=Math.floor(rng()*pool.length),c=pool[i];pool.splice(i,1);
+    out.push({cell:c.id,type:pickLoot(rng,lv),value:0,seed:rng(),rot:(rng()-0.5)*0.9,state:'in'});}
+  let sv=0;for(const b of out)sv+=LOOT[b.type].v;
+  for(const b of out)b.value=Math.max(1,Math.round(value*LOOT[b.type].v/sv));
+  return out;
+}
+// a cell was cleared: whatever is buried in it comes up whole, or is destroyed
+function buriedOut(c,by){
+  if(!layer.buried)return;
+  for(const b of layer.buried)if(b.state==='in'&&b.cell===c.id){if(crushes(by))buriedCrush(b,c,by);else buriedPop(b,c);}
+}
+// a boulder broke: the same for everything buried in its cells
+function buriedBreak(cl,style){
+  if(!layer.buried)return;const by=style==='pick'||style==='smash'?'hand':style;
+  for(const id of cl.cells)buriedOut(layer.cells[id],by);
+}
+function buriedPop(b,c){
+  b.state='up';const x=c.cx,y=c.cy;badgeStat('dug');
+  upPops.push({x,y,type:b.type,value:b.value,seed:b.seed,rot:b.rot,t0:now(),dur:0.5});
+  spawn('ring',x,y,{color:'rgba(255,226,140,1)',size:c.rad*0.9,life:0.3,speed:0});
+  for(let i=0;i<7;i++)spawn('spark',x,y,{color:LOOT[b.type].col,speed:50+Math.random()*90,life:0.35});
+  sfx(LOOT[b.type].kind==='gem'?'gem':'coin');buzz(10);
+  if(LOOT[b.type].kind==='gem'&&LOOT[b.type].v>=30)netFind('gem',b.type);
+  if(!state.seen['bury-up']){state.seen['bury-up']=true;save();
+    setTimeout(()=>hint(`Buried ${LOOT[b.type].kind==='gem'?'gems':'gold'}! Digging by hand turns them up. Power tools and explosives destroy them.`),650);}
+}
+function buriedCrush(b,c,by){
+  b.state='lost';const x=c.cx,y=c.cy,col=LOOT[b.type].col;
+  for(let i=0;i<6;i++)spawn('chunk',x+(Math.random()-0.5)*8,y+(Math.random()-0.5)*8,{color:i%2?col:'#8d8378',size:1+Math.random()*1.8,speed:40+Math.random()*70});
+  spawn('dust',x,y,{color:'#9a8f84',speed:8,size:c.rad*0.3,life:0.6});
+  floatText(x,y-10,`−${b.value.toLocaleString('en-US')}`,'#b3a596',14);
+  const key='bury-'+by;
+  if(!state.seen[key]){state.seen[key]=true;save();
+    hint(`${CRUSH_NAME[by]} destroyed buried ${LOOT[b.type].kind==='gem'?'gems':'gold'}. Dig by hand to keep them.`);}
+}
+function oreCrushed(cl,val,by){
+  const H=layer.band.rock;
+  for(const id of cl.cells){const c=layer.cells[id];for(let i=0;i<3;i++)spawn('chunk',c.cx,c.cy,{color:i?'#d9b347':hsl(H[0],H[1],H[2]),size:1+Math.random()*1.6,speed:50+Math.random()*60});}
+  floatText(cl.cx,cl.cy-8,`ORE LOST −${val.toLocaleString('en-US')}`,'#b3a596',15);
+  const key='ore-'+by;
+  if(!state.seen[key]){state.seen[key]=true;save();
+    setTimeout(()=>hint(`${CRUSH_NAME[by]} crushed the ore. Break ore boulders with the Pickaxe or Sledgehammer to keep it.`),300);}
+}
+function drawPops(t){
+  for(let i=upPops.length-1;i>=0;i--){const P=upPops[i],p=(t-P.t0)/P.dur;
+    if(p>=1){upPops.splice(i,1);flyToBank(P.x,P.y-22,P.type,P.value,0);floatText(P.x,P.y-30,`+${P.value.toLocaleString('en-US')}`,'#ffd34d',15);continue;}
+    const e=1-Math.pow(1-p,3),y=P.y-22*e,s=0.45+0.65*e;
+    ctx.fillStyle=`rgba(255,220,120,${(0.28*(1-p*0.5)).toFixed(3)})`;ctx.beginPath();ctx.arc(P.x,y,10+12*e,0,TAU);ctx.fill();
+    drawLoot(ctx,P.x,y,P.type,s,P.rot*(1-e),1,P.seed);}
+}
+function buriedFlush(){for(const P of upPops)flyToBank(P.x,P.y-22,P.type,P.value,0);upPops.length=0;}
+
+/* ---------- the first days: easing into the race, and something new each day ---------- */
+// After the opening (layers 1 to 9) the race's own numbers take over, but gently, in every race length except the quick
+// tour. Over layers 10 to 29 a layer's dig time eases from the opening's minute or so up to its stratum's minutes, and the
+// hard seams grow from three layers' work to the usual ten. Coins stay at the stratum's rate, so these quicker layers pay
+// well. Each day brings something new (the days are layers, so everyone meets them in the same order):
+//   day 2, layer 14: Short Fuse gives you a crate of explosives, on a rocky layer
+//   day 3, layer 20: Torque lends you her Drill for one layer, also a rocky one
+//   day 4, layer 26: a gold cache, worth most of a Drill
+//   day 5, from layer 32: once your own Drill or Laser Cutter shows some wear, Ratchet drops by and fixes it, free, once
+// Relics of an old expedition wait on layers 12, 18, 24 and 30 (the Old Compass was the first, on layer 2).
+const EARLY_FIRST=OPENING_LAST+1,EARLY_SPAN=20; // the ramp: layers 10 to 29
+const EARLY_MIN0=1.2,EARLY_SEAM0=3;              // where it starts: minutes per layer, and layers' work in a seam
+const EARLY_TNT=14,EARLY_DRILL=20,EARLY_CACHE=26,EARLY_CACHE_COINS=12000,EARLY_RATCHET=32,EARLY_RATCHET_WORN=0.9;
+const EARLY_RARE={12:'lamp',18:'map',24:'watch',30:'marker'};
+function earlyOn(){return openingOn()&&state.tune.early!==0;} // tuning can switch the easing off, to test raw strata
+function earlyK(L){if(!earlyOn())return 1;const x=clamp((L-EARLY_FIRST+1)/EARLY_SPAN,0,1);return x*x*(3-2*x);} // 0 before layer 10, 1 from layer 29
+function digMin(L){const m=handMin(L);return earlyOn()?Math.min(m,EARLY_MIN0+(m-EARLY_MIN0)*earlyK(L)):m;} // minutes a layer (or seam) takes by hand
+function seamWork(L){return earlyOn()?EARLY_SEAM0+(SEAM_WORK-EARLY_SEAM0)*earlyK(L):SEAM_WORK;}
+function earlyGround(L){ // the explosives and Drill layers are rockier, so the new tool has something to chew on
+  if(!earlyOn()||(L!==EARLY_TNT&&L!==EARLY_DRILL))return null;const G=GROUND[stratumFor(L).cls];
+  return{rock:Math.min(0.62,G.rock+0.24),clay:G.clay,gran:G.gran,boulder:Math.max(4,G.boulder)};}
+function earlyRareAt(L){return earlyOn()?EARLY_RARE[L]||null:null;}
+
+// ---- the gold cache: a strongbox in the dirt near the middle of layer 26, dug out by any tool ----
+function earlyCache(L,cells,loot,seed){
+  if(!earlyOn()||L!==EARLY_CACHE||state.seen['early-cache'])return;
+  const rng=mulberry32(hash2(seed,404));
+  let pool=cells.filter(c=>c.mat==='dirt'&&!c.rare&&c.cx>FW*0.3&&c.cx<FW*0.7&&c.cy>FH*0.32&&c.cy<FH*0.68&&!loot.some(it=>it.cell===c.id));
+  if(!pool.length)pool=cells.filter(c=>c.mat==='dirt'&&!c.rare);if(!pool.length)return;
+  const c=pool[Math.floor(rng()*pool.length)];c.cache=EARLY_CACHE_COINS;
+}
+function cacheFound(c){
+  const v=c.cache;c.cache=0;state.seen['early-cache']=true;save();
+  spawn('ring',c.cx,c.cy,{color:'rgba(255,224,150,1)',size:c.rad*2.6,life:0.6,speed:0});
+  for(let i=0;i<26;i++)spawn('spark',c.cx,c.cy,{color:i%2?'#ffd34d':'#fff3c4',speed:90+Math.random()*150,life:0.45+Math.random()*0.35});
+  floatText(c.cx,c.cy-30,'GOLD CACHE!','#ffd34d',22);sfx('fanfare');buzz([30,30,60]);addShake(4);
+  endPointers();mode='modal';
+  setTimeout(()=>{
+    const well=$('introWell');resetIntroButtons();
+    $('introTag').textContent='Gold cache';well.innerHTML='';well.className='well find';
+    $('introName').textContent='EXPEDITION STRONGBOX';$('introRole').textContent=`Layer ${layer.L} · ${depthLabel(layer.L)}`;
+    $('introHow').innerHTML=`The old expedition left a strongbox packed with gold: <b>${v.toLocaleString('en-US')} coins</b>.`+
+      (state.owned.drill?'':' That’s most of Torque’s Drill.');
+    $('introGo').textContent='TAKE THE GOLD';showCard();
+    const cv2=document.createElement('canvas'),w=well.clientWidth||300,h=well.clientHeight||220,d=Math.min(2,window.devicePixelRatio||1);
+    cv2.width=Math.round(w*d);cv2.height=Math.round(h*d);well.appendChild(cv2);const g=cv2.getContext('2d');g.scale(d,d);drawStrongbox(g,w/2,h/2+10,Math.min(w,h)*0.3);
+    introAfter=()=>{resetIntroButtons();const k=10,share=Math.floor(v/k);walletEarn('cache',{c:v,n:EARLY_CACHE}); // not the layer's own coins
+      for(let i=0;i<k;i++)flyToBank(c.cx+(Math.random()-0.5)*30,c.cy+(Math.random()-0.5)*30,i%2?'nugget':'coins',i===0?v-(k-1)*share:share,i*0.05,0);
+      if(!state.owned.drill)setTimeout(()=>{if(mode==='play')hint(`Torque’s Drill is ${TOOLS.drill.price.toLocaleString('en-US')} in the Shop.`);},1400);};
+  },700);
+}
+function drawStrongbox(g,x,y,R){
+  g.save();g.translate(x,y);
+  g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(R*0.08,R*0.62,R*1.1,R*0.24,0,0,TAU);g.fill();
+  const wood=(y0,y1)=>{const gr=g.createLinearGradient(0,y0,0,y1);gr.addColorStop(0,'#8a5a2b');gr.addColorStop(1,'#4e2f14');return gr;};
+  // the open lid, tipped back
+  g.fillStyle=wood(-R*1.0,-R*0.3);g.beginPath();g.moveTo(-R*0.95,-R*0.28);g.lineTo(-R*0.82,-R*0.98);g.lineTo(R*0.82,-R*0.98);g.lineTo(R*0.95,-R*0.28);g.closePath();g.fill();
+  g.lineWidth=Math.max(1,R*0.04);g.strokeStyle='#2a1a0b';g.stroke();
+  // gold heaped in the box
+  for(let i=0;i<22;i++){const a=i*2.399,rr=R*0.12*Math.sqrt(i),cx=Math.cos(a)*rr*1.6,cy=-R*0.3+Math.sin(a)*rr*0.5-R*0.08;
+    g.fillStyle=i%5===0?'#2f6ff5':i%7===0?'#e9403a':'#ffcf3f';g.beginPath();g.ellipse(cx,cy,R*0.13,R*0.08,0,0,TAU);g.fill();
+    g.strokeStyle='rgba(90,55,0,0.8)';g.lineWidth=Math.max(0.5,R*0.015);g.stroke();}
+  // the box, its iron bands and lock
+  g.fillStyle=wood(-R*0.3,R*0.62);roundRect(g,-R*1.0,-R*0.3,R*2.0,R*0.92,R*0.08);g.fill();g.lineWidth=Math.max(1,R*0.04);g.strokeStyle='#2a1a0b';g.stroke();
+  g.fillStyle='#4a4d52';for(const bx of[-R*0.72,R*0.6])g.fillRect(bx,-R*0.3,R*0.14,R*0.92);
+  g.fillStyle='#c9952f';roundRect(g,-R*0.14,-R*0.12,R*0.28,R*0.3,R*0.05);g.fill();g.strokeStyle='#3d2606';g.stroke();
+  g.fillStyle='#2a1a0b';g.beginPath();g.arc(0,R*0.0,R*0.04,0,TAU);g.fill();
+  // a glow over the gold
+  const gw=g.createRadialGradient(0,-R*0.4,2,0,-R*0.4,R*1.1);gw.addColorStop(0,'rgba(255,230,150,0.45)');gw.addColorStop(1,'rgba(255,230,150,0)');
+  g.fillStyle=gw;g.beginPath();g.arc(0,-R*0.4,R*1.1,0,TAU);g.fill();
+  g.restore();
+}
+function drawEarly(t){ // the cache glints harder than a relic
+  for(const c of layer.cells){if(!c.cache||c.mat==='open')continue;
+    const pulse=0.5+0.5*Math.sin(t*3+c.id);ctx.fillStyle=`rgba(255,214,90,${(0.16+0.16*pulse).toFixed(3)})`;ctx.beginPath();ctx.arc(c.cx,c.cy,c.rad*0.8,0,TAU);ctx.fill();
+    for(let k=0;k<3;k++){const ph=(t*0.7+c.id*0.13+k/3)%1;if(ph>0.25)continue;const a=Math.sin(ph/0.25*Math.PI);
+      ctx.save();ctx.globalAlpha=a;drawGlint(ctx,c.cx+Math.cos(k*2.1)*c.rad*0.35,c.cy+Math.sin(k*2.1)*c.rad*0.3,(1.2-k*0.2)*a);ctx.restore();}}
+}
+
+// ---- day 2: Short Fuse's crate of explosives ----
+function giftTnt(){
+  state.seen['early-tnt']=true;save();const T=TOOLS.dynamite,P=PORTRAITS[T.portrait],well=$('introWell');endPointers();resetIntroButtons();
+  $('introTag').textContent='A gift from Short Fuse';
+  well.innerHTML='';well.className='well';if(P){const img=new Image(P.w,P.h);img.src=P.src;img.alt='The explosives expert';well.appendChild(img);}
+  $('introName').textContent='EXPLOSIVES';$('introRole').textContent=T.role;
+  $('introHow').innerHTML='A crate of <b>three charges</b>, on the house. <b>TAP</b> to plant one: it clears a whole patch at once. '+
+    'Careful: a blast <b>destroys</b> any gold buried where it goes off. More crates are in the Shop.';
+  $('introGo').textContent='TAKE THE CRATE';showCard();
+  introAfter=()=>{resetIntroButtons();state.owned.dynamite=true;state.dyn=(state.dyn||0)+3;state.seen.dynamite=true;buildDock();selectTool('dynamite');save();
+    setTimeout(()=>{if(mode==='play')hint('Tap next to a cluster of boulders to blast it.');},300);};
+}
+// ---- day 3: Torque lends her Drill for one layer ----
+function lendDrill(){
+  state.seen['early-drill']=true;save();const T=TOOLS.drill,P=PORTRAITS[T.portrait],well=$('introWell');endPointers();resetIntroButtons();
+  $('introTag').textContent='Torque’s offer';
+  well.innerHTML='';well.className='well';if(P){const img=new Image(P.w,P.h);img.src=P.src;img.alt='The Drill expert';well.appendChild(img);}
+  $('introName').textContent='DRILL';$('introRole').textContent='Yours to try on this layer';
+  $('introHow').innerHTML='Borrow my Drill for this layer. <b>HOLD</b> it on rock: it tears right through. '+
+    `It also grinds up any gold buried in what it cuts. Like it? It’s <b>${T.price.toLocaleString('en-US')}</b> in the Shop.`;
+  $('introGo').textContent='TRY THE DRILL';$('introAlt').textContent='NO THANKS';$('introAlt').hidden=false;showCard();
+  introAfter=()=>{resetIntroButtons();state.loan='drill';state.owned.drill=true;const G=gear('drill');G.c=1;G.until=0;G.od=false;
+    state.seen.drill=true;buildDock();selectTool('drill');save();
+    setTimeout(()=>{if(mode==='play')hint('Hold the Drill on a boulder.');},300);};
+  introAltAfter=()=>hint('Torque’s Drill waits in the Shop.');
+}
+// ---- day 5: Ratchet's visit, a free repair that shows how wear works ----
+function ratchetDue(){ // a worn power tool of your own (not on loan, not in a workshop), while Ratchet isn't hired yet
+  if(state.seen['early-ratchet']||state.owned.ratchet)return null;
+  for(const k of POWER_KEYS){const G=gear(k);if(state.owned[k]&&state.loan!==k&&!(G.until>0)&&G.c<EARLY_RATCHET_WORN)return k;}
+  return null;}
+function ratchetVisit(k){
+  if(ratchetDue()!==k)return;
+  state.seen['early-ratchet']=true;save();
+  const T=TOOLS.ratchet,P=PORTRAITS[T.portrait],G=gear(k),well=$('introWell');endPointers();resetIntroButtons();
+  $('introTag').textContent='Ratchet drops by';
+  well.innerHTML='';well.className='well';if(P){const img=new Image(P.w,P.h);img.src=P.src;img.alt='Ratchet the mechanic';well.appendChild(img);}
+  $('introName').textContent='RATCHET';$('introRole').textContent=T.role;
+  $('introHow').innerHTML=(G.c<=0?`Your <b>${GEAR_NAME[k]}</b> broke down. `:`Your <b>${GEAR_NAME[k]}</b> is down to <b>${Math.round(G.c*100)}%</b>. `)+
+    'Power tools wear as they cut, four times as fast in Overdrive, and stop when they hit zero. This one’s on me. '+
+    `After that, hire me in the Shop for <b>${T.price.toLocaleString('en-US')}</b> and I’ll fix a worn or broken one for ${POWER[k].repairPct}% of its price.`;
+  $('introGo').textContent='FIX IT, THANKS';showCard();
+  introAfter=()=>{resetIntroButtons();const G=gear(k);G.c=1;G.until=0;G.od=false;sfx('buy');buildDock();save();
+    toast(`Ratchet fixed your ${GEAR_NAME[k]}: good as new.`,'#62e3ff');};
+}
+function endLoan(){ // dropping off the loan layer: the tool goes back, unless you bought it
+  const k=state.loan;if(!k)return;state.loan=null;
+  if(state.owned[k]){delete state.owned[k];if(state.gear)delete state.gear[k];if(state.tool===k)state.tool=state.owned.pickaxe?'pickaxe':'shovel';buildDock();}
+  save();setTimeout(()=>{toast(`Torque took her ${GEAR_NAME[k]} back.`,'#ffd34d');
+    setTimeout(()=>{if(mode==='play'&&!MG)hint(`Save up ${TOOLS[k].price.toLocaleString('en-US')} coins and it’s yours for good. It’s in the Shop.`);},1600);},400);
+}
+// ---- arriving on a layer of the first days ----
+function earlyArrive(L){
+  if(!earlyOn())return;
+  const later=(f,d)=>setTimeout(()=>{if(mode==='play'&&!MG&&!dropping&&state.L===L)f();},d);
+  if(L===EARLY_TNT&&!state.seen['early-tnt']&&!(state.dyn>0))later(giftTnt,1100);
+  if(L===EARLY_DRILL&&!state.seen['early-drill']&&!state.owned.drill)later(lendDrill,1100);
+  if(L>=EARLY_RATCHET){const k=ratchetDue();if(k)later(()=>ratchetVisit(k),1100);}
+  if(L===EARLY_CACHE&&!state.seen['early-cache']&&!state.seen['early-cachehint'])later(()=>{state.seen['early-cachehint']=true;hint('Something big glints in this layer.');},5000);
+  if(EARLY_RARE[L]&&!state.seen['early-glint']&&layer.cells.some(c=>c.rare))later(()=>{state.seen['early-glint']=true;hint('Another glint in the dirt. The old expedition left more behind.');},5000);
+}
+
+/* ---------- badges: milestones of the first days, kept in the chest next to the rare finds ---------- */
+// icon: a glyph from ICON. col: the medal's colour. dia: the Diamonds it pays when the store arrives. stat/n: earned when
+// that running count (state.stats) reaches n. The rest are earned by a moment in the game (badgeEarn).
+ICON.coin='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18zm0 3.2a5.8 5.8 0 1 0 0 11.6 5.8 5.8 0 0 0 0-11.6z"/><path d="M11 8.6h2v6.8h-2z"/></svg>';
+ICON.gem='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l4 5-9 11L3 9z"/></svg>';
+ICON.cave='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20c0-6 3.6-12 10-12s10 6 10 12h-5.5c0-3.3-2-6-4.5-6s-4.5 2.7-4.5 6z"/><path d="M8 4.2l1.6 2.6L11 3.6l1.6 3.4L14.2 4l1.2 3.2-6.8.2z"/></svg>';
+ICON.depth='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h16v3H4zM4 8h16v2.4H4z"/><path d="M10.6 12h2.8v5.2h3.4L12 22l-4.8-4.8h3.4z"/></svg>';
+const DIG_BADGES=[
+  {id:'firstdig',name:'First Shovelful', how:'Dig through your first layer.',                icon:'shovel',  col:'#c98a3a',dia:10},
+  {id:'pocket',  name:'Pocket Money',    how:'Pick up your first gold.',                     icon:'coin',    col:'#e5b62d',dia:10},
+  {id:'rocks',   name:'Rock Breaker',    how:'Break 25 boulders.',                           icon:'pickaxe', col:'#7f8a95',dia:15,stat:'boulders',n:25},
+  {id:'bigswing',name:'Big Swing',       how:'Split the big rock.',                          icon:'sledge',  col:'#fc6a1c',dia:20},
+  {id:'caver',   name:'Cavern Diver',    how:'Finish your first cavern.',                    icon:'cave',    col:'#6f5bd8',dia:15},
+  {id:'ten',     name:'Ten Down',        how:'Reach layer 10.',                              icon:'depth',   col:'#8a5a2c',dia:10},
+  {id:'treasure',name:'Treasure Hunter', how:'Dig out 10 buried finds by hand.',             icon:'gem',     col:'#1fb873',dia:20,stat:'dug',n:10},
+  {id:'seam',    name:'Seam Breaker',    how:'Break your first hard seam.',                  icon:'bolt',    col:'#3b7bff',dia:25},
+  {id:'blast',   name:'Demolition',      how:'Set off your first charge.',                   icon:'dynamite',col:'#d63a2a',dia:15},
+  {id:'driller', name:'Test Drive',      how:'Break five boulders with the Drill.',          icon:'drill',   col:'#e08a12',dia:20,stat:'drilled',n:5},
+  {id:'relics',  name:'Relic Hunter',    how:'Find three relics of the old expedition.',     icon:'chest',   col:'#c9952f',dia:30},
+  {id:'thirty',  name:'Thirty Down',     how:'Reach layer 30.',                              icon:'depth',   col:'#4b3a8c',dia:30},
+];
+const DIG_BADGE_BY=Object.fromEntries(DIG_BADGES.map(b=>[b.id,b]));
+function badgeCount(){return DIG_BADGES.filter(b=>state.badges&&state.badges[b.id]).length;}
+function badgeEarn(id){
+  const B=DIG_BADGE_BY[id];if(!B)return;if(!state.badges)state.badges={};if(state.badges[id])return;
+  state.badges[id]={L:state.L,at:Date.now()};save();
+  setTimeout(()=>{toast(`Badge earned: ${B.name}`,B.col);findsUi(true);sfx('unlock');if(typeof badgeDiamonds==='function')badgeDiamonds(B);},250);
+}
+function badgeStat(k,add=1){
+  if(!state.stats)state.stats={};state.stats[k]=(state.stats[k]||0)+add;
+  for(const B of DIG_BADGES)if(B.stat===k&&state.stats[k]>=B.n)badgeEarn(B.id);
+}
+function badgeDepth(L){if(L>=2)badgeEarn('firstdig');if(L>=10)badgeEarn('ten');if(L>=30)badgeEarn('thirty');}
+function badgeList(B){
+  const h=document.createElement('div');h.className='fhead';h.textContent=`Badges · ${badgeCount()} of ${DIG_BADGES.length}`;
+  const grid=document.createElement('div');grid.className='dg-grid';
+  for(const b of DIG_BADGES){const got=!!(state.badges&&state.badges[b.id]),el=document.createElement('div');el.className='dg-badge'+(got?'':' off');
+    const m=document.createElement('div');m.className='dg-med';m.style.setProperty('--bc',b.col);m.innerHTML=ICON[b.icon]||'';
+    const nm=document.createElement('div');nm.className='dg-name';nm.textContent=b.name;
+    const hw=document.createElement('div');hw.className='dg-how';
+    hw.textContent=got?`Layer ${state.badges[b.id].L}`:(b.stat?`${b.how} (${Math.min(b.n,(state.stats&&state.stats[b.stat])||0)}/${b.n})`:b.how);
+    el.append(m,nm,hw);grid.appendChild(el);}
+  B.append(h,grid);
+}
+
+/* ---------- the test store: Diamonds, packs and paid help, with pretend purchases ---------- */
+// The plan approved in "GroundBreaking: real money and the store". Nothing here takes real money: a pack asks for a pretend
+// confirmation and adds its Diamonds. Coins are never for sale. Paid help (Dig Boosts, Ratchet Rush) only works on dug
+// ground: above the deepest seam any team has broken. The game server will add the 3-day delay from its own records; the
+// playtest has no timestamps, so it leaves it out. Free Diamonds come from relics, badges and each new stratum. Online, with
+// the game server keeping wallets (wallet.js), Diamonds are the server's: packs wait for the phone apps, and every free
+// Diamond and every purchase is reported to it.
+const DIA_PACKS=[
+  {id:'pocket',name:'Pocketful',usd:0.99, dia:100},
+  {id:'pouch', name:'Pouch',    usd:4.99, dia:550,  bonus:10},
+  {id:'bucket',name:'Bucket',   usd:9.99, dia:1200, bonus:20},
+  {id:'crate', name:'Crate',    usd:19.99,dia:2500, bonus:25},
+  {id:'cart',  name:'Minecart', usd:49.99,dia:6500, bonus:30},
+  {id:'vault', name:'Vault',    usd:99.99,dia:14000,bonus:40},
+];
+const STARTER={id:'starter',name:'Starter Pack',usd:2.99,dia:300,boosts:3};
+const DIA_USD=4.99/550;                    // a Diamond's worth at the Pouch's rate, shown next to every Diamond price
+const BOOST_DIA=50,BOOST_SECS=3600,BOOST_K=1.5,RUSH_DIA_H=10;
+const FREE_DIA={relic:50,stratum:50};
+ICON.dia='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h10L21.5 9 12 20.5 2.5 9z"/></svg>';
+let shopTab='tools',storeAsk=null,digAt=0;
+function diaFmt(n){return Math.round(n||0).toLocaleString('en-US');}
+function usd(n){return '$'+n.toFixed(2);}
+function diaUsd(d){const v=d*DIA_USD;return!(d>0)?'$0':v<1?`about ${Math.max(1,Math.round(v*100))}¢`:`about $${v.toFixed(2)}`;}
+function diaIco(sm){return`<span class="dia-ico${sm?' sm':''}"></span>`;}
+function diaAdd(n,why,rep){if(!(n>0))return;state.dia=(state.dia||0)+n;if(rep)walletEarn(rep.kind,{d:n,n:rep.n,id:rep.id});save();diaUi();
+  setTimeout(()=>toast(`+${diaFmt(n)} Diamonds${why?' · '+why:''}`,'#62e3ff'),why?900:0);}
+function diaSpend(n){if((state.dia||0)<n){sfx('deny');return false;}state.dia-=n;save();diaUi();return true;}
+function diaUi(){const el=$('shopDia');if(el)el.textContent=diaFmt(state.dia);}
+
+// ---- dug ground, and the Dig Boost ----
+function chartedTo(){ // the deepest layer of dug ground
+  if(state.tune.charted)return Infinity; // tuning: paid help everywhere, to try it out
+  if(WAL.on&&WAL.w&&WAL.w.charted!=null)return WAL.w.charted|0; // the game server's own record, three days behind the seams
+  const se=seamEvery();let n=myX().solo.seams||0;
+  for(const id in NET.teams||{})n=Math.max(n,NET.teams[id].seams||0);
+  for(const r of NET.ranks||[])n=Math.max(n,r.seams||0);
+  return n*se;
+}
+function onCharted(){return state.L<=chartedTo();}
+function digBoostK(){return state.boost>0&&onCharted()?BOOST_K:1;}
+function noteDig(){digAt=now();}
+function boostTick(dt){ // a boost runs down only while you dig, and only on dug ground
+  if(!(state.boost>0)){boostUi();return;}
+  if(now()-digAt<0.6&&onCharted()){walletBoost(Math.min(dt,state.boost));state.boost=Math.max(0,state.boost-dt);if(state.boost<=0)toast('Your Dig Boost ran out.','#62e3ff');}
+  boostUi();
+}
+let boostShown='';
+function boostUi(){
+  const el=$('boostChip');if(!el)return;const b=state.boost||0;
+  const s=b>0?(onCharted()?`+50% · ${fmtDur(b*1000)}`:'BOOST PAUSED · FRONTIER'):'';if(s===boostShown)return;boostShown=s;
+  el.hidden=!s;el.classList.toggle('paused',!!s&&!onCharted());el.innerHTML=s?ICON.bolt+`<span>${s}</span>`:'';
+}
+
+// ---- the store tab ----
+function renderStore(list){
+  const live=walletLive(),note=document.createElement('p');note.className='store-test';if(live)storeAsk=null;
+  note.innerHTML=live?`<b>Diamonds live on the game server.</b> Packs go on sale in the phone apps; free Diamonds work now. You have ${diaIco(1)}<b>${diaFmt(state.dia)}</b>.`
+    :`<b>Test store.</b> No real money: purchases here are pretend. You have ${diaIco(1)}<b>${diaFmt(state.dia)}</b> (${diaUsd(state.dia||0)}).`;
+  list.appendChild(note);
+  const head=t=>{const h=document.createElement('div');h.className='shop-h';h.textContent=t;list.appendChild(h);};
+  const row=(icon,name,desc,btn)=>{const r=document.createElement('div');r.className='item';
+    const th=document.createElement('div');th.className='thumb ithumb dia-thumb';th.innerHTML=icon;
+    const info=document.createElement('div'),nm=document.createElement('div'),ds=document.createElement('div');nm.className='nm';nm.textContent=name;ds.className='ds';ds.innerHTML=desc;info.append(nm,ds);
+    r.append(th,info,btn);list.appendChild(r);return r;};
+  const button=(html,on,fn)=>{const b=document.createElement('button');b.type='button';b.className='buy';b.innerHTML=html;b.disabled=!on;if(fn)b.addEventListener('click',fn);return b;};
+  // the pretend checkout
+  if(storeAsk){const A=storeAsk,box=document.createElement('div');box.className='store-ask';
+    box.innerHTML=`<div class="sa-t">Test purchase</div><div class="sa-d"><b>${A.name}</b>: ${diaIco(1)}${diaFmt(A.dia)}${A.boosts?` and ${A.boosts} Dig Boosts`:''} for <b>${usd(A.usd)}</b>. No money is charged.</div>`;
+    const ok=button('PRETEND TO BUY',true,()=>{storeAsk=null;storeBuy(A);}),no=button('CANCEL',true,()=>{storeAsk=null;renderShop();});no.classList.add('alt');
+    const bt=document.createElement('div');bt.className='sa-b';bt.append(ok,no);box.appendChild(bt);list.appendChild(box);}
+  // the Starter Pack, once, after the opening
+  if(!live&&state.L>OPENING_LAST&&!(state.bought&&state.bought.starter)){head('Starter Pack · once only');
+    row(ICON.dia,STARTER.name,`${diaIco(1)}<b>${STARTER.dia}</b> and <b>${STARTER.boosts} Dig Boosts</b>. A Prospector Shovel skin joins it when cosmetics arrive.`,
+      button(usd(STARTER.usd),true,()=>{storeAsk=STARTER;renderShop();}));}
+  head(live?'Diamond packs · coming with the phone apps':'Diamond packs');
+  const grid=document.createElement('div');grid.className='packs';
+  for(const P of DIA_PACKS){const c=document.createElement('button');c.type='button';c.className='pack';
+    c.innerHTML=`${P.bonus?`<i class="pk-bonus">+${P.bonus}%</i>`:''}<span class="pk-gem">${ICON.dia}</span><b class="pk-n">${diaFmt(P.dia)}</b><span class="pk-name">${P.name}</span><span class="pk-usd">${usd(P.usd)}</span>`;
+    if(live)c.disabled=true;else c.addEventListener('click',()=>{storeAsk=P;renderShop();});grid.appendChild(c);}
+  list.appendChild(grid);
+  head('Spend Diamonds');
+  const b=state.boost||0,here=onCharted();
+  row(ICON.bolt,'Dig Boost',`+50% digging speed for an hour of digging, on dug ground only. ${diaIco(1)}${BOOST_DIA} (${diaUsd(BOOST_DIA)}).`+
+    (b>0?` <b>${fmtDur(b*1000)} left</b>${here?'':', paused here: the frontier is dug by hand'}.`:here?'':' <b>You’re at the frontier</b>, so it would wait for dug ground.'),
+    button(`${diaIco(1)}${BOOST_DIA}`,(state.dia||0)>=BOOST_DIA,()=>{if(!diaSpend(BOOST_DIA))return;walletSpend('boost',{d:BOOST_DIA});state.boost=(state.boost||0)+BOOST_SECS;save();sfx('buy');boostUi();
+      toast('Dig Boost: +50% for an hour of digging.','#62e3ff');renderShop();}));
+  const rep=POWER_KEYS.filter(k=>state.owned[k]&&gear(k).until>0);
+  if(rep.length)for(const k of rep){const hrs=Math.max(1,Math.ceil((gear(k).until-Date.now())/3600e3)),cost=RUSH_DIA_H*hrs;
+    row(ICON.wrench,`Ratchet Rush · ${GEAR_NAME[k]}`,`Ratchet finishes it now: ${diaIco(1)}${RUSH_DIA_H} for each hour left (${diaUsd(cost)}).`+(here?'':' Only on dug ground.'),
+      button(`${diaIco(1)}${cost}`,here&&(state.dia||0)>=cost,()=>{if(!diaSpend(cost))return;walletSpend('rush:'+k,{d:cost,n:hrs});gear(k).until=Date.now()-1;sfx('buy');renderShop();}));}
+  else row(ICON.wrench,'Ratchet Rush',`Finishes a repair at once: ${diaIco(1)}${RUSH_DIA_H} for each hour left. Nothing is in the workshop.`,button('—',false));
+  const later=(icon,name,desc)=>row(icon,name,desc,button('LATER',false));
+  later(ICON.dia,'Koji rental',`Koji’s Digger 03 digs while you’re away, on dug ground: ${diaIco(1)}300 a week. Koji arrives in a later build.`);
+  later(ICON.chest,'Dig Pass',`A monthly pass for ${usd(4.99)}: Diamonds, boosts, a Koji rental and a season skin. Coming later.`);
+  later(ICON.shovel,'Cosmetics',`Tool skins, crew outfits, dig effects, team banners and name colours, ${diaIco(1)}150 to 1,200. Coming later.`);
+  head('Free Diamonds');
+  const fr=document.createElement('p');fr.className='store-free';
+  fr.innerHTML=`Every relic you dig up: ${diaIco(1)}${FREE_DIA.relic}. Every badge: ${diaIco(1)}10 to 30. Every new stratum: ${diaIco(1)}${FREE_DIA.stratum}. A weekly team chest comes later.`;
+  list.appendChild(fr);
+}
+function storeBuy(P){if(walletLive())return; // pretend purchases only in the playtest
+  if(!state.bought)state.bought={};state.bought[P.id]=(state.bought[P.id]||0)+1;
+  state.dia=(state.dia||0)+P.dia;if(P.boosts)state.boost=(state.boost||0)+P.boosts*BOOST_SECS;save();diaUi();boostUi();
+  sfx('unlock');toast(`+${diaFmt(P.dia)} Diamonds${P.boosts?` and ${P.boosts} Dig Boosts`:''} (test purchase)`,'#62e3ff');renderShop();
+}
+function setShopTab(t){shopTab=t;storeAsk=null;$('tabTools').classList.toggle('on',t==='tools');$('tabDia').classList.toggle('on',t==='dia');renderShop();}
+function badgeDiamonds(B){diaAdd(B.dia,B.name,{kind:'badge',id:B.id});}
+
+/* ---------- the wallet on the game server ---------- */
+// On the Supabase game server with its economy on (game_config.economy, the m8 update), coins and Diamonds live in a
+// wallet the server keeps. The phone still adds coins the moment they land, so digging never waits on the network, and it
+// reports what it earned and spent: each layer's running total, caverns, seams, the cache, relics, badges, new strata,
+// purchases, Dig Boost time used. Reports wait in an outbox on this phone (kept across restarts) and go up in batches.
+// When the game starts it sends what's waiting, then takes the server's numbers: the server's balance plus whatever is
+// still on its way. A purchase the server turns down (it counts fewer coins) is undone. Everywhere else (the Claude
+// playtest, a server without the economy) the phone's own numbers stand, as before.
+const WALLET_KEY='gb-wallet',WALLET_SOLD=['sledge','drill','laser','pump','ice','ratchet'];
+const WAL={on:false,off:false,ready:false,uid:'',out:[],ack:{},boostUsed:0,w:null,busy:null,dirty:false,adopt:false,t:0,due:0,fails:0,bestSent:0,hiddenAt:0};
+function walletQueue(){return!!window.GB_SUPABASE&&!WAL.off;} // the online build keeps its reports from the first moment
+function walletLive(){return WAL.on;}             // the game server keeps the coins
+(function walletLoad(){try{const d=JSON.parse(localStorage.getItem(WALLET_KEY)||'null');if(!d||typeof d!=='object')return;
+  WAL.uid=String(d.uid||'');WAL.out=Array.isArray(d.out)?d.out.filter(it=>it&&typeof it==='object'&&it.t):[];
+  WAL.ack=d.ack&&typeof d.ack==='object'?d.ack:{};WAL.boostUsed=Math.max(0,+d.bu||0);}catch(e){}})();
+function walletKeep(){if(!walletQueue())return;
+  try{localStorage.setItem(WALLET_KEY,JSON.stringify({uid:WAL.uid,out:WAL.out,ack:WAL.ack,bu:Math.round(WAL.boostUsed*10)/10}));}catch(e){}}
+
+// ---- what the game reports ----
+function walletDug(L,v){ // a layer's coins as they land (caverns, seams and the cache report themselves)
+  if(!(v>0)||!(L>=1))return;const D=state.dug||(state.dug={});D[L]=(D[L]||0)+v;walletSoon();}
+function walletEarn(kind,o){ // o: c = coins the phone already added, d = Diamonds, n = layer/seam/stratum, id = relic/badge/raid
+  if(!walletQueue())return;o=o||{};
+  WAL.out.push({t:'earn',kind,amount:Math.round(o.c||o.d||0),n:o.n|0,id:o.id==null?null:String(o.id),c:Math.round(o.c||0),d:Math.round(o.d||0),at:Date.now()});
+  walletKeep();walletSoon();}
+function walletSpend(item,o){ // a purchase the phone already made; the server charges from its own price list
+  if(!walletQueue())return;o=o||{};
+  WAL.out.push({t:'spend',item,n:o.n|0,ref:rid(12),c:Math.round(o.c||0),d:Math.round(o.d||0),at:Date.now()});
+  walletKeep();walletSoon(1500);}
+function walletBoost(dt){if(walletQueue()&&dt>0)WAL.boostUsed+=dt;}
+function walletMini(M,v){ // what a cavern, a seam fight or a mole raid paid, reported as its coins fly in
+  if(!(v>0))return;
+  if(M.kind==='seam')walletEarn(NET.teamId?'seam':'solo_seam',{c:v,n:M.n});
+  else if(M.kind==='raid')walletEarn('raid_defense',{c:v,n:state.L,id:M.raid&&M.raid.id});
+  else walletEarn('cavern',{c:v,n:M.at||state.L});}
+function walletPending(){ // what this phone has added or spent that the server hasn't heard about yet
+  const D=state.dug||{};let c=0,d=0,b=-WAL.boostUsed;
+  for(const L in D)c+=Math.max(0,Math.round(D[L])-(WAL.ack[L]|0));
+  for(const it of WAL.out){
+    if(it.t==='earn'){c+=it.c|0;d+=it.d|0;}
+    else if(it.t==='spend'){c-=it.c|0;d-=it.d|0;if(it.item==='boost')b+=BOOST_SECS;}
+    else if(it.t==='boost')b-=it.secs||0;}
+  return{c,d,b};}
+
+// ---- sending: one batch at a time, within ten seconds of an earning, sooner after a purchase ----
+function walletSoon(ms=10000){
+  if(!WAL.ready)return;const due=Date.now()+ms;if(WAL.t&&WAL.due<=due)return;
+  clearTimeout(WAL.t);WAL.due=due;WAL.t=setTimeout(()=>{WAL.t=0;walletPump();},ms);}
+function walletPump(adopt){ // resolves true once everything waiting has gone up (false: the network said no; it tries again)
+  if(!WAL.ready)return Promise.resolve(false);
+  if(adopt)WAL.adopt=true;WAL.dirty=true;
+  if(!WAL.busy)WAL.busy=walletRun().finally(()=>{WAL.busy=null;});
+  return WAL.busy;}
+async function walletRun(){
+  let ok=true;
+  while(ok&&WAL.dirty){WAL.dirty=false;ok=await walletSend();}
+  if(ok&&WAL.adopt&&WAL.w){WAL.adopt=false;walletAdopt(WAL.w);}
+  return ok;}
+async function walletSend(){
+  if(WAL.boostUsed>=1){let s=Math.floor(WAL.boostUsed);WAL.boostUsed-=s; // boost time used becomes a report of its own
+    while(s>0){const k=Math.min(3600,s);WAL.out.push({t:'boost',secs:k,ref:rid(12),at:Date.now()});s-=k;}walletKeep();}
+  for(let round=0;round<25;round++){
+    const D=state.dug||{},now=Date.now(),items=[],meta=[];
+    for(const L of Object.keys(D).map(Number).sort((a,b)=>a-b)){const v=Math.round(D[L]);if(v>(WAL.ack[L]|0)){items.push({t:'earn',kind:'layer',amount:v,n:L});meta.push({L,v});}}
+    WAL.out=WAL.out.filter(it=>!(it.later&&now-(it.at||now)>14*864e5)); // a depth never reached in two weeks: dropped
+    const part=WAL.out.slice(0,Math.max(0,190-items.length));
+    for(const it of part){items.push(it.t==='spend'?{t:'spend',item:it.item,n:it.n,ref:it.ref}:it.t==='boost'?{t:'boost',secs:it.secs,ref:it.ref}
+      :{t:'earn',kind:it.kind,amount:it.amount,n:it.n,id:it.id});meta.push({it});}
+    if(!items.length&&!WAL.adopt)return true;
+    let res;
+    try{
+      if((state.best||1)>WAL.bestSent&&NET.api&&NET.api.walletDepth){await NET.api.walletDepth();WAL.bestSent=state.best||1;} // so layers deeper than before can pay
+      res=await NET.api.walletBatch(items);}
+    catch(e){WAL.fails++;console.warn('wallet',(e&&e.message)||e);
+      clearTimeout(WAL.t);WAL.due=0;WAL.t=setTimeout(()=>{WAL.t=0;walletPump();},Math.min(300e3,15e3*2**Math.min(5,WAL.fails-1)));return false;}
+    WAL.fails=0;if(res&&res.w)WAL.w=res.w;
+    const r=(res&&res.r)||[],gone=new Set(),refused=[];
+    meta.forEach((m,i)=>{const s=r[i];
+      if(m.L){if(s!=='later')WAL.ack[m.L]=Math.max(WAL.ack[m.L]|0,m.v);return;}
+      if(s==='later'){m.it.later=1;return;}
+      gone.add(m.it);if(m.it.t==='spend'&&s!=='ok'&&!m.it.check)refused.push({it:m.it,why:String(s||'')});});
+    WAL.out=WAL.out.filter(it=>!gone.has(it));walletPrune();walletKeep();
+    if(refused.length)walletRefused(refused);
+    if(!WAL.out.some(it=>!part.includes(it)))return true; // more than one batch's worth: go again
+  }
+  return true;}
+function walletPrune(){ // layers well above you, fully reported, are forgotten
+  const D=state.dug||{};
+  for(const k in D)if(+k<state.L-3&&(WAL.ack[k]|0)>=Math.round(D[k])){delete D[k];delete WAL.ack[k];}
+  for(const k in WAL.ack)if(!(k in D))delete WAL.ack[k];}
+function walletRefused(list){ // the server didn't charge for these: it takes over the numbers, so the phone undoes them
+  WAL.adopt=true;const why=list[0].why.replace(/\.$/,'');
+  setTimeout(()=>toast(`The game server didn’t confirm a purchase (${why}). Your coins and tools now match the server.`,'#ff5b47'),400);}
+
+// ---- taking the server's numbers ----
+function walletAdopt(w){ // the server's balance, plus what's still on its way to it
+  if(!w)return;const p=walletPending();let fly=0;for(const f of flies)if(!f.lay)fly+=f.value; // a cavern's coins still flying in: counted already
+  state.coins=Math.max(0,Math.round((+w.coins||0)+p.c-fly));state.dia=Math.round((+w.dia||0)+p.d);state.boost=Math.max(0,(+w.boost||0)+p.b);
+  // tools and crew: the server's list, plus purchases still on their way and a tool on loan
+  const pend=new Set(WAL.out.filter(it=>it.t==='spend'&&/^(tool|crew):/.test(it.item)).map(it=>it.item.split(':')[1])),O=w.owned||{};let dock=false;
+  for(const k of WALLET_SOLD){const has=!!O[k]||pend.has(k)||state.loan===k;
+    if(has&&!state.owned[k]){state.owned[k]=true;dock=true;}
+    else if(!has&&state.owned[k]){delete state.owned[k];if(state.gear)delete state.gear[k];if(state.tool===k)state.tool=state.owned.pickaxe?'pickaxe':'shovel';dock=true;}}
+  if(dock)buildDock();
+  updateDock();diaUi();boostUi();if(!$('ovShop').hidden)renderShop();save();}
+
+// ---- starting up ----
+async function walletStart(){ // the Supabase backend calls this once it's up and the server keeps wallets
+  WAL.on=true;
+  if(WAL.uid!==NET.uid){WAL.uid=NET.uid;WAL.out=[];WAL.ack={};WAL.boostUsed=0;walletKeep();} // another account's reports never go up
+  for(let i=0;;i++){ // the first sync makes the wallet from this phone's coins and tools, leaving out what the reports will add
+    try{const p=walletPending(),own={};
+      for(const k in state.owned)if(state.owned[k]&&k!==state.loan)own[k]=true;
+      for(const it of WAL.out)if(it.t==='spend'&&/^(tool|crew):/.test(it.item))delete own[it.item.split(':')[1]];
+      WAL.w=await NET.api.walletSync(Math.max(0,Math.round(state.coins-p.c)),own);break;}
+    catch(e){console.warn('wallet sync',(e&&e.message)||e);if(!NET.on)return;await new Promise(r=>setTimeout(r,Math.min(300e3,5e3*2**Math.min(6,i))));}}
+  WAL.ready=true;walletCatchUp();
+  await walletPump(true);
+}
+function walletOff(){ // a server without wallets: the phone's numbers stand and nothing waits to go up
+  WAL.on=WAL.ready=false;WAL.out=[];WAL.ack={};WAL.boostUsed=0;try{localStorage.removeItem(WALLET_KEY);}catch(e){}WAL.off=true;}
+function walletCatchUp(){ // what pays once each (Diamonds, the cache, a team seam) goes up again at every start, in case a report went missing
+  const add=(kind,o)=>WAL.out.push(Object.assign({t:'earn',kind,amount:0,n:0,id:null,c:0,d:0,at:Date.now(),check:1},o));
+  for(const id in state.finds||{})add('relic',{id});
+  for(const id in state.badges||{})add('badge',{id});
+  for(const k in state.seen||{}){const m=/^stratum-(\d+)$/.exec(k);if(m)add('stratum',{n:+m[1]});}
+  if(state.seen&&state.seen['early-cache'])add('cache',{n:EARLY_CACHE,amount:EARLY_CACHE_COINS});
+  if(NET.teamId){const k0=NET.teamId+':';
+    Object.keys(myX().claimed).filter(k=>k.startsWith(k0)).map(k=>+k.slice(k0.length)).sort((a,b)=>b-a).slice(0,3).forEach(n=>add('seam',{n}));}
+  walletKeep();}
+async function walletFlush(){if(WAL.ready){try{await walletPump();}catch(e){}}} // before a team or raid charges the wallet
+async function walletTestCoins(n){ // the tuning panel's test coins: on the game server only where it allows them
+  try{await walletFlush();WAL.w=await NET.api.walletTestCoins(n);walletAdopt(WAL.w);hint(`+${n.toLocaleString('en-US')} coins for testing.`);}
+  catch(e){hint((e&&e.friendly)||'The game server didn’t add the coins. Try again.');}
+  tuneStats();}
+document.addEventListener("visibilitychange",()=>{ // (double quotes: assemble.py rewrites the base's own listener) reports go up as the game goes to the background; back after a while, it checks in
+  if(!WAL.ready)return;
+  if(document.hidden){WAL.hiddenAt=Date.now();walletKeep();walletPump();}
+  else if(WAL.hiddenAt&&Date.now()-WAL.hiddenAt>120e3){WAL.hiddenAt=0;walletPump(true);}});
+window.addEventListener('pagehide',()=>{walletKeep();if(WAL.ready)walletPump();});
 
 /* ---------- caverns: shared mini game flow ---------- */
 // Every cavern is a small module: init, layout, still (static scene), peek (live bits seen from the layer above),
@@ -2243,7 +2912,7 @@ function peekCavern(t){
 function startMini(kind,pre){
   if(!GAMES[kind])kind=pre?pre.kind:miniKindFor(state.L);
   endPointers();drillSound(false);chargeSound(false);
-  for(const f of flies)state.coins+=f.value;flies.length=0;shownCoins=state.coins;$('coinTxt').textContent=coinFmt(state.coins);
+  for(const f of flies){state.coins+=f.value;if(f.lay)walletDug(f.lay,f.value);}flies.length=0;shownCoins=state.coins;$('coinTxt').textContent=coinFmt(state.coins);
   fx.setTransform(1,0,0,1,0,0);fx.clearRect(0,0,fxc.width,fxc.height);fxDrawn=false;
   parts.length=0;texts.length=0;shake.amp=0;$('hint').classList.remove('show');
   const seamless=!!(pre&&pre.kind===kind&&pre.at===state.L),M=seamless?pre:makeCavern(kind,state.L),G=M.G,t=now();
@@ -2315,6 +2984,7 @@ function miniPause(hidden){ // stop every cavern clock while the app is in the b
 function showResults(){
   const M=MG;if(M.phase==='result')return;M.phase='result';mode='modal';
   const R=M.G.results(M);caveBonus(M,R);M.payout=Math.max(0,Math.round(R.total));
+  if(MINI_ORDER.includes(M.kind))badgeEarn('caver');
   if(MINI_ORDER.includes(M.kind))netFind('cave',`cleared ${M.G.title.charAt(0)+M.G.title.slice(1).toLowerCase()} for ${M.payout} coins`);
   $('rTag').textContent=R.tag;$('rTitle').textContent=R.title;
   const box=$('rStats');box.textContent='';
@@ -2329,6 +2999,7 @@ function endMini(){
   cv.setAttribute('aria-label','Dig site. Tap the ground to dig.');
   const total=M.payout||0;MG=null;mode='play';parts.length=0;texts.length=0;shake.amp=0;fieldDirty=true;
   renderBelow(); // brings back whatever waits under this layer, including the next cavern
+  walletMini(M,total); // the game server hears what it paid
   if(total>0){const a=appEl.getBoundingClientRect(),k=clamp(Math.round(total/30),3,10),share=Math.floor(total/k);
     for(let i=0;i<k;i++)flyFromScreen(a.width/2+(Math.random()-0.5)*90,a.height*0.55+(Math.random()-0.5)*70,i%3?'coins':'nugget',i===0?total-(k-1)*share:share,i*0.06);}
   if(MINI_ORDER.includes(M.kind))showBanner();save();
@@ -4383,7 +5054,7 @@ const rid=(n,abc='abcdefghijkmnpqrstuvwxyz23456789')=>{let s='';for(let i=0;i<n;
 function seamEvery(){return(NET.team&&NET.team.se)||state.tune.seamEvery||5;}
 function seamAt(L){const se=seamEvery();return L>0&&L%se===0?L/se:0;} // seam n sits under layer n*se
 function seamHP(n,members){ // ten layers' hand work at the seam's depth; a bigger team's seam is tougher, but not linearly
-  return Math.round(SEAM_WORK*handMin(n*seamEvery())*60*HAND_TAPS*Math.sqrt(Math.max(1,members))*(state.tune.seamTough||1));
+  return Math.round(seamWork(n*seamEvery())*digMin(n*seamEvery())*60*HAND_TAPS*Math.sqrt(Math.max(1,members))*(state.tune.seamTough||1));
 }
 function toolPower(n){return seamTool(n||1).mult;} // the best working tool you own, on the seam's rock
 function seamReach(n){return clamp((state.best||state.L)/(n*seamEvery()),0,1);}
@@ -4544,7 +5215,7 @@ function claudeTeamSubs(C,tid){ // everything that belongs to one team: its seam
 let netSaveT=0,netProgT=0,cloudKey='',netNoSave=false;
 function netResetLocal(){ // this phone forgets its game (switching or deleting accounts); the page reloads next
   netNoSave=true;clearTimeout(netSaveT);
-  try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem('gb-chat-seen');}catch(e){}}
+  try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem('gb-chat-seen');localStorage.removeItem(WALLET_KEY);}catch(e){}}
 function netSaveSoon(){ // the cloud copy is written only when the save really changed
   if(!NET.on||NET.readOnly)return;clearTimeout(netSaveT);
   netSaveT=setTimeout(()=>{const d=saveData(),k=JSON.stringify(Object.assign({},d,{at:0}));if(k===cloudKey)return;cloudKey=k;NET.api.saveCloud(d);},2500);}
@@ -4586,6 +5257,7 @@ async function netApplyCloud(){ // a newer save from another device wins
 //           decline_invite revoke_invites kick_member set_role hand_over update_team rename_team set_announcement
 //           leave_team set_name report delete_my_account open_seam hit_seam post_chat send_raid report_raid last_raid_on
 //           (create_team and join_team for servers without the team update)
+//           wallet_sync wallet_batch wallet_test_coins (the economy update: wallet.js does the bookkeeping)
 //   live    'me:<you>'      your own profile (rank changes, kicks, being let in), invites to you, your raids' results
 //           'db:team:<id>'  database changes for your team (row-level security decides what you hear)
 //           'team:<id>'     private channel: who's online (presence) and quick 'hit' / 'feed' broadcasts
@@ -4662,6 +5334,7 @@ async function netStartSupabase(){
   NET.players[uid]=sbPlayer(P);
   if(P.team_id)await S.loadTeams([P.team_id]);
   await netApplyCloud();NET.cloudDone=true; // a newer save from another device first, so raids and rewards land on top of it
+  if(cfg.data){NET.econ=!!cfg.data.economy;if(NET.econ)walletStart().catch(e=>console.warn('wallet',(e&&e.message)||e));else walletOff();} // coins on the server, or on the phone
   let mine=sb.channel('me:'+uid)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'raid_results',filter:'sender=eq.'+uid},p=>S.raidResult(p.new));
   if(NET.v2)mine=mine
@@ -4836,7 +5509,7 @@ function supabaseApi(S){
         for(const id of part){if(!(id in NET.names))NET.names[id]='';NET.colors[id]=sbColor(id);}
         for(const p of data)noteName(p);}},
     reportProgress:()=>{if(!S.switching)netWrite('progress',S.progressNow);},
-    createTeam:async name=>{const t=await joining(()=>rpc('create_team',{p_name:name}));me().role='foreman';joined(t);return t.id;},
+    createTeam:async name=>{await walletFlush();const t=await joining(()=>rpc('create_team',{p_name:name}));me().role='foreman';joined(t);return t.id;},
     joinTeam:async code=>{
       try{const t=await joining(()=>rpc('join_team',{p_code:String(code||'')}));joined(t);return null;}
       catch(e){return e.friendly||'Could not reach the game server. Try again.';}},
@@ -4861,7 +5534,7 @@ function supabaseApi(S){
       NET.chat=NET.chat.concat([{by:uid,tid:NET.teamId,t,at:Date.now(),s:0,tmp:1}]);netFire('chat');
       try{await rpc('post_chat',{p_body:t});}
       catch(e){const i=NET.chat.findIndex(m=>m.tmp&&m.t===t);if(i>=0)NET.chat.splice(i,1);netFire('chat');toast(e.friendly||'Message not sent. Try again.','#ff5b47');}},
-    sendRaid:async to=>{const r=await rpc('send_raid',{p_to:to});me().raidAt=Date.now();return r;},
+    sendRaid:async to=>{await walletFlush();const r=await rpc('send_raid',{p_to:to});me().raidAt=Date.now();return r;},
     lastRaidOn:async to=>sbMs(await rpc('last_raid_on',{p_team:to})),
     reportRaid:(r,res)=>netWrite('raid/'+r.id,()=>rpc('report_raid',{p_raid:r.id,p_stolen:Math.max(0,Math.round(res.stole||0)),p_bonked:Math.max(0,Math.round(res.bonked||0))})),
     setStatus:patch=>{Object.assign(S.status,patch);if(S.ch&&S.live)S.ch.track(Object.assign({u:uid},S.status)).catch(()=>{});},
@@ -4911,7 +5584,7 @@ function supabaseApi(S){
     cancelRequest:async tid=>{await rpc('cancel_request',{p_team:tid});await S.loadMyRequests();},
     answerRequest:async(id,yes)=>{try{await rpc('answer_request',{p_user:id,p_accept:!!yes});}finally{await S.loadRequests();}
       if(yes)S.reloadCrew().catch(()=>{});},
-    makeTeam:async(name,settings)=>{const t=await joining(()=>rpc('make_team',{p_name:name,p_settings:settings||{}}));me().role='foreman';joined(t);return t.id;},
+    makeTeam:async(name,settings)=>{await walletFlush();const t=await joining(()=>rpc('make_team',{p_name:name,p_settings:settings||{}}));me().role='foreman';joined(t);return t.id;},
     makeInvite:async tag=>rpc('make_invite',tag?{p_invitee_tag:String(tag)}:{}),
     peekInvite:async token=>rpc('peek_invite',{p_token:String(token||'')}),
     redeemInvite:async token=>{const t=await joining(()=>rpc('redeem_invite',{p_token:String(token||'')}));me().role=me().team===t.id?me().role:'digger';joined(t);return t.id;},
@@ -4925,6 +5598,11 @@ function supabaseApi(S){
     renameTeam:async name=>{const t=await rpc('rename_team',{p_name:name});NET.teams[t.id]=sbTeam(t);netDerive();S.rankAt=0;S.refreshRanks();return t;},
     setAnnouncement:async text=>{const t=await rpc('set_announcement',{p_text:String(text||'')});NET.teams[t.id]=sbTeam(t);netDerive();return t;},
     report:async(kind,target,reason)=>rpc('report',{p_kind:kind,p_target:String(target),p_reason:String(reason||'')}),
+    // ---- the wallet (wallet.js) ----
+    walletSync:(coins,owned)=>rpc('wallet_sync',{p_coins:Math.max(0,Math.round(coins||0)),p_owned:owned||{}}),
+    walletBatch:items=>rpc('wallet_batch',{p_items:items}),
+    walletDepth:()=>S.progressNow(), // the depth first, so a layer just reached can pay
+    walletTestCoins:n=>rpc('wallet_test_coins',{p_coins:n}),
     // ---- your account ----
     authSettings:async()=>{if(S.authSet)return S.authSet;
       try{const r=await fetch(C.url+'/auth/v1/settings',{headers:{apikey:C.key}});S.authSet=r.ok?await r.json():{};}catch(e){S.authSet={};}return S.authSet;},
@@ -5682,7 +6360,7 @@ function seamClaims(){ // a seam your team breaks while you're on it pays everyo
     X.claimed[k]=1;
     if(!seamPaysMe(n)){toast(`Your team broke through hard seam ${n}! (It opened before you joined, so no reward this time.)`,'#ffd34d');save();continue;}
     const S=seamState(n),v=seamReward(n,S.total?S.mine/S.total:0);
-    state.coins+=v;coinBump();$('coinTxt').textContent=coinFmt(state.coins);shownCoins=state.coins;
+    badgeEarn('seam');state.coins+=v;walletEarn('seam',{c:v,n});coinBump();$('coinTxt').textContent=coinFmt(state.coins);shownCoins=state.coins;
     toast(`Your team broke through hard seam ${n}! +${v} coins`,'#ffd34d');sfx('fanfare');save();accountNudge('seam');}
 }
 
@@ -5799,7 +6477,7 @@ function seamDrawCrew(M,S){ // who's hitting it, by share of the damage
 function seamResults(M){
   const S=seamState(M.n),share=S.total?clamp(S.mine/S.total,0,1):0,pays=seamPaysMe(M.n),v=pays?seamReward(M.n,share):0,mates=Object.keys(S.by).filter(id=>S.by[id]>0&&id!==NET.uid).length;
   if(NET.teamId)myX().claimed[NET.teamId+':'+M.n]=1;
-  if(M.broke)accountNudge('seam');
+  if(M.broke){accountNudge('seam');badgeEarn('seam');}
   const rows=[['Hard seam',`${M.n} · ${depthLabel(M.depth)}`],[NET.teamId?'Team damage':'Damage',`${Math.round(S.total).toLocaleString('en-US')} / ${S.hp.toLocaleString('en-US')}`],
     ...(NET.teamId?[['Your damage',`${Math.round(S.mine).toLocaleString('en-US')} (${Math.round(share*100)}%)`]]:[])];
   if(NET.teamId)rows.push(['Teammates who hit it',String(mates)]);
@@ -5924,8 +6602,9 @@ function showIntro(key,after){
 }
 function closeIntro(){$('ovIntro').hidden=true;mode='play';const f=introAfter;introAfter=null;if(f)f();}
 function renderShop(){
-  $('shopCoins').textContent=state.coins.toLocaleString('en-US');const list=$('shopList');list.innerHTML='';renderWorkshop(list);
-  for(const k of SHOP){const T=TOOLS[k],P=T.portrait?PORTRAITS[T.portrait]:null,owned=!!state.owned[k];
+  $('shopCoins').textContent=state.coins.toLocaleString('en-US');diaUi();const list=$('shopList');list.innerHTML='';
+  $('ovShop').classList.toggle('dia-tab',shopTab==='dia');if(shopTab==='dia'){renderStore(list);return;}renderWorkshop(list);
+  for(const k of SHOP){const T=TOOLS[k],P=T.portrait?PORTRAITS[T.portrait]:null,owned=!!state.owned[k]&&state.loan!==k;
     const row=document.createElement('div');row.className='item';
     const th=document.createElement('div');th.className='thumb';if(P){th.style.backgroundImage=`url(${P.src})`;th.style.backgroundPosition=THUMB_FOCUS[T.portrait]||'50% 8%';}else{th.classList.add('ithumb');th.innerHTML=ICON[k];}
     const info=document.createElement('div');const nm=document.createElement('div');nm.className='nm';nm.textContent=T.name;const ds=document.createElement('div');ds.className='ds';
@@ -5937,11 +6616,14 @@ function renderShop(){
     row.append(th,info,b);list.appendChild(row);}
 }
 function buy(k){const T=TOOLS[k];if(state.coins<T.price){sfx('deny');return;}
+  walletSpend(k==='dynamite'?'tnt':(T.crew?'crew:':'tool:')+k,{c:T.price});
   state.coins-=T.price;shownCoins=state.coins;$('coinTxt').textContent=coinFmt(state.coins);sfx('buy');
+  if(state.loan===k){state.loan=null;delete state.owned[k];} // buying the tool on loan keeps it
   const first=!state.owned[k];state.owned[k]=true;if(POWER[k]){const G=gear(k);G.c=1;G.until=0;}if(k==='dynamite')state.dyn+=3;
   buildDock();save();
   if(first){closeShop();showIntro(k,T.crew?null:()=>selectTool(k));}else{renderShop();hint(`+3 charges. You have ${state.dyn}.`);}}
-function openShop(){if(mode!=='play'||dropping)return;auInit();endPointers();renderShop();$('ovShop').hidden=false;mode='modal';}
+function openShop(tab){if(mode!=='play'||dropping)return;auInit();endPointers();shopTab=typeof tab==='string'?tab:'tools';storeAsk=null;
+  $('tabTools').classList.toggle('on',shopTab==='tools');$('tabDia').classList.toggle('on',shopTab==='dia');renderShop();$('ovShop').hidden=false;mode='modal';}
 function closeShop(){$('ovShop').hidden=true;if(mode==='modal')mode='play';}
 const TUNE_UI=[
   {k:'race',label:'Race length',min:0,max:3,step:1,fmt:v=>RACES[v|0].label},
@@ -5954,6 +6636,8 @@ const TUNE_UI=[
   {k:'dirtTough',label:'Dirt toughness',min:0.5,max:3,step:0.25,fmt:v=>'×'+v},
   {k:'rockTough',label:'Rock toughness',min:0.5,max:3,step:0.25,fmt:v=>'×'+v},
   {k:'lootMult',label:'Coins per layer',min:0.5,max:3,step:0.25,fmt:v=>'×'+v},
+  {k:'charted',label:'Paid help works (test store)',min:0,max:1,step:1,fmt:v=>v?'Everywhere':'On dug ground',live:true},
+  {k:'early',label:'First days eased in',min:0,max:1,step:1,fmt:v=>v?'On':'Off'},
   {k:'seamEvery',label:'Hard seam every (new teams, solo)',min:2,max:12,step:1,fmt:v=>v+' layers',live:true},
   {k:'seamTough',label:'Seam toughness',min:0.25,max:3,step:0.25,fmt:v=>'×'+v,live:true},
   {k:'clearPct',label:'Clear needed to drop',min:50,max:100,step:5,fmt:v=>v+'%',live:true},
@@ -6014,6 +6698,7 @@ $('tuneClose').addEventListener('click',closeTune);
 $('ovTune').addEventListener('pointerdown',e=>{if(e.target===$('ovTune'))closeTune();});
 $('introGo').addEventListener('click',closeIntro);
 $('introAlt').addEventListener('click',closeIntroAlt);
+$('tabTools').addEventListener('click',()=>setShopTab('tools'));$('tabDia').addEventListener('click',()=>setShopTab('dia'));
 $('btnFinds').addEventListener('click',openFinds);
 appEl.addEventListener('scroll',()=>{if(appEl.scrollLeft||appEl.scrollTop){appEl.scrollLeft=0;appEl.scrollTop=0;}});
 $('mgLeave').addEventListener('click',()=>seamLeave());
@@ -6025,7 +6710,7 @@ $('btnSound').addEventListener('click',()=>{state.muted=!state.muted;auInit();if
 $('tDebug').addEventListener('change',e=>{state.tune.debug=e.target.checked;save();});
 $('tRegen').addEventListener('click',()=>{regenerate();closeTune();hint('Layer regenerated with the current settings.');});
 $('tSeed').addEventListener('click',()=>{state.seed=(Math.random()*4294967296)>>>0;regenerate();save();closeTune();hint('New world seed.');});
-$('tCoins').addEventListener('click',()=>{state.coins+=100000;coinBump();save();tuneStats();hint('+100,000 coins for testing.');});
+$('tCoins').addEventListener('click',()=>{if(walletLive()){walletTestCoins(100000);return;}state.coins+=100000;coinBump();save();tuneStats();hint('+100,000 coins for testing.');});
 $('tSkip').addEventListener('click',()=>{closeTune();doDrop(true);});
 $('tDefaults').addEventListener('click',()=>{const dbg=state.tune.debug;state.tune=Object.assign({},TUNE_DEFAULT,{debug:dbg});buildTune();uiProgress();dropState='';save();});
 $('tReset').addEventListener('click',()=>{const b=$('tReset');if(!resetArmed){resetArmed=1;b.classList.add('armed');b.textContent='Tap again to reset';setTimeout(disarmReset,3000);return;}
