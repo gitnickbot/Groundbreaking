@@ -2744,13 +2744,15 @@ async function walletSend(){
     catch(e){WAL.fails++;console.warn('wallet',(e&&e.message)||e);
       clearTimeout(WAL.t);WAL.due=0;WAL.t=setTimeout(()=>{WAL.t=0;walletPump();},Math.min(300e3,15e3*2**Math.min(5,WAL.fails-1)));return false;}
     WAL.fails=0;if(res&&res.w)WAL.w=res.w;
-    const r=(res&&res.r)||[],gone=new Set(),refused=[];
+    const r=(res&&res.r)||[],gone=new Set(),refused=[],unpaid=[];
     meta.forEach((m,i)=>{const s=r[i];
       if(m.L){if(s!=='later')WAL.ack[m.L]=Math.max(WAL.ack[m.L]|0,m.v);return;}
       if(s==='later'){m.it.later=1;return;}
-      gone.add(m.it);if(m.it.t==='spend'&&s!=='ok'&&!m.it.check)refused.push({it:m.it,why:String(s||'')});});
+      gone.add(m.it);if(m.it.t==='spend'&&s!=='ok'&&!m.it.check)refused.push({it:m.it,why:String(s||'')});
+      if(m.it.t==='earn'&&!m.it.check&&((m.it.c|0)>0||(m.it.d|0)>0)&&s!=='paid'&&s!=='done')unpaid.push(m.it);});
     WAL.out=WAL.out.filter(it=>!gone.has(it));walletPrune();walletKeep();
     if(refused.length)walletRefused(refused);
+    if(unpaid.length)walletUnpaid(unpaid);
     if(!WAL.out.some(it=>!part.includes(it)))return true; // more than one batch's worth: go again
   }
   return true;}
@@ -2761,6 +2763,12 @@ function walletPrune(){ // layers well above you, fully reported, are forgotten
 function walletRefused(list){ // the server didn't charge for these: it takes over the numbers, so the phone undoes them
   WAL.adopt=true;const why=list[0].why.replace(/\.$/,'');
   setTimeout(()=>toast(`The game server didn’t confirm a purchase (${why}). Your coins and tools now match the server.`,'#ff5b47'),400);}
+
+function walletUnpaid(list){ // coins or Diamonds the phone added that the server won't pay: it takes over the numbers
+  WAL.adopt=true;const c=list.reduce((a,it)=>a+(it.c|0),0),d=list.reduce((a,it)=>a+(it.d|0),0),it=list[0];
+  const what=it.kind==='seam'?`Hard seam ${it.n} opened before you joined, so its ${c.toLocaleString('en-US')} coins aren’t yours.`
+    :`The game server didn’t count ${c?c.toLocaleString('en-US')+' coins':''}${c&&d?' and ':''}${d?d+' Diamonds':''}.`;
+  setTimeout(()=>toast(`${what} Your coins now match the server.`,'#ff5b47'),400);}
 
 // ---- taking the server's numbers ----
 function walletAdopt(w){ // the server's balance, plus what's still on its way to it
@@ -5755,9 +5763,12 @@ function fillSeamCard(){
   const T=NET.team,n=(T.seams||0)+1,L=n*seamEvery(),S=seamState(n);
   C.append(el('div','tm-h',`Hard seam ${n} · ${meters(L)}`));
   if(!S.open){
-    const lead=NET.members.slice().sort((a,b)=>(b.best||0)-(a.best||0))[0];
-    C.append(el('div','tm-sub',`Nobody has reached it yet. Deepest: ${lead?(lead.id===NET.uid?'you':netName(lead.id)):'—'}, layer ${lead?Math.min(lead.best||1,L):1} of ${L}.`));
-    C.append(el('div','tm-sub dim','When someone gets there, everyone can help break it.'));return;}
+    if((state.best||state.L||1)>=L){ // you've dug that far (perhaps before joining): you can start the fight from anywhere
+      C.append(el('div','tm-sub','Nobody has started on it yet. You’ve dug that far, so you can start the fight from here, and the whole crew can join in.'));
+      const b=el('button','tm-btn wide','START THE BREAKTHROUGH');b.type='button';b.disabled=NET.readOnly;b.addEventListener('click',()=>{closeTeam();enterSeam(n);});C.append(b);return;}
+    const lead=NET.members.slice().sort((a,b)=>(b.best||0)-(a.best||0))[0],there=lead&&(lead.best||1)>=L;
+    C.append(el('div','tm-sub',there?`${netName(lead.id)} has dug that far and can start the fight.`:`Nobody has reached it yet. Deepest: ${lead?(lead.id===NET.uid?'you':netName(lead.id)):'—'}, layer ${lead?Math.min(lead.best||1,L):1} of ${L}.`));
+    C.append(el('div','tm-sub dim',there?'Once it starts, everyone can help break it.':'When someone gets there, everyone can help break it.'));return;}
   const left=Math.max(0,1-S.total/S.hp),bar=el('div','sbar'),fill=el('i');fill.style.width=(left*100).toFixed(1)+'%';bar.append(fill);
   const at=NET.peers.filter(p=>p.s==='seam').length;
   C.append(el('div','tm-sub',`${Math.ceil(left*100)}% left · ${at} at the seam now`),bar);
@@ -6344,7 +6355,10 @@ function seamBlocked(){ // the seam under this layer, if the team hasn't broken 
 function enterSeam(n){
   if(NET.teamId){
     const cur=(NET.team.seams||0)+1;
-    if(n>cur){hint(`Your team has to break hard seam ${cur} first. Join that fight from the Team panel.`,'seamOrder');sfx('deny');return;}
+    if(n>cur){ // an earlier seam comes first: show its fight in the Team panel when there's something to do there
+      const can=seamState(cur).open||(state.best||state.L||1)>=cur*seamEvery();
+      hint(can?`Your team has to break hard seam ${cur} first. Start or join that fight from the Team panel.`:`Your team has to break hard seam ${cur} first. Join that fight from the Team panel when it starts.`,'seamOrder');sfx('deny');
+      if(can)setTimeout(()=>{if(mode==='play'&&!MG&&!dropping)openTeam('team');},900);return;}
     if(!NET.seamDocs[n])NET.api.openSeam(n,seamHP(n,Math.max(1,NET.members.length)));
   }
   seamTarget=n;startMini('seam');
@@ -6352,13 +6366,15 @@ function enterSeam(n){
 function seamReward(n,share){return Math.round(2*layerCoins(n*seamEvery())*(1+1.5*clamp(share,0,1)));} // two layers' coins, more for the big hitters
 function seamPaysMe(n){ // on the game server, a seam pays the diggers who were on the team when it opened (no hopping in for the payout)
   const D=NET.seamDocs[n],P=NET.players[NET.uid];
+  if(NET.v2&&NET.serverAuth&&!D)return null; // not known until the seam's record arrives (just after joining a team, there's none yet)
   return!(NET.v2&&NET.serverAuth&&D&&D.at&&P&&P.joinedAt&&D.at<P.joinedAt-2000);}
 function seamClaims(){ // a seam your team breaks while you're on it pays everyone, more for those who hit it
   if(!NET.teamId)return;const X=myX(),k0=NET.teamId+':';
   for(let n=1;n<=(NET.team.seams||0);n++){const k=k0+n;if(X.claimed[k])continue;
     if(MG&&MG.kind==='seam'&&MG.n===n)continue; // the fight's own results pay for it
+    const pays=seamPaysMe(n);if(pays===null)continue; // decided once its record is in
     X.claimed[k]=1;
-    if(!seamPaysMe(n)){toast(`Your team broke through hard seam ${n}! (It opened before you joined, so no reward this time.)`,'#ffd34d');save();continue;}
+    if(!pays){toast(`Your team broke through hard seam ${n}! (It opened before you joined, so no reward this time.)`,'#ffd34d');save();continue;}
     const S=seamState(n),v=seamReward(n,S.total?S.mine/S.total:0);
     badgeEarn('seam');state.coins+=v;walletEarn('seam',{c:v,n});coinBump();$('coinTxt').textContent=coinFmt(state.coins);shownCoins=state.coins;
     toast(`Your team broke through hard seam ${n}! +${v} coins`,'#ffd34d');sfx('fanfare');save();accountNudge('seam');}
@@ -6475,7 +6491,7 @@ function seamDrawCrew(M,S){ // who's hitting it, by share of the damage
   ctx.restore();
 }
 function seamResults(M){
-  const S=seamState(M.n),share=S.total?clamp(S.mine/S.total,0,1):0,pays=seamPaysMe(M.n),v=pays?seamReward(M.n,share):0,mates=Object.keys(S.by).filter(id=>S.by[id]>0&&id!==NET.uid).length;
+  const S=seamState(M.n),share=S.total?clamp(S.mine/S.total,0,1):0,pays=seamPaysMe(M.n)!==false,v=pays?seamReward(M.n,share):0,mates=Object.keys(S.by).filter(id=>S.by[id]>0&&id!==NET.uid).length;
   if(NET.teamId)myX().claimed[NET.teamId+':'+M.n]=1;
   if(M.broke){accountNudge('seam');badgeEarn('seam');}
   const rows=[['Hard seam',`${M.n} · ${depthLabel(M.depth)}`],[NET.teamId?'Team damage':'Damage',`${Math.round(S.total).toLocaleString('en-US')} / ${S.hp.toLocaleString('en-US')}`],
